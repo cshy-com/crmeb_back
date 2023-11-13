@@ -40,13 +40,8 @@
 14. `@Email`	字符串	必须是一个邮箱格式
 15. `@Pattern`	字符串、字符	正则匹配字符串
 
-# 产品复制
-1. 设置 [99api](https://www.99api.com "99api") 对应的api到配置表eb_system_config 
-2. 配置baseUrl和key 实际的key可以根据自己的定义修改
-3. 目前支持天猫，京东，淘宝，苏宁，拼多多
 
-# 打印机
-1. [易联云文档](http://doc2.10ss.net/337744 "易联云文档")
-2. [易联云JAVA SDK](http://doc2.10ss.net/337744 "易联云JAVA SDK gitee文档")
-3. [如何导入第三方JAVA SDK包](https://blog.csdn.net/weixin_46028577/article/details/106342938?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase "如何导入第三方JAVA SDK包")
-
+# 分支说明
+1. main为线上版本
+2. test为测试/修改bug分支
+3. mall_dev为开发分支
