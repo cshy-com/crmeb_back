@@ -1,6 +1,6 @@
 package com.cshy.common.enums;
 
-public enum SMSTemplateEnum {
+public enum SmsTemplateEnum {
     VERIFICATION_CODE("SMS_462690015", "code", "验证码"),//验证码
     ORDER_SUCCESSFUL_2_EMPLOYEE("SMS_463604731", "name", "下单成功通知员工"),//下单成功通知员工
     ORDER_SUCCESSFUL_2_CUSTOMER("SMS_463634933", "name", "下单成功通知客户"),//下单成功通知客户
@@ -15,7 +15,7 @@ public enum SMSTemplateEnum {
 
     private String name;
 
-    private SMSTemplateEnum(String code, String param, String name){
+    SmsTemplateEnum(String code, String param, String name){
         this.code = code;
         this.param = param;
         this.name = name;

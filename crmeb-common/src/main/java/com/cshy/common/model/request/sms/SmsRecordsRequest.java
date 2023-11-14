@@ -1,4 +1,4 @@
-package com.cshy.common.model.request;
+package com.cshy.common.model.request.sms;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

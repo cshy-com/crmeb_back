@@ -1,18 +1,17 @@
 package com.cshy.service.service;
 
 
-import com.cshy.common.enums.SMSTemplateEnum;
+import com.cshy.common.enums.SmsTemplateEnum;
 import com.cshy.common.model.entity.sms.SmsRecord;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.SmsApplyTempRequest;
-import com.cshy.common.model.request.SmsModifySignRequest;
-import com.cshy.common.model.request.SmsRecordsRequest;
+import com.cshy.common.model.request.sms.SmsApplyTempRequest;
+import com.cshy.common.model.request.sms.SmsModifySignRequest;
+import com.cshy.common.model.request.sms.SmsRecordsRequest;
 import com.cshy.common.model.vo.MyRecord;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * SmsService 接口
@@ -43,15 +42,22 @@ public interface SmsService {
     MyRecord applys(Integer type, PageParamRequest pageParamRequest);
 
 
-    com.aliyun.dysmsapi20170525.Client createClient(String accessKeyId, String accessKeySecret) throws Exception;
+    /**
+     *
+     * @param phoneNumber
+     * @param smsTemplateEnum
+     * @param request
+     * @param params
+     */
+    void sendCode(String phoneNumber, SmsTemplateEnum smsTemplateEnum, HttpServletRequest request, String... params);
 
     /**
-     * 发送公共验证码
-     *
-     * @param phoneNumber 手机号
-     * @param type SMSTemplateEnum枚举
+     * 阿里云短信服务建立通信
+     * @param accessKeyId
+     * @param accessKeySecret
+     * @return
      */
-    void sendCode(String phoneNumber, SMSTemplateEnum type, HttpServletRequest request, String... s);
+    com.aliyun.dysmsapi20170525.Client createClient(String accessKeyId, String accessKeySecret) throws Exception;
 
     /**
      * 发送支付成功短信
@@ -118,5 +124,12 @@ public interface SmsService {
      */
     Boolean sendOrderDeliverNotice(String phone, String nickName, String storeName, String orderNo, Integer msgTempId);
 
+
+    /**
+     * 查询发送短信记录列表
+     * @param smsRecordsRequest
+     * @param pageParamRequest
+     * @return
+     */
     CommonPage<SmsRecord> page(SmsRecordsRequest smsRecordsRequest, PageParamRequest pageParamRequest);
 }

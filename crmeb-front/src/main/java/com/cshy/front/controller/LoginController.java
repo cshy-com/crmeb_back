@@ -1,10 +1,8 @@
 package com.cshy.front.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.cshy.common.enums.SMSTemplateEnum;
+import com.cshy.common.enums.SmsTemplateEnum;
 import com.cshy.common.exception.CrmebException;
-import com.cshy.common.model.entity.giftCard.GiftCard;
 import com.cshy.common.model.request.LoginMobileRequest;
 import com.cshy.common.model.request.LoginRequest;
 import com.cshy.common.model.response.CommonResult;
@@ -23,7 +21,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
 
 /**
  * 用户登陆 前端控制器
@@ -92,7 +89,7 @@ public class LoginController {
             @ApiImplicitParam(name = "phone", value = "手机号码", required = true)
     })
     public CommonResult<Object> sendCode(@RequestParam String phone, HttpServletRequest request) {
-        smsService.sendCode(phone, SMSTemplateEnum.VERIFICATION_CODE, request, null);
+        smsService.sendCode(phone, SmsTemplateEnum.VERIFICATION_CODE, request, null);
         return CommonResult.success("发送成功");
     }
 }

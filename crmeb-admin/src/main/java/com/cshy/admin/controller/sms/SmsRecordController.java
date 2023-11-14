@@ -1,15 +1,14 @@
-package com.cshy.admin.controller;
+package com.cshy.admin.controller.sms;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cshy.common.model.entity.sms.SmsRecord;
 import com.cshy.common.model.page.CommonPage;
-import com.cshy.common.model.request.SmsRecordsRequest;
+import com.cshy.common.model.request.sms.SmsRecordsRequest;
 import com.cshy.common.model.response.CommonResult;
-import com.cshy.common.model.response.StoreOrderDetailResponse;
 import com.cshy.common.model.vo.MyRecord;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.SmsApplyTempRequest;
-import com.cshy.common.model.request.SmsModifySignRequest;
+import com.cshy.common.model.request.sms.SmsApplyTempRequest;
+import com.cshy.common.model.request.sms.SmsModifySignRequest;
 import com.cshy.service.service.SmsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -20,7 +19,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 
@@ -86,9 +84,8 @@ public class SmsRecordController {
     }
 
     /**
-     * 模板申请记录
+     * 短信发送记录分页
      */
-    @PreAuthorize("hasAuthority('admin:sms:applys')")
     @ApiOperation(value = "短信发送记录分页")
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     public CommonResult<CommonPage<SmsRecord>> page(@Validated SmsRecordsRequest smsRecordsRequest, @Validated PageParamRequest pageParamRequest) {

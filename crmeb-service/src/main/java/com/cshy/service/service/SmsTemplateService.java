@@ -1,13 +1,16 @@
 package com.cshy.service.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.cshy.common.model.dto.sms.SmsTemplateDto;
+import com.cshy.common.model.entity.base.BaseService;
 import com.cshy.common.model.entity.sms.SmsTemplate;
+import com.cshy.common.model.query.sms.SmsTemplateQuery;
+import com.cshy.common.model.vo.sms.SmsTemplateVo;
 
 /**
  * SmsTemplateService 接口
 
  */
-public interface SmsTemplateService extends IService<SmsTemplate> {
+public interface SmsTemplateService extends BaseService<SmsTemplate, SmsTemplateDto, SmsTemplateQuery, SmsTemplateVo> {
 
     /**
      * 获取详情
@@ -15,4 +18,6 @@ public interface SmsTemplateService extends IService<SmsTemplate> {
      * @return SmsTemplate
      */
     SmsTemplate getDetail(Integer id);
+
+    void sync() throws Exception;
 }

@@ -1,4 +1,4 @@
-package com.cshy.common.model.request;
+package com.cshy.common.model.request.sms;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;

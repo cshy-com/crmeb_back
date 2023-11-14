@@ -13,13 +13,13 @@ import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cshy.common.constants.OnePassConstants;
 import com.cshy.common.constants.SmsConstants;
-import com.cshy.common.enums.SMSTemplateEnum;
+import com.cshy.common.enums.SmsTemplateEnum;
 import com.cshy.common.model.entity.sms.SmsRecord;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.SmsApplyTempRequest;
-import com.cshy.common.model.request.SmsModifySignRequest;
-import com.cshy.common.model.request.SmsRecordsRequest;
+import com.cshy.common.model.request.sms.SmsApplyTempRequest;
+import com.cshy.common.model.request.sms.SmsModifySignRequest;
+import com.cshy.common.model.request.sms.SmsRecordsRequest;
 import com.cshy.common.model.vo.MyRecord;
 import com.cshy.common.model.vo.OnePassLoginVo;
 import com.cshy.common.model.vo.SendSmsVo;
@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
@@ -69,13 +70,10 @@ public class SmsServiceImpl implements SmsService {
     @Autowired
     private UserService userService;
 
-    @Autowired
+    @Resource
     private SmsRecordDao smsRecordDao;
 
     private static final Logger logger = LoggerFactory.getLogger(SmsServiceImpl.class);
-
-    private static String accessKeyID = "LTAI5tCtW9M9F82sQ4KhFKaA";
-    private static String accessKeySecret = "aNN4vBcCzb5yFknNhcDWPKbc7c32RQ";
 
     @Override
     public com.aliyun.dysmsapi20170525.Client createClient(String accessKeyId, String accessKeySecret) throws Exception {
@@ -89,19 +87,22 @@ public class SmsServiceImpl implements SmsService {
     }
 
     @Override
-    public void sendCode(String phoneNumber, SMSTemplateEnum type, HttpServletRequest request, String... params) {
+    public void sendCode(String phoneNumber, SmsTemplateEnum smsTemplateEnum, HttpServletRequest request, String... params) {
         ValidateFormUtil.isPhone(phoneNumber, "手机号码错误");
         try {
-            logger.info("向手机号 {} 发送短信，短信模板code为：{}, 名称为：{}", phoneNumber, type.getCode(), type.getName());
-            Client client = this.createClient(accessKeyID, accessKeySecret);
+            //查询accessKeyID / accessKeySecret
+            String smsKey = systemConfigService.getValueByKey(Constants.SMS_KEY);
+            String smsSecret = systemConfigService.getValueByKey(Constants.SMS_SECRET);
+            logger.info("向手机号 {} 发送短信，短信模板code为：{}, 名称为：{}", phoneNumber, smsTemplateEnum.getCode(), smsTemplateEnum.getName());
+            Client client = this.createClient(smsKey, smsSecret);
 
             com.aliyun.dysmsapi20170525.models.SendSmsRequest sendSmsRequest;
-            if (type.equals(SMSTemplateEnum.VERIFICATION_CODE))
+            if (smsTemplateEnum.equals(SmsTemplateEnum.VERIFICATION_CODE))
                 //验证码
                 sendSmsRequest = this.sendVerificationCode(phoneNumber);
             else
                 //其他模板
-                sendSmsRequest = sendCommonCode(phoneNumber, type, params);
+                sendSmsRequest = sendCommonCode(phoneNumber, smsTemplateEnum, params);
 
             com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
             SendSmsResponse sendSmsResponse = client.sendSmsWithOptions(sendSmsRequest, runtime);
@@ -109,8 +110,8 @@ public class SmsServiceImpl implements SmsService {
             //添加发送短信记录
             SmsRecord smsRecord = new SmsRecord()
                     .setResultCode(sendSmsResponse.getBody().getCode())
-                    .setTemplate(type.getCode())
-                    .setTemplateName(type.getName())
+                    .setTemplate(smsTemplateEnum.getCode())
+                    .setTemplateName(smsTemplateEnum.getName())
                     .setMemo(JSON.toJSONString(sendSmsResponse.getBody()))
                     .setPhone(phoneNumber);
             if (Objects.nonNull(params))
@@ -137,14 +138,14 @@ public class SmsServiceImpl implements SmsService {
         redisUtil.set(userService.getValidateCodeRedisKey(phone), code, Long.valueOf(codeExpireStr), TimeUnit.MINUTES);
         SendSmsRequest sendSmsRequest = new SendSmsRequest()
                 .setSignName("清云私享")
-                .setTemplateCode(SMSTemplateEnum.VERIFICATION_CODE.getCode())
+                .setTemplateCode(SmsTemplateEnum.VERIFICATION_CODE.getCode())
                 .setPhoneNumbers(phone)
                 .setTemplateParam("{\"code\":\"" + code + "\"}");
         logger.info("向手机号 {} 发送验证码：{}", phone, code);
         return sendSmsRequest;
     }
 
-    private SendSmsRequest sendCommonCode(String phone, SMSTemplateEnum type, String... params) {
+    private SendSmsRequest sendCommonCode(String phone, SmsTemplateEnum type, String... params) {
         //构建templateParam参数
         String typeParam = type.getParam();
         String[] split = typeParam.split(",");

@@ -236,6 +236,12 @@ public class Constants {
     //验证码过期时间
     public static final String CONFIG_KEY_SMS_CODE_EXPIRE = "sms_code_expire";
 
+    //短信服务key
+    public static final String SMS_KEY = "sms_key";
+
+    //短信服务secret
+    public static final String SMS_SECRET = "sms_secret";
+
 
     //config配置的formId
     public static final int CONFIG_FORM_ID_INDEX = 133; //首页配置
@@ -702,4 +708,13 @@ public class Constants {
      */
     public static final String[] JOB_ERROR_STR = { "java.net.URL", "javax.naming.InitialContext", "org.yaml.snakeyaml",
             "org.springframework", "org.apache", "com.ruoyi.common.utils.file", "com.ruoyi.common.config" };
+
+    /**
+     * 阿里云短信模板列表查询
+     */
+    public static final String AUDIT_STATE_INIT = "AUDIT_STATE_INIT"; //审核中
+    public static final String AUDIT_STATE_PASS = "AUDIT_STATE_PASS";// 审核通过。
+    public static final String AUDIT_STATE_NOT_PASS = "AUDIT_STATE_NOT_PASS";//审核未通过，请在返回参数Reason中查看审核未通过原因。
+    public static final String AUDIT_STATE_CANCEL = "AUDIT_STATE_CANCEL"; //取消审核。
+    public static final String AUDIT_SATE_CANCEL = "AUDIT_SATE_CANCEL";//取消审核。
 }

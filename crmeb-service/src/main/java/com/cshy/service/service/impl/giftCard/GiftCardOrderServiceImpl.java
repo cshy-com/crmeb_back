@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cshy.common.constants.Constants;
-import com.cshy.common.enums.SMSTemplateEnum;
+import com.cshy.common.enums.SmsTemplateEnum;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.dto.giftCard.GiftCardOrderDto;
 import com.cshy.common.model.entity.base.BaseServiceImpl;
@@ -224,7 +224,7 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
         StoreProductInfoResponse productServiceInfo = this.storeProductService.getInfo(cardOrder.getProductId());
         //发送短信
         UserAddress userAddress = userAddressService.getById(cardOrder.getAddressId(), true);
-        smsService.sendCode(userAddress.getPhone(), SMSTemplateEnum.ORDER_SHIPPING_Multi_PARAM,  request, productServiceInfo.getStoreName(), "tempMobile");
+        smsService.sendCode(userAddress.getPhone(), SmsTemplateEnum.ORDER_SHIPPING_Multi_PARAM,  request, productServiceInfo.getStoreName(), "tempMobile");
     }
 
     @Override
@@ -237,11 +237,11 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
         String phone = systemConfigService.getValueByKey(Constants.SMS_EMPLOYEE_NUMBER);
 
         //短信通知
-        smsService.sendCode(phone, SMSTemplateEnum.ORDER_SUCCESSFUL_2_EMPLOYEE, request, dto.getProductName());
+        smsService.sendCode(phone, SmsTemplateEnum.ORDER_SUCCESSFUL_2_EMPLOYEE, request, dto.getProductName());
 
         User info = userService.getInfo();
 
-        smsService.sendCode(info.getPhone(), SMSTemplateEnum.ORDER_SUCCESSFUL_2_CUSTOMER, request, dto.getProductName());
+        smsService.sendCode(info.getPhone(), SmsTemplateEnum.ORDER_SUCCESSFUL_2_CUSTOMER, request, dto.getProductName());
         return id;
     }
 
