@@ -175,5 +175,12 @@ public class StoreProductAttrValueServiceImpl extends ServiceImpl<StoreProductAt
         lqw.eq(StoreProductAttrValue::getIsDel, false);
         return dao.selectList(lqw);
     }
+
+    @Override
+    public StoreProductAttrValue getById(Integer id, Boolean isDel) {
+        StoreProductAttrValue one = dao.getById(id, isDel);
+        return one;
+
+    }
 }
 

@@ -163,28 +163,37 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
 
             //查询用户地址
             UserAddress userAddress = userAddressService.getById(giftCardOrderVo.getAddressId(), true);
-            Map<String, Object> address = CommonUtil.objToMap(userAddress, UserAddress.class);
-            giftCardOrderVo.setUserAddress(address);
+            if (Objects.nonNull(userAddress)) {
+                Map<String, Object> address = CommonUtil.objToMap(userAddress, UserAddress.class);
+                giftCardOrderVo.setUserAddress(address);
+            }
 
             //查询商品信息
-            StoreProduct storeProduct = storeProductService.getH5Detail(giftCardOrderVo.getProductId());
-            Map<String, Object> product = CommonUtil.objToMap(storeProduct, StoreProduct.class);
-            giftCardOrderVo.setStoreProduct(product);
+            StoreProduct storeProduct = storeProductService.getH5Detail(giftCardOrderVo.getProductId(), true);
+            if (Objects.nonNull(storeProduct)) {
+                Map<String, Object> product = CommonUtil.objToMap(storeProduct, StoreProduct.class);
+                giftCardOrderVo.setStoreProduct(product);
+            }
 
             //卡类型名称
-            GiftCardType giftCardType = giftCardTypeService.getById(giftCardOrderVo.getGiftCardTypeId());
-            giftCardOrderVo.setGiftCardTypeName(giftCardType.getName());
+            GiftCardType giftCardType = giftCardTypeService.getById(giftCardOrderVo.getGiftCardTypeId(), true);
+            if (Objects.nonNull(giftCardType))
+                giftCardOrderVo.setGiftCardTypeName(giftCardType.getName());
 
             //查询规格
-            StoreProductAttrValue storeProductAttrValue = storeProductAttrValueService.getById(giftCardOrderVo.getAttrValueId());
-            Map<String, Object> attrValue = CommonUtil.objToMap(storeProductAttrValue, StoreProductAttrValue.class);
-            giftCardOrderVo.setAttrValue(attrValue);
+            StoreProductAttrValue storeProductAttrValue = storeProductAttrValueService.getById(Integer.valueOf(giftCardOrderVo.getAttrValueId()), true);
+            if (Objects.nonNull(storeProductAttrValue)) {
+                Map<String, Object> attrValue = CommonUtil.objToMap(storeProductAttrValue, StoreProductAttrValue.class);
+                giftCardOrderVo.setAttrValue(attrValue);
+            }
 
             //查询礼品卡
-            GiftCard giftCard = giftCardService.getById(giftCardOrderVo.getGiftCardId());
-            Map<String, Object> giftCardMap = CommonUtil.objToMap(giftCard, GiftCard.class);
-            giftCardMap.remove("qrcode");
-            giftCardOrderVo.setGiftCard(giftCardMap);
+            GiftCard giftCard = giftCardService.getById(giftCardOrderVo.getGiftCardId(), true);
+            if (Objects.nonNull(giftCard)) {
+                Map<String, Object> giftCardMap = CommonUtil.objToMap(giftCard, GiftCard.class);
+                giftCardMap.remove("qrcode");
+                giftCardOrderVo.setGiftCard(giftCardMap);
+            }
         });
         super.onAfterPage(page);
     }
@@ -224,7 +233,7 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
         StoreProductInfoResponse productServiceInfo = this.storeProductService.getInfo(cardOrder.getProductId());
         //发送短信
         UserAddress userAddress = userAddressService.getById(cardOrder.getAddressId(), true);
-        smsService.sendCode(userAddress.getPhone(), SMSTemplateEnum.ORDER_SHIPPING_Multi_PARAM,  request, productServiceInfo.getStoreName(), "tempMobile");
+        smsService.sendCode(userAddress.getPhone(), SMSTemplateEnum.ORDER_SHIPPING_Multi_PARAM, request, productServiceInfo.getStoreName(), "tempMobile");
     }
 
     @Override

@@ -29,6 +29,9 @@ public class GiftCardTypeServiceImpl extends BaseServiceImpl<GiftCardType, GiftC
     @Resource
     private GiftCardProductService giftCardProductService;
 
+    @Resource
+    private GiftCardTypeDao giftCardTypeDao;
+
     @Override
     protected void onBeforeAdd(GiftCardTypeDto dto) {
         if (Objects.isNull(dto.getStatus()))
@@ -44,5 +47,10 @@ public class GiftCardTypeServiceImpl extends BaseServiceImpl<GiftCardType, GiftC
             giftCardTypeVo.setProductIdList(idList);
         });
         super.onAfterPage(page);
+    }
+
+    @Override
+    public GiftCardType getById(String id, Boolean isDel) {
+        return giftCardTypeDao.getById(id, isDel);
     }
 }

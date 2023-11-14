@@ -15,7 +15,8 @@ public interface GiftCardProductDao extends BaseMapper<GiftCardProduct> {
             "       AND id not in ( " +
             "       <foreach collection=\"idList\" item=\"id\" open=\"(\" separator=\",\"  close=\")\"> " +
             "           #{id} " +
-            "       </foreach> "+
+            "       </foreach> " +
+            "   </if>" +
             " </script>")
     void batchDeleteByIds(@Param("idList") List<String> idList);
 }
