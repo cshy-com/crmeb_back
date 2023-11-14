@@ -9,6 +9,8 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.model.request.*;
+import com.cshy.common.model.request.store.*;
+import com.cshy.common.model.request.system.SystemWriteOffOrderSearchRequest;
 import com.cshy.common.model.response.*;
 import com.cshy.common.model.vo.*;
 import com.cshy.service.service.*;
@@ -984,7 +986,8 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
             if (StrUtil.isNotBlank(user.getPhone())) {
                 SmsTemplate smsTemplate = smsTemplateService.getDetail(notification.getSmsId());
                 // 发送改价短信提醒
-                smsService.sendOrderEditPriceNotice(user.getPhone(), existOrder.getOrderNo(), request.getPayPrice(), Integer.valueOf(smsTemplate.getTempId()));
+                //TODO 修改短信通知
+                smsService.sendOrderEditPriceNotice(user.getPhone(), existOrder.getOrderNo(), request.getPayPrice(), 0);
             }
         }
 
@@ -1492,7 +1495,8 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
                 if (voList.size() > 1) {
                     proName = proName.concat("等");
                 }
-                smsService.sendOrderDeliverNotice(user.getPhone(), user.getNickname(), proName, storeOrder.getOrderNo(), Integer.valueOf(smsTemplate.getTempId()));
+                //TODO 修改短信通知
+                smsService.sendOrderDeliverNotice(user.getPhone(), user.getNickname(), proName, storeOrder.getOrderNo(), 0);
             }
         }
 

@@ -3,8 +3,8 @@ package com.cshy.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.seckill.StoreSeckillManger;
-import com.cshy.common.model.request.StoreSeckillMangerRequest;
-import com.cshy.common.model.request.StoreSeckillMangerSearchRequest;
+import com.cshy.common.model.request.store.StoreSeckillMangerRequest;
+import com.cshy.common.model.request.store.StoreSeckillMangerSearchRequest;
 import com.cshy.common.model.response.StoreSeckillManagerResponse;
 
 import java.util.List;

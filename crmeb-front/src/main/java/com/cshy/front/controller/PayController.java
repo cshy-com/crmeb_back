@@ -1,6 +1,6 @@
 package com.cshy.front.controller;
 
-import com.cshy.common.model.request.OrderPayRequest;
+import com.cshy.common.model.request.order.OrderPayRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.OrderPayResultResponse;
 import com.cshy.common.utils.CrmebUtil;

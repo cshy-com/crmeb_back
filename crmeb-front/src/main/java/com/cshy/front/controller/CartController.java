@@ -1,9 +1,9 @@
 package com.cshy.front.controller;
 
 import com.cshy.common.model.page.CommonPage;
-import com.cshy.common.model.request.CartNumRequest;
-import com.cshy.common.model.request.CartRequest;
-import com.cshy.common.model.request.CartResetRequest;
+import com.cshy.common.model.request.cart.CartNumRequest;
+import com.cshy.common.model.request.cart.CartRequest;
+import com.cshy.common.model.request.cart.CartResetRequest;
 import com.cshy.common.model.response.CartInfoResponse;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
@@ -58,7 +58,7 @@ public class CartController {
     @ApiOperation(value = "新增")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public CommonResult<HashMap<String,String>> save(@RequestBody @Validated CartRequest storeCartRequest) {
-        String cartId = storeCartService.saveCate(storeCartRequest);
+        String cartId = storeCartService.saveCart(storeCartRequest);
         if (StringUtils.isNotBlank(cartId)) {
             HashMap<String,String> result = new HashMap<>();
             result.put("cartId", cartId);

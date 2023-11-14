@@ -1,8 +1,8 @@
 package com.cshy.front.controller;
 
 import com.cshy.common.model.page.CommonPage;
-import com.cshy.common.model.request.UserCollectAllRequest;
-import com.cshy.common.model.request.UserCollectRequest;
+import com.cshy.common.model.request.user.UserCollectAllRequest;
+import com.cshy.common.model.request.user.UserCollectRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.response.UserRelationResponse;

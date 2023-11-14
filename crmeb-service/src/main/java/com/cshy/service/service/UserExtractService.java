@@ -5,8 +5,8 @@ import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.response.UserExtractRecordResponse;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.entity.finance.UserExtract;
-import com.cshy.common.model.request.UserExtractRequest;
-import com.cshy.common.model.request.UserExtractSearchRequest;
+import com.cshy.common.model.request.user.UserExtractRequest;
+import com.cshy.common.model.request.user.UserExtractSearchRequest;
 import com.cshy.common.model.response.BalanceResponse;
 import com.cshy.common.model.response.UserExtractResponse;
 

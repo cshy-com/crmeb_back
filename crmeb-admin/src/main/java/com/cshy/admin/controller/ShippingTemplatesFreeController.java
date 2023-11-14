@@ -1,6 +1,6 @@
 package com.cshy.admin.controller;
 
-import com.cshy.common.model.request.ShippingTemplatesFreeRequest;
+import com.cshy.common.model.request.shipping.ShippingTemplatesFreeRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.service.service.ShippingTemplatesFreeService;
 import io.swagger.annotations.Api;

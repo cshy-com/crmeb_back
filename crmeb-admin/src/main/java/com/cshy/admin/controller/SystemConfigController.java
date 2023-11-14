@@ -2,8 +2,8 @@ package com.cshy.admin.controller;
 
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.entity.system.SystemConfig;
-import com.cshy.common.model.request.SystemConfigAdminRequest;
-import com.cshy.common.model.request.SystemFormCheckRequest;
+import com.cshy.common.model.request.system.SystemConfigAdminRequest;
+import com.cshy.common.model.request.system.SystemFormCheckRequest;
 import com.cshy.service.service.SystemConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

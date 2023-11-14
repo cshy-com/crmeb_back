@@ -3,7 +3,10 @@ package com.cshy.admin.controller;
 
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.*;
-import com.cshy.common.model.request.*;
+import com.cshy.common.model.request.user.UserOperateIntegralMoneyRequest;
+import com.cshy.common.model.request.user.UserSearchRequest;
+import com.cshy.common.model.request.user.UserUpdateRequest;
+import com.cshy.common.model.request.user.UserUpdateSpreadRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.entity.user.User;
 import com.cshy.common.model.response.TopDetail;

@@ -4,7 +4,7 @@ import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.order.StoreOrderStatus;
-import com.cshy.common.model.request.StoreOrderStatusSearchRequest;
+import com.cshy.common.model.request.store.StoreOrderStatusSearchRequest;
 import com.cshy.service.service.StoreOrderStatusService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

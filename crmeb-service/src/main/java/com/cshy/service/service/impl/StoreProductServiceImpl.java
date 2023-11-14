@@ -19,6 +19,8 @@ import com.cshy.common.model.entity.coupon.StoreCoupon;
 import com.cshy.common.model.entity.giftCard.GiftCardProduct;
 import com.cshy.common.model.entity.product.*;
 import com.cshy.common.model.request.*;
+import com.cshy.common.model.request.product.ProductRequest;
+import com.cshy.common.model.request.store.*;
 import com.cshy.common.model.response.*;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.utils.CrmebUtil;

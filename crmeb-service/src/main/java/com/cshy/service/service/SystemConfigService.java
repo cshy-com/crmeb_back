@@ -1,8 +1,8 @@
 package com.cshy.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.cshy.common.model.request.SystemConfigAdminRequest;
-import com.cshy.common.model.request.SystemFormCheckRequest;
+import com.cshy.common.model.request.system.SystemConfigAdminRequest;
+import com.cshy.common.model.request.system.SystemFormCheckRequest;
 import com.cshy.common.model.vo.ExpressSheetVo;
 import com.cshy.common.model.entity.system.SystemConfig;
 

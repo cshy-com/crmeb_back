@@ -3,8 +3,8 @@ package com.cshy.service.service;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.system.SystemGroup;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.cshy.common.model.request.SystemGroupRequest;
-import com.cshy.common.model.request.SystemGroupSearchRequest;
+import com.cshy.common.model.request.system.SystemGroupRequest;
+import com.cshy.common.model.request.system.SystemGroupSearchRequest;
 
 import java.util.List;
 

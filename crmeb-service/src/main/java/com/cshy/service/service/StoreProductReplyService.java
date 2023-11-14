@@ -1,9 +1,9 @@
 package com.cshy.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.cshy.common.model.request.StoreProductReplyAddRequest;
-import com.cshy.common.model.request.StoreProductReplyCommentRequest;
-import com.cshy.common.model.request.StoreProductReplySearchRequest;
+import com.cshy.common.model.request.store.StoreProductReplyAddRequest;
+import com.cshy.common.model.request.store.StoreProductReplyCommentRequest;
+import com.cshy.common.model.request.store.StoreProductReplySearchRequest;
 import com.cshy.common.model.response.ProductDetailReplyResponse;
 import com.cshy.common.model.response.ProductReplyResponse;
 import com.cshy.common.model.response.StoreProductReplyResponse;

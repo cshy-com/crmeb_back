@@ -3,8 +3,8 @@ package com.cshy.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.product.StoreProductRelation;
-import com.cshy.common.model.request.UserCollectAllRequest;
-import com.cshy.common.model.request.UserCollectRequest;
+import com.cshy.common.model.request.user.UserCollectAllRequest;
+import com.cshy.common.model.request.user.UserCollectRequest;
 import com.cshy.common.model.response.UserRelationResponse;
 
 import java.util.List;

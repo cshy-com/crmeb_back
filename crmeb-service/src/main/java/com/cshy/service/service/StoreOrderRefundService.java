@@ -2,7 +2,7 @@ package com.cshy.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.entity.order.StoreOrder;
-import com.cshy.common.model.request.StoreOrderRefundRequest;
+import com.cshy.common.model.request.store.StoreOrderRefundRequest;
 
 
 /**

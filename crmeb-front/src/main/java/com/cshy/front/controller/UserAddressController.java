@@ -1,8 +1,8 @@
 package com.cshy.front.controller;
 
 import com.cshy.common.model.page.CommonPage;
-import com.cshy.common.model.request.UserAddressDelRequest;
-import com.cshy.common.model.request.UserAddressRequest;
+import com.cshy.common.model.request.user.UserAddressDelRequest;
+import com.cshy.common.model.request.user.UserAddressRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.user.UserAddress;

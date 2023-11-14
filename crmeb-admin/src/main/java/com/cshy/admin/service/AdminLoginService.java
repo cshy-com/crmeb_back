@@ -1,6 +1,6 @@
 package com.cshy.admin.service;
 
-import com.cshy.common.model.request.SystemAdminLoginRequest;
+import com.cshy.common.model.request.system.SystemAdminLoginRequest;
 import com.cshy.common.model.response.MenusResponse;
 import com.cshy.common.model.response.SystemAdminResponse;
 import com.cshy.common.model.response.SystemLoginResponse;

@@ -2,8 +2,8 @@ package com.cshy.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.entity.system.SystemUserLevel;
-import com.cshy.common.model.request.SystemUserLevelRequest;
-import com.cshy.common.model.request.SystemUserLevelUpdateShowRequest;
+import com.cshy.common.model.request.system.SystemUserLevelRequest;
+import com.cshy.common.model.request.system.SystemUserLevelUpdateShowRequest;
 
 import java.util.List;
 

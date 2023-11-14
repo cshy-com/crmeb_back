@@ -2,7 +2,7 @@ package com.cshy.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.entity.express.ShippingTemplatesFree;
-import com.cshy.common.model.request.ShippingTemplatesFreeRequest;
+import com.cshy.common.model.request.shipping.ShippingTemplatesFreeRequest;
 
 import java.util.List;
 

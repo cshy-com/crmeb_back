@@ -1,7 +1,7 @@
 package com.cshy.service.service;
 
 import com.cshy.common.model.entity.order.StoreOrder;
-import com.cshy.common.model.request.OrderPayRequest;
+import com.cshy.common.model.request.order.OrderPayRequest;
 import com.cshy.common.model.response.OrderPayResultResponse;
 
 /**

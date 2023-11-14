@@ -4,7 +4,7 @@ import com.cshy.common.model.request.PageParamRequest;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.entity.combination.StorePink;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.cshy.common.model.request.StorePinkSearchRequest;
+import com.cshy.common.model.request.store.StorePinkSearchRequest;
 import com.cshy.common.model.response.StorePinkAdminListResponse;
 import com.cshy.common.model.response.StorePinkDetailResponse;
 

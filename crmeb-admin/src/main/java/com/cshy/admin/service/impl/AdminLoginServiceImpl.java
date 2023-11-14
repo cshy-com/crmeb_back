@@ -11,7 +11,7 @@ import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.system.SystemAdmin;
 import com.cshy.common.model.entity.system.SystemMenu;
 import com.cshy.common.model.entity.system.SystemPermissions;
-import com.cshy.common.model.request.SystemAdminLoginRequest;
+import com.cshy.common.model.request.system.SystemAdminLoginRequest;
 import com.cshy.common.model.response.MenusResponse;
 import com.cshy.common.model.response.SystemAdminResponse;
 import com.cshy.common.model.response.SystemGroupDataAdminLoginBannerResponse;
@@ -41,7 +41,6 @@ import java.util.stream.Stream;
 
 /**
  * 管理端登录服务实现类
-
  */
 @Service
 public class AdminLoginServiceImpl implements AdminLoginService {
@@ -116,6 +115,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 
     /**
      * 获取登录页图片
+     *
      * @return Map
      */
     @Override
@@ -134,6 +134,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 
     /**
      * 获取管理员可访问目录
+     *
      * @return List<MenusResponse>
      */
     @Override

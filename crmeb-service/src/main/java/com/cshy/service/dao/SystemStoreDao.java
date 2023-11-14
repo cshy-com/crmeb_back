@@ -1,6 +1,6 @@
 package com.cshy.service.dao;
 
-import com.cshy.common.model.request.StoreNearRequest;
+import com.cshy.common.model.request.store.StoreNearRequest;
 import com.cshy.common.model.vo.SystemStoreNearVo;
 import com.cshy.common.model.entity.system.SystemStore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;

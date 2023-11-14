@@ -2,7 +2,7 @@ package com.cshy.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.SystemStoreStaffRequest;
+import com.cshy.common.model.request.system.SystemStoreStaffRequest;
 import com.cshy.common.model.response.SystemStoreStaffResponse;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.entity.system.SystemStoreStaff;

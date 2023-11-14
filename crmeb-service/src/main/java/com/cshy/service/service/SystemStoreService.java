@@ -3,8 +3,8 @@ package com.cshy.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.system.SystemStore;
-import com.cshy.common.model.request.StoreNearRequest;
-import com.cshy.common.model.request.SystemStoreRequest;
+import com.cshy.common.model.request.store.StoreNearRequest;
+import com.cshy.common.model.request.system.SystemStoreRequest;
 import com.cshy.common.model.response.StoreNearResponse;
 
 import java.util.HashMap;

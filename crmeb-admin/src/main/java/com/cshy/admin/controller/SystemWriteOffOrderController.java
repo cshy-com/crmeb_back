@@ -1,7 +1,7 @@
 package com.cshy.admin.controller;
 
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.SystemWriteOffOrderSearchRequest;
+import com.cshy.common.model.request.system.SystemWriteOffOrderSearchRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.SystemWriteOffOrderResponse;
 import com.cshy.service.service.StoreOrderService;

@@ -3,7 +3,7 @@ package com.cshy.service.service;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.user.UserTag;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.cshy.common.model.request.UserTagRequest;
+import com.cshy.common.model.request.user.UserTagRequest;
 
 import java.util.List;
 

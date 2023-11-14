@@ -4,7 +4,7 @@ import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.user.UserGroup;
-import com.cshy.common.model.request.UserGroupRequest;
+import com.cshy.common.model.request.user.UserGroupRequest;
 import com.cshy.service.service.UserGroupService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

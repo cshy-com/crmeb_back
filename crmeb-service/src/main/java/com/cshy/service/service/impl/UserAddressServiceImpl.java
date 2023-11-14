@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.exception.CrmebException;
-import com.cshy.common.model.request.UserAddressRequest;
+import com.cshy.common.model.request.user.UserAddressRequest;
 import com.github.pagehelper.PageHelper;
 import com.cshy.common.model.entity.system.SystemCity;
 import com.cshy.common.model.entity.user.UserAddress;

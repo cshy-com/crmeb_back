@@ -7,7 +7,7 @@ import com.cshy.common.constants.TaskConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.entity.system.SystemAdmin;
-import com.cshy.common.model.request.StoreOrderStaticsticsRequest;
+import com.cshy.common.model.request.store.StoreOrderStaticsticsRequest;
 import com.cshy.common.model.response.StoreOrderVerificationConfirmResponse;
 import com.cshy.common.model.response.StoreStaffDetail;
 import com.cshy.common.model.response.StoreStaffTopDetail;

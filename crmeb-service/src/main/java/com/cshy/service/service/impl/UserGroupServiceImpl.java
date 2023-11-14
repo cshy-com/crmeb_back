@@ -3,7 +3,7 @@ package com.cshy.service.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.UserGroupRequest;
+import com.cshy.common.model.request.user.UserGroupRequest;
 import com.github.pagehelper.PageHelper;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.model.entity.user.UserGroup;

@@ -1,7 +1,7 @@
 package com.cshy.common.model.response;
 
 import com.cshy.common.model.entity.product.StoreProductAttr;
-import com.cshy.common.model.request.StoreProductAttrValueRequest;
+import com.cshy.common.model.request.store.StoreProductAttrValueRequest;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 

@@ -3,9 +3,9 @@ package com.cshy.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.system.SystemFormTemp;
-import com.cshy.common.model.request.SystemFormCheckRequest;
-import com.cshy.common.model.request.SystemFormTempRequest;
-import com.cshy.common.model.request.SystemFormTempSearchRequest;
+import com.cshy.common.model.request.system.SystemFormCheckRequest;
+import com.cshy.common.model.request.system.SystemFormTempRequest;
+import com.cshy.common.model.request.system.SystemFormTempSearchRequest;
 
 import java.util.List;
 

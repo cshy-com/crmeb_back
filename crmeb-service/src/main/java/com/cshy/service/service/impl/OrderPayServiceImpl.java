@@ -20,7 +20,7 @@ import com.cshy.common.model.entity.product.StoreProductCoupon;
 import com.cshy.common.model.entity.sms.SmsTemplate;
 import com.cshy.common.model.entity.system.SystemAdmin;
 import com.cshy.common.model.entity.system.SystemNotification;
-import com.cshy.common.model.request.OrderPayRequest;
+import com.cshy.common.model.request.order.OrderPayRequest;
 import com.cshy.common.model.response.OrderPayResultResponse;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.utils.DateUtil;
@@ -274,7 +274,8 @@ public class OrderPayServiceImpl implements OrderPayService {
                 // 发送短信
                 if (StrUtil.isNotBlank(user.getPhone()) && payNotification.getIsSms().equals(1)) {
                     SmsTemplate smsTemplate = smsTemplateService.getDetail(payNotification.getSmsId());
-                    smsService.sendPaySuccess(user.getPhone(), storeOrder.getOrderNo(), storeOrder.getPayPrice(), Integer.valueOf(smsTemplate.getTempId()));
+                    //TODO 修改短信通知
+                    smsService.sendPaySuccess(user.getPhone(), storeOrder.getOrderNo(), storeOrder.getPayPrice(), 0);
                 }
 
                 // 发送用户支付成功管理员提醒短信
@@ -286,7 +287,8 @@ public class OrderPayServiceImpl implements OrderPayService {
                         SmsTemplate smsTemplate = smsTemplateService.getDetail(payAdminNotification.getSmsId());
                         // 发送短信
                         systemAdminList.forEach(admin -> {
-                            smsService.sendOrderPaySuccessNotice(admin.getPhone(), storeOrder.getOrderNo(), admin.getRealName(), Integer.valueOf(smsTemplate.getTempId()));
+                            //TODO 修改短信通知
+                            smsService.sendOrderPaySuccessNotice(admin.getPhone(), storeOrder.getOrderNo(), admin.getRealName(), 0);
                         });
                     }
                 }

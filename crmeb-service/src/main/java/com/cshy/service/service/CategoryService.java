@@ -3,8 +3,8 @@ package com.cshy.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.category.Category;
-import com.cshy.common.model.request.CategoryRequest;
-import com.cshy.common.model.request.CategorySearchRequest;
+import com.cshy.common.model.request.category.CategoryRequest;
+import com.cshy.common.model.request.category.CategorySearchRequest;
 import com.cshy.common.model.vo.CategoryTreeVo;
 
 import java.util.HashMap;

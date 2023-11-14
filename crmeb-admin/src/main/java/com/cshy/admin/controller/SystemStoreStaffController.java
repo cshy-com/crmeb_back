@@ -4,7 +4,7 @@ import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.system.SystemStoreStaff;
-import com.cshy.common.model.request.SystemStoreStaffRequest;
+import com.cshy.common.model.request.system.SystemStoreStaffRequest;
 import com.cshy.common.model.response.SystemStoreStaffResponse;
 import com.cshy.service.service.SystemStoreStaffService;
 import io.swagger.annotations.Api;

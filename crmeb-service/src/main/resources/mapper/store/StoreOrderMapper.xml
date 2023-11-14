@@ -24,7 +24,7 @@
         </if>
         GROUP by DATE_FORMAT(o.`create_time`, '%Y-%m-%d') order by o.`create_time` desc limit #{ page },#{ limit };
     </select>
-    <select id="getOrderStatisticsPriceDetail" parameterType="com.cshy.common.model.request.StoreDateRangeSqlPram"
+    <select id="getOrderStatisticsPriceDetail" parameterType="com.cshy.common.model.request.store.StoreDateRangeSqlPram"
             resultType="com.cshy.common.model.response.StoreOrderStatisticsChartItemResponse">
         select sum(o.pay_price) as num,date_format(o.create_time, '%Y-%m-%d') as time
         from s_order o
@@ -34,7 +34,7 @@
         group by date_format(o.create_time, '%Y-%m-%d')
         order by o.create_time desc;
     </select>
-    <select id="getOrderStatisticsOrderCountDetail" parameterType="com.cshy.common.model.request.StoreDateRangeSqlPram"
+    <select id="getOrderStatisticsOrderCountDetail" parameterType="com.cshy.common.model.request.store.StoreDateRangeSqlPram"
             resultType="com.cshy.common.model.response.StoreOrderStatisticsChartItemResponse">
         select count(id) as num, date_format(o.create_time, '%Y-%m-%d') as time
         from s_order o

@@ -2,8 +2,8 @@ package com.cshy.admin.controller;
 
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.entity.system.SystemUserLevel;
-import com.cshy.common.model.request.SystemUserLevelRequest;
-import com.cshy.common.model.request.SystemUserLevelUpdateShowRequest;
+import com.cshy.common.model.request.system.SystemUserLevelRequest;
+import com.cshy.common.model.request.system.SystemUserLevelUpdateShowRequest;
 import com.cshy.service.service.SystemUserLevelService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

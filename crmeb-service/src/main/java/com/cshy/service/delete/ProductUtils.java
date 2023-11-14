@@ -14,7 +14,7 @@ import com.cshy.common.model.entity.seckill.StoreSeckill;
 import com.cshy.common.model.entity.seckill.StoreSeckillManger;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttr;
-import com.cshy.common.model.request.StoreProductRequest;
+import com.cshy.common.model.request.store.StoreProductRequest;
 import com.cshy.service.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;

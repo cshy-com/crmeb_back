@@ -7,7 +7,7 @@ import com.cshy.common.model.response.BargainRecordResponse;
 import com.cshy.common.model.response.BargainUserInfoResponse;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.entity.bargain.StoreBargainUser;
-import com.cshy.common.model.request.StoreBargainUserSearchRequest;
+import com.cshy.common.model.request.store.StoreBargainUserSearchRequest;
 import com.cshy.common.model.response.StoreBargainUserResponse;
 
 import java.util.List;

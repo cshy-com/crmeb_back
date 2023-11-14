@@ -2,8 +2,8 @@ package com.cshy.admin.controller;
 
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.entity.system.SystemMenu;
-import com.cshy.common.model.request.SystemMenuRequest;
-import com.cshy.common.model.request.SystemMenuSearchRequest;
+import com.cshy.common.model.request.system.SystemMenuRequest;
+import com.cshy.common.model.request.system.SystemMenuSearchRequest;
 import com.cshy.common.model.vo.MenuCheckVo;
 import com.cshy.service.service.SystemMenuService;
 import io.swagger.annotations.Api;

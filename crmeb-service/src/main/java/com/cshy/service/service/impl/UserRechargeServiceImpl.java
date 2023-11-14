@@ -17,7 +17,7 @@ import com.github.pagehelper.PageInfo;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.common.model.vo.dateLimitUtilVo;
 import com.cshy.common.model.entity.finance.UserRecharge;
-import com.cshy.common.model.request.UserRechargeSearchRequest;
+import com.cshy.common.model.request.user.UserRechargeSearchRequest;
 import com.cshy.common.model.response.UserRechargeResponse;
 import com.cshy.common.model.entity.user.User;
 import com.cshy.service.dao.UserRechargeDao;

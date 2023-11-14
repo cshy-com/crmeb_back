@@ -1,7 +1,7 @@
 package com.cshy.front.controller;
 
 
-import com.cshy.common.model.request.StoreNearRequest;
+import com.cshy.common.model.request.store.StoreNearRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.response.StoreNearResponse;

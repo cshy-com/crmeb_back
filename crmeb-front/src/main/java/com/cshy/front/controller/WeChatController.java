@@ -2,7 +2,7 @@ package com.cshy.front.controller;
 
 import com.cshy.common.model.entity.wechat.TemplateMessage;
 import com.cshy.common.model.request.RegisterThirdUserRequest;
-import com.cshy.common.model.request.WxBindingPhoneRequest;
+import com.cshy.common.model.request.wechat.WxBindingPhoneRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.LoginResponse;
 import com.cshy.common.model.response.WeChatJsSdkConfigResponse;

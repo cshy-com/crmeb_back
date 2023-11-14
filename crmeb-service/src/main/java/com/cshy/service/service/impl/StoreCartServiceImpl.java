@@ -1,7 +1,6 @@
 package com.cshy.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -10,9 +9,9 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.model.page.CommonPage;
-import com.cshy.common.model.request.CartNumRequest;
-import com.cshy.common.model.request.CartRequest;
-import com.cshy.common.model.request.CartResetRequest;
+import com.cshy.common.model.request.cart.CartNumRequest;
+import com.cshy.common.model.request.cart.CartRequest;
+import com.cshy.common.model.request.cart.CartResetRequest;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
@@ -160,7 +159,7 @@ public class StoreCartServiceImpl extends ServiceImpl<StoreCartDao, StoreCart> i
      * @return 添加后的成功标识
      */
     @Override
-    public String saveCate(CartRequest storeCartRequest) {
+    public String saveCart(CartRequest storeCartRequest) {
         // 判断商品正常
         StoreProduct product = storeProductService.getById(storeCartRequest.getProductId());
         if (ObjectUtil.isNull(product) || product.getIsDel() || !product.getIsShow()) {
@@ -178,7 +177,6 @@ public class StoreCartServiceImpl extends ServiceImpl<StoreCartDao, StoreCart> i
         storeCartPram.setProductAttrUnique(storeCartRequest.getProductAttrUnique());
         storeCartPram.setUid(currentUser.getUid());
         List<StoreCart> existCarts = getByEntity(storeCartPram); // 这里仅仅能获取一条以信息
-        String todayStr = DateUtil.date().toString(Constants.DATE_FORMAT_DATE);
         if (existCarts.size() > 0) { // 购物车添加数量
             StoreCart forUpdateStoreCart = existCarts.get(0);
             forUpdateStoreCart.setCartNum(forUpdateStoreCart.getCartNum() + storeCartRequest.getCartNum());

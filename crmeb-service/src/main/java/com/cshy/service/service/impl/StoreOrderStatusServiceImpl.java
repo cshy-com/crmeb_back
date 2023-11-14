@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.constants.Constants;
-import com.cshy.common.model.request.StoreOrderStatusSearchRequest;
+import com.cshy.common.model.request.store.StoreOrderStatusSearchRequest;
 import com.github.pagehelper.PageHelper;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.common.model.entity.order.StoreOrder;

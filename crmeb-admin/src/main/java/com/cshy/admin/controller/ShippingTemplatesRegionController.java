@@ -1,6 +1,6 @@
 package com.cshy.admin.controller;
 
-import com.cshy.common.model.request.ShippingTemplatesRegionRequest;
+import com.cshy.common.model.request.shipping.ShippingTemplatesRegionRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.service.service.ShippingTemplatesRegionService;
 import io.swagger.annotations.Api;

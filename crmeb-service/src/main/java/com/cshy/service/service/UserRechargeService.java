@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.request.PageParamRequest;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.entity.finance.UserRecharge;
-import com.cshy.common.model.request.UserRechargeSearchRequest;
+import com.cshy.common.model.request.user.UserRechargeSearchRequest;
 import com.cshy.common.model.response.UserRechargeResponse;
 
 import java.math.BigDecimal;

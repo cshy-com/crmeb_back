@@ -2,8 +2,8 @@ package com.cshy.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.entity.system.SystemMenu;
-import com.cshy.common.model.request.SystemMenuRequest;
-import com.cshy.common.model.request.SystemMenuSearchRequest;
+import com.cshy.common.model.request.system.SystemMenuRequest;
+import com.cshy.common.model.request.system.SystemMenuSearchRequest;
 import com.cshy.common.model.vo.MenuCheckVo;
 
 import java.util.List;

@@ -3,8 +3,8 @@ package com.cshy.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.entity.system.SystemRole;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.SystemRoleRequest;
-import com.cshy.common.model.request.SystemRoleSearchRequest;
+import com.cshy.common.model.request.system.SystemRoleRequest;
+import com.cshy.common.model.request.system.SystemRoleSearchRequest;
 import com.cshy.common.model.response.RoleInfoResponse;
 import com.cshy.common.model.vo.CategoryTreeVo;
 

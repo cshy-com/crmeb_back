@@ -3,8 +3,8 @@ package com.cshy.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.system.SystemAttachment;
-import com.cshy.common.model.request.SystemAttachmentMoveRequest;
-import com.cshy.common.model.request.SystemAttachmentRequest;
+import com.cshy.common.model.request.system.SystemAttachmentMoveRequest;
+import com.cshy.common.model.request.system.SystemAttachmentRequest;
 
 import java.util.List;
 

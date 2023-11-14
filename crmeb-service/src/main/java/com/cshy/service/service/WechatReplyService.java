@@ -3,8 +3,8 @@ package com.cshy.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.wechat.WechatReply;
-import com.cshy.common.model.request.WechatReplyRequest;
-import com.cshy.common.model.request.WechatReplySearchRequest;
+import com.cshy.common.model.request.wechat.WechatReplyRequest;
+import com.cshy.common.model.request.wechat.WechatReplySearchRequest;
 
 import java.util.List;
 

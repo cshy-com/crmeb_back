@@ -2,7 +2,7 @@ package com.cshy.common.model.response;
 
 import com.cshy.common.model.entity.category.Category;
 import com.cshy.common.model.entity.product.StoreProduct;
-import com.cshy.common.model.request.StoreCouponRequest;
+import com.cshy.common.model.request.store.StoreCouponRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

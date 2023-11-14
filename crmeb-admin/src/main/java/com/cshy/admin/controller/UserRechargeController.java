@@ -3,7 +3,7 @@ package com.cshy.admin.controller;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.UserRechargeSearchRequest;
+import com.cshy.common.model.request.user.UserRechargeSearchRequest;
 import com.cshy.common.model.response.UserRechargeResponse;
 import com.cshy.service.service.UserRechargeService;
 import io.swagger.annotations.Api;

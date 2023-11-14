@@ -3,9 +3,9 @@ package com.cshy.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.entity.system.SystemAdmin;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.SystemAdminAddRequest;
-import com.cshy.common.model.request.SystemAdminRequest;
-import com.cshy.common.model.request.SystemAdminUpdateRequest;
+import com.cshy.common.model.request.system.SystemAdminAddRequest;
+import com.cshy.common.model.request.system.SystemAdminRequest;
+import com.cshy.common.model.request.system.SystemAdminUpdateRequest;
 import com.cshy.common.model.response.SystemAdminResponse;
 
 import java.util.HashMap;

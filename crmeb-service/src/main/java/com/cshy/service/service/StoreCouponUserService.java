@@ -2,13 +2,13 @@ package com.cshy.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.page.CommonPage;
-import com.cshy.common.model.request.UserCouponReceiveRequest;
+import com.cshy.common.model.request.user.UserCouponReceiveRequest;
 import com.cshy.common.model.vo.MyRecord;
 import com.cshy.common.model.request.PageParamRequest;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.entity.coupon.StoreCouponUser;
-import com.cshy.common.model.request.StoreCouponUserRequest;
-import com.cshy.common.model.request.StoreCouponUserSearchRequest;
+import com.cshy.common.model.request.store.StoreCouponUserRequest;
+import com.cshy.common.model.request.store.StoreCouponUserSearchRequest;
 import com.cshy.common.model.response.StoreCouponUserOrder;
 import com.cshy.common.model.response.StoreCouponUserResponse;
 

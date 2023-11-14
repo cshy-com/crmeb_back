@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cshy.service.dao.ShippingTemplatesFreeDao">
 
-    <select id="getListGroup" resultType="com.cshy.common.model.request.ShippingTemplatesFreeRequest" parameterType="integer">
+    <select id="getListGroup" resultType="com.cshy.common.model.request.shipping.ShippingTemplatesFreeRequest" parameterType="integer">
                 SELECT group_concat(`city_id`) AS city_id, title, `number`, price, uniqid FROM shipping_templates_free where temp_id = #{tempId, jdbcType=INTEGER} GROUP BY `uniqid` ORDER BY id ASC
     </select>
 </mapper>

@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.SearchAndPageRequest;
 import com.cshy.common.model.entity.coupon.StoreCoupon;
-import com.cshy.common.model.request.StoreCouponRequest;
-import com.cshy.common.model.request.StoreCouponSearchRequest;
+import com.cshy.common.model.request.store.StoreCouponRequest;
+import com.cshy.common.model.request.store.StoreCouponSearchRequest;
 import com.cshy.common.model.response.StoreCouponFrontResponse;
 import com.cshy.common.model.response.StoreCouponInfoResponse;
 

@@ -1,9 +1,9 @@
 package com.cshy.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.cshy.common.model.request.CartNumRequest;
-import com.cshy.common.model.request.CartRequest;
-import com.cshy.common.model.request.CartResetRequest;
+import com.cshy.common.model.request.cart.CartNumRequest;
+import com.cshy.common.model.request.cart.CartRequest;
+import com.cshy.common.model.request.cart.CartResetRequest;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.response.CartInfoResponse;
 import com.github.pagehelper.PageInfo;
@@ -38,7 +38,7 @@ public interface StoreCartService extends IService<StoreCart> {
      * @param storeCartRequest 新增购物车参数
      * @return 新增结果
      */
-    String saveCate(CartRequest storeCartRequest);
+    String saveCart(CartRequest storeCartRequest);
 
     /**
      * 删除购物车

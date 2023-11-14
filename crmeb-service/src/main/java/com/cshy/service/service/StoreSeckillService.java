@@ -2,9 +2,8 @@ package com.cshy.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.StoreSeckillAddRequest;
-import com.cshy.common.model.request.StoreSeckillSearchRequest;
-import com.cshy.common.model.response.*;
+import com.cshy.common.model.request.store.StoreSeckillAddRequest;
+import com.cshy.common.model.request.store.StoreSeckillSearchRequest;
 import com.cshy.common.model.response.*;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.entity.seckill.StoreSeckill;

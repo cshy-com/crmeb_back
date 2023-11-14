@@ -13,6 +13,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.*;
 import com.cshy.common.model.entity.user.*;
 import com.cshy.common.model.request.*;
+import com.cshy.common.model.request.store.StoreCouponUserSearchRequest;
+import com.cshy.common.model.request.user.*;
 import com.cshy.common.model.response.*;
 import com.cshy.service.service.*;
 import com.github.pagehelper.Page;

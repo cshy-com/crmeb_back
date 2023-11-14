@@ -2,8 +2,8 @@ package com.cshy.admin.controller;
 
 import com.cshy.common.model.entity.article.Article;
 import com.cshy.common.model.page.CommonPage;
-import com.cshy.common.model.request.ArticleRequest;
-import com.cshy.common.model.request.ArticleSearchRequest;
+import com.cshy.common.model.request.article.ArticleRequest;
+import com.cshy.common.model.request.article.ArticleSearchRequest;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.vo.ArticleVo;

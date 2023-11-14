@@ -3,13 +3,12 @@ package com.cshy.service.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.request.BargainFrontRequest;
 import com.cshy.common.model.response.*;
-import com.cshy.common.model.response.*;
 import com.cshy.common.model.vo.MyRecord;
 import com.cshy.common.model.request.PageParamRequest;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.entity.bargain.StoreBargain;
-import com.cshy.common.model.request.StoreBargainRequest;
-import com.cshy.common.model.request.StoreBargainSearchRequest;
+import com.cshy.common.model.request.store.StoreBargainRequest;
+import com.cshy.common.model.request.store.StoreBargainSearchRequest;
 
 import java.util.HashMap;
 import java.util.List;

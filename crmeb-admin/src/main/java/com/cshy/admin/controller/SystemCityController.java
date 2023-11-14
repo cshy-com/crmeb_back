@@ -1,8 +1,8 @@
 package com.cshy.admin.controller;
 
 import com.cshy.common.model.entity.system.SystemCity;
-import com.cshy.common.model.request.SystemCityRequest;
-import com.cshy.common.model.request.SystemCitySearchRequest;
+import com.cshy.common.model.request.system.SystemCityRequest;
+import com.cshy.common.model.request.system.SystemCitySearchRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.vo.SystemCityTreeVo;
 import com.cshy.service.service.SystemCityService;

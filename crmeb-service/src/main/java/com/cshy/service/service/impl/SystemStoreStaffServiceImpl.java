@@ -9,7 +9,7 @@ import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
-import com.cshy.common.model.request.SystemStoreStaffRequest;
+import com.cshy.common.model.request.system.SystemStoreStaffRequest;
 import com.cshy.common.model.response.SystemStoreStaffResponse;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;

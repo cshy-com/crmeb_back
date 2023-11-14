@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.model.entity.express.ShippingTemplatesFree;
-import com.cshy.common.model.request.ShippingTemplatesFreeRequest;
+import com.cshy.common.model.request.shipping.ShippingTemplatesFreeRequest;
 import com.cshy.service.dao.ShippingTemplatesFreeDao;
 import com.cshy.service.service.ShippingTemplatesFreeService;
 import com.cshy.service.service.SystemCityService;
