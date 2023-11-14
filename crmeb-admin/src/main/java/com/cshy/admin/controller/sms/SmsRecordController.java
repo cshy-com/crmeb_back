@@ -36,54 +36,6 @@ public class SmsRecordController {
     private SmsService smsService;
 
     /**
-     * 修改签名
-     */
-    @PreAuthorize("hasAuthority('admin:sms:modify:sign')")
-    @ApiOperation(value = "修改签名")
-    @RequestMapping(value = "/modify/sign", method = RequestMethod.POST)
-    public CommonResult<JSONObject> modifySign(@RequestBody @Validated SmsModifySignRequest request) {
-        if (smsService.modifySign(request)) {
-            return CommonResult.success();
-        }
-        return CommonResult.failed();
-    }
-
-    /**
-     * 短信模板
-     */
-    @PreAuthorize("hasAuthority('admin:sms:temps')")
-    @ApiOperation(value = "短信模板")
-    @RequestMapping(value = "/temps", method = RequestMethod.GET)
-    public CommonResult<Map<String, Object>> temps(@ModelAttribute PageParamRequest pageParamRequest) {
-        MyRecord myRecord = smsService.temps(pageParamRequest);
-        return CommonResult.success(myRecord);
-    }
-
-    /**
-     * 申请短信模板
-     */
-    @PreAuthorize("hasAuthority('admin:sms:temp:apply')")
-    @ApiOperation(value = "申请短信模板")
-    @RequestMapping(value = "/temp/apply", method = RequestMethod.POST)
-    public CommonResult<JSONObject> applyTempMessage(@RequestBody @Validated SmsApplyTempRequest request) {
-        if (smsService.applyTempMessage(request)) {
-            return CommonResult.success();
-        }
-        return CommonResult.failed();
-    }
-
-    /**
-     * 模板申请记录
-     */
-    @PreAuthorize("hasAuthority('admin:sms:applys')")
-    @ApiOperation(value = "模板申请记录")
-    @RequestMapping(value = "/applys", method = RequestMethod.POST)
-    @ApiImplicitParam(name="type", value="type (1=验证码 2=通知 3=推广)")
-    public CommonResult<Map<String, Object>> applys(@RequestParam(name = "type", required = false) Integer type, @ModelAttribute PageParamRequest pageParamRequest) {
-        return CommonResult.success(smsService.applys(type, pageParamRequest));
-    }
-
-    /**
      * 短信发送记录分页
      */
     @ApiOperation(value = "短信发送记录分页")
