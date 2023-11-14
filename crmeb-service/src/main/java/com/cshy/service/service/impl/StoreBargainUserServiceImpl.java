@@ -24,7 +24,7 @@ import com.cshy.common.model.vo.dateLimitUtilVo;
 import com.cshy.common.model.entity.bargain.StoreBargain;
 import com.cshy.common.model.entity.bargain.StoreBargainUser;
 import com.cshy.common.model.entity.bargain.StoreBargainUserHelp;
-import com.cshy.common.model.request.StoreBargainUserSearchRequest;
+import com.cshy.common.model.request.store.StoreBargainUserSearchRequest;
 import com.cshy.common.model.response.StoreBargainUserResponse;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.entity.user.User;
