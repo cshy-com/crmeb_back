@@ -1193,7 +1193,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             SpreadOrderResponse response = new SpreadOrderResponse();
             StoreOrder storeOrder = storeOrderService.getByOderId(e.getLinkId());
             response.setId(storeOrder.getId());
-            response.setOrderId(storeOrder.getOrderNo());
+            response.setOrderId(storeOrder.getOrderId());
             response.setRealName(storeOrder.getRealName());
             response.setUserPhone(storeOrder.getUserMobile());
             response.setPrice(e.getPrice());

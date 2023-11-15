@@ -74,7 +74,7 @@ public class HomeServiceImpl implements HomeService {
         }
 
         for (StoreOrder storeOrder : list) {
-            map.put(storeOrder.getOrderNo(), storeOrder.getId());
+            map.put(storeOrder.getOrderId(), storeOrder.getId());
         }
 
         return map;
@@ -95,7 +95,7 @@ public class HomeServiceImpl implements HomeService {
         }
 
         for (StoreOrder storeOrder : list) {
-            map.put(storeOrder.getOrderNo(), storeOrder.getPayPrice());
+            map.put(storeOrder.getOrderId(), storeOrder.getPayPrice());
         }
 
         return map;

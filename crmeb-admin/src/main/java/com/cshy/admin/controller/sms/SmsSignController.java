@@ -2,19 +2,20 @@ package com.cshy.admin.controller.sms;
 
 import com.cshy.common.model.Type;
 import com.cshy.common.model.entity.base.BasePage;
+import com.cshy.common.model.entity.sms.SmsSign;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.query.sms.SmsSignQuery;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.vo.sms.SmsSignVo;
 import com.cshy.service.service.SmsSignService;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -39,8 +40,7 @@ public class SmsSignController {
 
     @ApiOperation(value = "获取所有短信签名")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public CommonResult<String> list() {
-        smsSignService.list();
-        return CommonResult.success();
+    public CommonResult<List<SmsSign>> list() {
+        return CommonResult.success(smsSignService.list());
     }
 }

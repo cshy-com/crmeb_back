@@ -738,7 +738,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         luw.set(StoreOrder::getPayPrice, price);
         luw.set(StoreOrder::getBeforePayPrice, oldPrice);
         luw.set(StoreOrder::getIsAlterPrice, 1);
-        luw.eq(StoreOrder::getOrderNo, orderNo);
+        luw.eq(StoreOrder::getOrderId, orderNo);
         luw.eq(StoreOrder::getPaid, false);
         return update(luw);
     }
@@ -850,7 +850,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
     @Override
     public StoreOrder getByOderId(String orderId) {
         LambdaQueryWrapper<StoreOrder> lqw = Wrappers.lambdaQuery();
-        lqw.eq(StoreOrder::getOrderNo, orderId);
+        lqw.eq(StoreOrder::getOrderId, orderId);
         return dao.selectOne(lqw);
     }
 
@@ -873,7 +873,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         LambdaUpdateWrapper<StoreOrder> lqw = new LambdaUpdateWrapper<>();
         lqw.set(StoreOrder::getPaid, true);
         lqw.set(StoreOrder::getPayTime, DateUtil.nowDateTime());
-        lqw.eq(StoreOrder::getOrderNo, orderNo);
+        lqw.eq(StoreOrder::getOrderId, orderNo);
         lqw.eq(StoreOrder::getPaid,false);
         return update(lqw);
     }
@@ -887,10 +887,10 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
     public Map<String, StoreOrder> getMapInOrderNo(List<String> orderNoList) {
         Map<String, StoreOrder> map = new HashMap<>();
         LambdaUpdateWrapper<StoreOrder> lqw = new LambdaUpdateWrapper<>();
-        lqw.in(StoreOrder::getOrderNo, orderNoList);
+        lqw.in(StoreOrder::getOrderId, orderNoList);
         List<StoreOrder> orderList = dao.selectList(lqw);
         orderList.forEach(order -> {
-            map.put(order.getOrderNo(), order);
+            map.put(order.getOrderId(), order);
         });
         return map;
     }
@@ -904,7 +904,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
     public BigDecimal getSpreadOrderTotalPriceByOrderList(List<String> orderNoList) {
         LambdaQueryWrapper<StoreOrder> lqw = new LambdaQueryWrapper<>();
         lqw.select(StoreOrder::getPayPrice);
-        lqw.in(StoreOrder::getOrderNo, orderNoList);
+        lqw.in(StoreOrder::getOrderId, orderNoList);
         List<StoreOrder> orderList = dao.selectList(lqw);
         return orderList.stream().map(StoreOrder::getPayPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -955,7 +955,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         StoreOrder existOrder = getInfoException(request.getOrderNo());
         // 订单已支付
         if (existOrder.getPaid()) {
-            throw new CrmebException(StrUtil.format("订单号为 {} 的订单已支付", existOrder.getOrderNo()));
+            throw new CrmebException(StrUtil.format("订单号为 {} 的订单已支付", existOrder.getOrderId()));
         }
         if (existOrder.getIsAlterPrice()) {
             throw new CrmebException("系统只支持一次改价");
@@ -968,7 +968,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
 
         Boolean execute = transactionTemplate.execute(e -> {
             // 修改订单价格
-            orderEditPrice(existOrder.getOrderNo(), request.getPayPrice(), existOrder.getPayPrice());
+            orderEditPrice(existOrder.getOrderId(), request.getPayPrice(), existOrder.getPayPrice());
             // 订单修改状态操作
             storeOrderStatusService.createLog(existOrder.getId(), Constants.ORDER_LOG_EDIT,
                     Constants.RESULT_ORDER_EDIT_PRICE_LOGS.replace("${orderPrice}", oldPrice)
@@ -977,7 +977,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         });
         if (!execute) {
             throw new CrmebException(Constants.RESULT_ORDER_EDIT_PRICE_SUCCESS
-                    .replace("${orderNo}", existOrder.getOrderNo()).replace("${price}", request.getPayPrice()+""));
+                    .replace("${orderNo}", existOrder.getOrderId()).replace("${price}", request.getPayPrice()+""));
         }
         // 发送改价短信提醒
         SystemNotification notification = systemNotificationService.getByMark(NotifyConstants.MODIFY_ORDER_PRICE_MARK);
@@ -987,7 +987,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
                 SmsTemplate smsTemplate = smsTemplateService.getDetail(notification.getSmsId());
                 // 发送改价短信提醒
                 //TODO 修改短信通知
-                smsService.sendOrderEditPriceNotice(user.getPhone(), existOrder.getOrderNo(), request.getPayPrice(), 0);
+                smsService.sendOrderEditPriceNotice(user.getPhone(), existOrder.getOrderId(), request.getPayPrice(), 0);
             }
         }
 
@@ -1433,7 +1433,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
 
     private StoreOrder getInfoException(String orderNo) {
         LambdaQueryWrapper<StoreOrder> lqw = Wrappers.lambdaQuery();
-        lqw.eq(StoreOrder::getOrderNo, orderNo);
+        lqw.eq(StoreOrder::getOrderId, orderNo);
         StoreOrder storeOrder = dao.selectOne(lqw);
         if (ObjectUtil.isNull(storeOrder)) {
             throw new CrmebException("没有找到订单信息");
@@ -1496,7 +1496,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
                     proName = proName.concat("等");
                 }
                 //TODO 修改短信通知
-                smsService.sendOrderDeliverNotice(user.getPhone(), user.getNickname(), proName, storeOrder.getOrderNo(), 0);
+                smsService.sendOrderDeliverNotice(user.getPhone(), user.getNickname(), proName, storeOrder.getOrderId(), 0);
             }
         }
 
@@ -1528,7 +1528,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
             }
             // 发送微信模板消息
             temMap.put(Constants.WE_CHAT_TEMP_KEY_FIRST, "订单发货提醒");
-            temMap.put("keyword1", storeOrder.getOrderNo());
+            temMap.put("keyword1", storeOrder.getOrderId());
             temMap.put("keyword2", cn.hutool.core.date.DateUtil.now());
             temMap.put("keyword3", storeOrder.getDeliveryName());
             temMap.put("keyword4", storeOrder.getTrackingNo());
@@ -1548,7 +1548,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
 //        temMap.put("character_string4", storeOrder.getDeliveryId());
 //        temMap.put("thing7", "您的订单已发货");
             // 放开部分为一码秦川小程序
-            temMap.put("character_string1", storeOrder.getOrderNo());
+            temMap.put("character_string1", storeOrder.getOrderId());
             temMap.put("name6", storeOrder.getDeliveryName());
             temMap.put("character_string7", storeOrder.getTrackingNo());
             temMap.put("thing11", "您的订单已发货");
@@ -1702,7 +1702,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
                 return ;
             }
             map.put(Constants.WE_CHAT_TEMP_KEY_FIRST, "订单配送提醒");
-            map.put("keyword1", storeOrder.getOrderNo());
+            map.put("keyword1", storeOrder.getOrderId());
             map.put("keyword2", DateUtil.dateToStr(storeOrder.getCreateTime(), Constants.DATE_FORMAT));
             map.put("keyword3", storeOrder.getUserAddress());
             map.put("keyword4", request.getDeliveryName());
@@ -1725,7 +1725,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
 //        map.put("name4", request.getDeliveryName());
 //        map.put("phone_number10", request.getDeliveryTel());
             map.put("thing8", proName);
-            map.put("character_string1", storeOrder.getOrderNo());
+            map.put("character_string1", storeOrder.getOrderId());
             map.put("name4", request.getDeliveryName());
             map.put("phone_number10", request.getDeliveryTel());
             templateMessageService.pushMiniTemplateMessage(notification.getRoutineId(), map, userToken.getToken());

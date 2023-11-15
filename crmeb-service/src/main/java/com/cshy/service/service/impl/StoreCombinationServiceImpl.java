@@ -846,7 +846,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
         // 订单申请退款
         OrderRefundApplyRequest refundRequest = new OrderRefundApplyRequest();
         refundRequest.setId(order.getId());
-        refundRequest.setUni(order.getOrderNo());
+        refundRequest.setUni(order.getOrderId());
         refundRequest.setText("拼团订单取消，申请退款");
         refundRequest.setExplain("用户取消拼团订单，申请退款");
         boolean apply = orderService.refundApply(refundRequest);

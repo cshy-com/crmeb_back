@@ -1,10 +1,12 @@
 package com.cshy.service.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.aliyun.dysmsapi20170525.Client;
 import com.aliyun.dysmsapi20170525.models.QuerySmsTemplateListResponse;
 import com.aliyun.dysmsapi20170525.models.QuerySmsTemplateListResponseBody;
 import com.aliyun.tea.TeaException;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.dto.sms.SmsTemplateDto;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -42,6 +45,9 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
 
     @Resource
     private SystemConfigService systemConfigService;
+
+    @Resource
+    private SmsTemplateDao smsTemplateDao;
 
     @Resource
     private SmsSignService smsSignService;
@@ -118,6 +124,14 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
     public void update(String id, Integer triggerPosition, String signId) {
         //查询签名
         SmsSign smsSign = smsSignService.getById(signId);
+
+        //保证triggerPosition唯一性
+        List<SmsTemplate> smsTemplates = this.list(new LambdaQueryWrapper<SmsTemplate>().eq(SmsTemplate::getTriggerPosition, triggerPosition));
+        if (CollUtil.isNotEmpty(smsTemplates)) {
+            smsTemplates.forEach(temp -> {
+                this.smsTemplateDao.initTriggerPosition(temp.getId());
+            });
+        }
 
         SmsTemplate smsTemplate = this.getById(id);
         smsTemplate.setTriggerPosition(triggerPosition);

@@ -1,9 +1,8 @@
 package com.cshy.admin.controller.sms;
 
 import com.cshy.common.model.Type;
-import com.cshy.common.model.dto.giftCard.GiftCardDto;
-import com.cshy.common.model.dto.sms.SmsTemplateDto;
 import com.cshy.common.model.entity.base.BasePage;
+import com.cshy.common.model.entity.sms.SmsTemplate;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.query.sms.SmsTemplateQuery;
 import com.cshy.common.model.response.CommonResult;
@@ -53,8 +52,7 @@ public class SmsTemplateController {
 
     @ApiOperation(value = "查看详情")
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
-    public CommonResult<String> get(@PathVariable String id) {
-        smsTemplateService.getById(id);
-        return CommonResult.success();
+    public CommonResult<SmsTemplate> get(@PathVariable String id) {
+        return CommonResult.success(smsTemplateService.getById(id));
     }
 }
