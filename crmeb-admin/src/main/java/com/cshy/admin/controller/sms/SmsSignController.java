@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("api/admin/sms/sign")
-@Api(tags = "短信签名接口")
+@Api(tags = "v2 -- 短信签名接口")
 public class SmsSignController {
     @Autowired
     private SmsSignService smsSignService;

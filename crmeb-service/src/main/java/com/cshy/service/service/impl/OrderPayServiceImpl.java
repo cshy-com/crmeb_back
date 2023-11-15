@@ -144,9 +144,6 @@ public class OrderPayServiceImpl implements OrderPayService {
     private UserExperienceRecordService userExperienceRecordService;
 
     @Autowired
-    private YlyPrintService ylyPrintService;
-
-    @Autowired
     private SystemNotificationService systemNotificationService;
 
     @Autowired
@@ -300,9 +297,6 @@ public class OrderPayServiceImpl implements OrderPayService {
 
                 // 购买成功后根据配置送优惠券
                 autoSendCoupons(storeOrder);
-
-                // 根据配置 打印小票
-                ylyPrintService.YlyPrint(storeOrder.getOrderNo(),true);
 
             } catch (Exception e) {
                 e.printStackTrace();

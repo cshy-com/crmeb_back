@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("api/admin/sms/template")
-@Api(tags = "短信模板接口")
+@Api(tags = "v2 -- 短信模板接口")
 public class SmsTemplateController {
     @Autowired
     private SmsTemplateService smsTemplateService;
@@ -48,6 +48,13 @@ public class SmsTemplateController {
     })
     public CommonResult<String> update(@RequestParam String id, @RequestParam Integer triggerPosition, @RequestParam String signId) {
         smsTemplateService.update(id, triggerPosition, signId);
+        return CommonResult.success();
+    }
+
+    @ApiOperation(value = "查看详情")
+    @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
+    public CommonResult<String> get(@PathVariable String id) {
+        smsTemplateService.getById(id);
         return CommonResult.success();
     }
 }

@@ -29,7 +29,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("api/admin/sms")
-@Api(tags = "短信服务")
+@Api(tags = "v2 -- 短信服务")
 public class SmsRecordController {
 
     @Autowired
