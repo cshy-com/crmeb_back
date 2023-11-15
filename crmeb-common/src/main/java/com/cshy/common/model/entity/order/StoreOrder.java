@@ -31,7 +31,7 @@ public class StoreOrder implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "订单号")
-    private String orderNo;
+    private String orderId;
 
     @ApiModelProperty(value = "用户id")
     private Integer uid;

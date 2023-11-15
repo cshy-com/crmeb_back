@@ -200,7 +200,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         // 商品赠送积分
         // 查询订单详情
         // 获取商品额外赠送积分
-        List<StoreOrderInfo> orderInfoList = storeOrderInfoService.getListByOrderNo(storeOrder.getOrderNo());
+        List<StoreOrderInfo> orderInfoList = storeOrderInfoService.getListByOrderNo(storeOrder.getOrderId());
         if (orderInfoList.get(0).getProductType().equals(0)) {
             List<Integer> productIds = orderInfoList.stream().map(StoreOrderInfo::getProductId).collect(Collectors.toList());
             if (productIds.size() > 0) {
@@ -256,7 +256,7 @@ public class OrderPayServiceImpl implements OrderPayService {
             // 佣金记录
             if (CollUtil.isNotEmpty(recordList)) {
                 recordList.forEach(temp -> {
-                    temp.setLinkId(storeOrder.getOrderNo());
+                    temp.setLinkId(storeOrder.getOrderId());
                 });
                 userBrokerageRecordService.saveBatch(recordList);
             }
@@ -274,7 +274,7 @@ public class OrderPayServiceImpl implements OrderPayService {
                 // 发送短信
                 if (StrUtil.isNotBlank(user.getPhone()) && payNotification.getIsSms().equals(1)) {
                     SmsTemplate smsTemplate = smsTemplateService.getDetail(payNotification.getSmsId());
-                    smsService.sendPaySuccess(user.getPhone(), storeOrder.getOrderNo(), storeOrder.getPayPrice(), Integer.valueOf(smsTemplate.getTempId()));
+                    smsService.sendPaySuccess(user.getPhone(), storeOrder.getOrderId(), storeOrder.getPayPrice(), Integer.valueOf(smsTemplate.getTempId()));
                 }
 
                 // 发送用户支付成功管理员提醒短信
@@ -286,7 +286,7 @@ public class OrderPayServiceImpl implements OrderPayService {
                         SmsTemplate smsTemplate = smsTemplateService.getDetail(payAdminNotification.getSmsId());
                         // 发送短信
                         systemAdminList.forEach(admin -> {
-                            smsService.sendOrderPaySuccessNotice(admin.getPhone(), storeOrder.getOrderNo(), admin.getRealName(), Integer.valueOf(smsTemplate.getTempId()));
+                            smsService.sendOrderPaySuccessNotice(admin.getPhone(), storeOrder.getOrderId(), admin.getRealName(), Integer.valueOf(smsTemplate.getTempId()));
                         });
                     }
                 }
@@ -300,7 +300,7 @@ public class OrderPayServiceImpl implements OrderPayService {
                 autoSendCoupons(storeOrder);
 
                 // 根据配置 打印小票
-                ylyPrintService.YlyPrint(storeOrder.getOrderNo(),true);
+                ylyPrintService.YlyPrint(storeOrder.getOrderId(),true);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -331,7 +331,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         });
         boolean update = storePinkService.updateBatchById(pinkList);
         if (!update) {
-            logger.error("拼团订单支付成功后更新拼团状态失败,orderNo = " + storeOrder.getOrderNo());
+            logger.error("拼团订单支付成功后更新拼团状态失败,orderNo = " + storeOrder.getOrderId());
             return false;
         }
         SystemNotification notification = systemNotificationService.getByMark(NotifyConstants.GROUP_SUCCESS_MARK);
@@ -342,7 +342,7 @@ public class OrderPayServiceImpl implements OrderPayService {
                 User tempUser = userService.getById(i.getUid());
                 // 发送微信模板消息
                 MyRecord record = new MyRecord();
-                record.set("orderNo", order.getOrderNo());
+                record.set("orderNo", order.getOrderId());
                 record.set("proName", storeCombination.getTitle());
                 record.set("payType", order.getPayType());
                 record.set("isChannel", order.getPaymentChannel());
@@ -580,7 +580,7 @@ public class OrderPayServiceImpl implements OrderPayService {
                 userService.updateIntegral(user, storeOrder.getUseIntegral(), "sub");
             }
             // 添加支付成功redis队列
-            redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, storeOrder.getOrderNo());
+            redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, storeOrder.getOrderId());
 
             // 处理拼团
             if (storeOrder.getCombinationId() > 0) {
@@ -606,7 +606,7 @@ public class OrderPayServiceImpl implements OrderPayService {
                 storePink.setUid(user.getUid());
                 storePink.setAvatar(user.getAvatar());
                 storePink.setNickname(user.getNickname());
-                storePink.setOrderId(storeOrder.getOrderNo());
+                storePink.setOrderId(storeOrder.getOrderId());
                 storePink.setOrderIdKey(storeOrder.getId());
                 storePink.setTotalNum(storeOrder.getTotalNum());
                 storePink.setTotalPrice(storeOrder.getTotalPrice());
@@ -702,7 +702,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         }
 
         OrderPayResultResponse response = new OrderPayResultResponse();
-        response.setOrderNo(storeOrder.getOrderNo());
+        response.setOrderNo(storeOrder.getOrderId());
         response.setPayType(storeOrder.getPayType());
         // 0元付
         if (storeOrder.getPayPrice().compareTo(BigDecimal.ZERO) <= 0) {
@@ -863,7 +863,7 @@ public class OrderPayServiceImpl implements OrderPayService {
     private UserIntegralRecord integralRecordSubInit(StoreOrder storeOrder, User user) {
         UserIntegralRecord integralRecord = new UserIntegralRecord();
         integralRecord.setUid(storeOrder.getUid());
-        integralRecord.setLinkId(storeOrder.getOrderNo());
+        integralRecord.setLinkId(storeOrder.getOrderId());
         integralRecord.setLinkType(IntegralRecordConstants.INTEGRAL_RECORD_LINK_TYPE_ORDER);
         integralRecord.setType(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_SUB);
         integralRecord.setTitle(IntegralRecordConstants.BROKERAGE_RECORD_TITLE_ORDER);
@@ -894,7 +894,7 @@ public class OrderPayServiceImpl implements OrderPayService {
     private UserExperienceRecord experienceRecordInit(StoreOrder storeOrder, Integer balance, Integer experience) {
         UserExperienceRecord record = new UserExperienceRecord();
         record.setUid(storeOrder.getUid());
-        record.setLinkId(storeOrder.getOrderNo());
+        record.setLinkId(storeOrder.getOrderId());
         record.setLinkType(ExperienceRecordConstants.EXPERIENCE_RECORD_LINK_TYPE_ORDER);
         record.setType(ExperienceRecordConstants.EXPERIENCE_RECORD_TYPE_ADD);
         record.setTitle(ExperienceRecordConstants.EXPERIENCE_RECORD_TITLE_ORDER);
@@ -912,7 +912,7 @@ public class OrderPayServiceImpl implements OrderPayService {
     private UserIntegralRecord integralRecordInit(StoreOrder storeOrder, Integer balance, Integer integral, String type) {
         UserIntegralRecord integralRecord = new UserIntegralRecord();
         integralRecord.setUid(storeOrder.getUid());
-        integralRecord.setLinkId(storeOrder.getOrderNo());
+        integralRecord.setLinkId(storeOrder.getOrderId());
         integralRecord.setLinkType(IntegralRecordConstants.INTEGRAL_RECORD_LINK_TYPE_ORDER);
         integralRecord.setType(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD);
         integralRecord.setTitle(IntegralRecordConstants.BROKERAGE_RECORD_TITLE_ORDER);
@@ -956,7 +956,7 @@ public class OrderPayServiceImpl implements OrderPayService {
             // 发送微信模板消息
             temMap.put(Constants.WE_CHAT_TEMP_KEY_FIRST, "您的订单已支付成功！");
             temMap.put("keyword1", storeOrder.getPayPrice().toString());
-            temMap.put("keyword2", storeOrder.getOrderNo());
+            temMap.put("keyword2", storeOrder.getOrderId());
             temMap.put(Constants.WE_CHAT_TEMP_KEY_END, "欢迎下次再来！");
             templateMessageService.pushTemplateMessage(payNotification.getWechatId(), temMap, userToken.getToken());
             return;
@@ -971,7 +971,7 @@ public class OrderPayServiceImpl implements OrderPayService {
 //            temMap.put("character_string1", storeOrder.getOrderId());
 //            temMap.put("amount2", storeOrder.getPayPrice().toString() + "元");
 //            temMap.put("thing7", "您的订单已支付成功");
-            temMap.put("character_string3", storeOrder.getOrderNo());
+            temMap.put("character_string3", storeOrder.getOrderId());
             temMap.put("amount9", storeOrder.getPayPrice().toString() + "元");
             temMap.put("thing6", "您的订单已支付成功");
             templateMessageService.pushMiniTemplateMessage(payNotification.getRoutineId(), temMap, userToken.getToken());
@@ -1015,7 +1015,7 @@ public class OrderPayServiceImpl implements OrderPayService {
             return Boolean.TRUE;
         });
         if (!execute) {
-            logger.error(StrUtil.format("支付成功领取优惠券，更新数据库失败，订单编号：{}", storeOrder.getOrderNo()));
+            logger.error(StrUtil.format("支付成功领取优惠券，更新数据库失败，订单编号：{}", storeOrder.getOrderId()));
         }
     }
 }

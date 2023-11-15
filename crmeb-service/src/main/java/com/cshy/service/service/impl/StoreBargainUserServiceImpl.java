@@ -548,7 +548,7 @@ public class StoreBargainUserServiceImpl extends ServiceImpl<StoreBargainUserDao
                     } else if (bargainOrder.getPaid()) {
                         recordResponse.setIsPay(true);
                     } else {
-                        recordResponse.setOrderNo(bargainOrder.getOrderNo());
+                        recordResponse.setOrderNo(bargainOrder.getOrderId());
                     }
                 }
             }

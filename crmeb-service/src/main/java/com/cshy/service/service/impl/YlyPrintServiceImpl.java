@@ -73,7 +73,7 @@ public class YlyPrintServiceImpl implements YlyPrintService {
 
         YlyPrintRequest ylyPrintRequest = new YlyPrintRequest();
         ylyPrintRequest.setBusinessName(systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_SITE_NAME));
-        ylyPrintRequest.setOrderNo(exitOrder.getOrderNo());
+        ylyPrintRequest.setOrderNo(exitOrder.getOrderId());
         ylyPrintRequest.setDate(DateUtil.format(exitOrder.getPayTime(), Constants.DATE_FORMAT));
         ylyPrintRequest.setName(exitOrder.getRealName());
         ylyPrintRequest.setPhone(exitOrder.getUserMobile());

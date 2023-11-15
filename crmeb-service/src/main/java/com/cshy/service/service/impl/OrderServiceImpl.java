@@ -297,7 +297,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Boolean refundApply(OrderRefundApplyRequest request) {
         StoreOrder storeOrderPram = new StoreOrder();
-        storeOrderPram.setOrderNo(request.getUni());
+        storeOrderPram.setOrderId(request.getUni());
         storeOrderPram.setIsDel(false);
         storeOrderPram.setPaid(true);
         StoreOrder existStoreOrder = storeOrderService.getByEntityOne(storeOrderPram);
@@ -338,7 +338,7 @@ public class OrderServiceImpl implements OrderService {
                     Integer tempId = Integer.valueOf(smsTemplate.getTempId());
                     // 发送短信
                     systemAdminList.forEach(admin -> {
-                        smsService.sendOrderRefundApplyNotice(admin.getPhone(), existStoreOrder.getOrderNo(), admin.getRealName(), tempId);
+                        smsService.sendOrderRefundApplyNotice(admin.getPhone(), existStoreOrder.getOrderId(), admin.getRealName(), tempId);
                     });
                 }
             }
@@ -396,7 +396,7 @@ public class OrderServiceImpl implements OrderService {
             // 发送用户退款管理员提醒短信
             if (notification.getIsSms().equals(1) && CollUtil.isNotEmpty(systemAdminList)) {
                 // 发送短信
-                systemAdminList.forEach(admin -> smsService.sendOrderRefundApplyNotice(admin.getPhone(), storeOrder.getOrderNo(), admin.getRealName(), tempId));
+                systemAdminList.forEach(admin -> smsService.sendOrderRefundApplyNotice(admin.getPhone(), storeOrder.getOrderId(), admin.getRealName(), tempId));
             }
         }
 
@@ -425,7 +425,7 @@ public class OrderServiceImpl implements OrderService {
             // 活动类型
             infoResponse.setActivityType(getOrderActivityType(storeOrder));
             // 订单详情对象列表
-            List<StoreOrderInfo> orderInfoList = storeOrderInfoService.getListByOrderNo(storeOrder.getOrderNo());
+            List<StoreOrderInfo> orderInfoList = storeOrderInfoService.getListByOrderNo(storeOrder.getOrderId());
             List<OrderInfoResponse> infoResponseList = CollUtil.newArrayList();
             orderInfoList.forEach(e -> {
                 OrderInfoResponse orderInfoResponse = new OrderInfoResponse();
@@ -525,7 +525,7 @@ public class OrderServiceImpl implements OrderService {
         MyRecord orderStatusVo = getOrderStatusVo(storeOrder);
         // 订单详情对象列表
         List<OrderInfoResponse> infoResponseList = CollUtil.newArrayList();
-        List<StoreOrderInfo> infoList = storeOrderInfoService.getListByOrderNo(storeOrder.getOrderNo());
+        List<StoreOrderInfo> infoList = storeOrderInfoService.getListByOrderNo(storeOrder.getOrderId());
         infoList.forEach(e -> {
             OrderInfoResponse orderInfoResponse = new OrderInfoResponse();
             orderInfoResponse.setStoreName(e.getProductName());
@@ -725,7 +725,7 @@ public class OrderServiceImpl implements OrderService {
     public Object expressOrder(String orderId) {
         HashMap<String, Object> resultMap = new HashMap<>();
         StoreOrder storeOrderPram = new StoreOrder();
-        storeOrderPram.setOrderNo(orderId);
+        storeOrderPram.setOrderId(orderId);
         StoreOrder existOrder = storeOrderService.getByEntityOne(storeOrderPram);
         if (ObjectUtil.isNull(existOrder)) throw new CrmebException("未找到该订单信息");
         if (!existOrder.getDeliveryType().equals(Constants.ORDER_LOG_EXPRESS) || StringUtils.isBlank(existOrder.getDeliveryType()))
@@ -1086,7 +1086,7 @@ public class OrderServiceImpl implements OrderService {
 
         StoreOrder storeOrder = new StoreOrder();
         storeOrder.setUid(user.getUid());
-        storeOrder.setOrderNo(orderNo);
+        storeOrder.setOrderId(orderNo);
         storeOrder.setRealName(request.getRealName());
         storeOrder.setUserMobile(request.getPhone());
         storeOrder.setUserAddress(userAddressStr);
@@ -1205,13 +1205,13 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 加入自动未支付自动取消队列
-        redisUtil.lPush(Constants.ORDER_AUTO_CANCEL_KEY, storeOrder.getOrderNo());
+        redisUtil.lPush(Constants.ORDER_AUTO_CANCEL_KEY, storeOrder.getOrderId());
 
         // 发送后台管理员下单提醒通知短信
-        sendAdminOrderNotice(storeOrder.getOrderNo());
+        sendAdminOrderNotice(storeOrder.getOrderId());
 
         MyRecord record = new MyRecord();
-        record.set("orderNo", storeOrder.getOrderNo());
+        record.set("orderNo", storeOrder.getOrderId());
         return record;
     }
 
@@ -1237,7 +1237,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void refundTrackingNo(String trackingNo, String uni) {
         StoreOrder storeOrderPram = new StoreOrder();
-        storeOrderPram.setOrderNo(uni);
+        storeOrderPram.setOrderId(uni);
         storeOrderPram.setIsDel(false);
         storeOrderPram.setPaid(true);
         StoreOrder existStoreOrder = storeOrderService.getByEntityOne(storeOrderPram);
@@ -1270,7 +1270,7 @@ public class OrderServiceImpl implements OrderService {
             this.storeOrderService.updateById(storeOrder);
 
             //查询同一订单商品
-            List<StoreOrderInfo> storeOrderInfoList = this.storeOrderInfoService.getListByOrderNo(storeOrder.getOrderNo());
+            List<StoreOrderInfo> storeOrderInfoList = this.storeOrderInfoService.getListByOrderNo(storeOrder.getOrderId());
             List<String> nameList = storeOrderInfoList.stream().map(StoreOrderInfo::getProductName).collect(Collectors.toList());
             nameStr = StringUtils.join("，", nameList);
 

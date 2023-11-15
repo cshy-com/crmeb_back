@@ -192,7 +192,7 @@ public class CallbackServiceImpl implements CallbackService {
                         storePink.setUid(user.getUid());
                         storePink.setAvatar(user.getAvatar());
                         storePink.setNickname(user.getNickname());
-                        storePink.setOrderId(storeOrder.getOrderNo());
+                        storePink.setOrderId(storeOrder.getOrderId());
                         storePink.setOrderIdKey(storeOrder.getId());
                         storePink.setTotalNum(storeOrder.getTotalNum());
                         storePink.setTotalPrice(storeOrder.getTotalPrice());
@@ -232,7 +232,7 @@ public class CallbackServiceImpl implements CallbackService {
                     sb.append("</xml>");
                     return sb.toString();
                 }
-                redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, storeOrder.getOrderNo());
+                redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, storeOrder.getOrderId());
             }
             // 充值
             if (Constants.SERVICE_PAY_TYPE_RECHARGE.equals(attachVo.getType())) {

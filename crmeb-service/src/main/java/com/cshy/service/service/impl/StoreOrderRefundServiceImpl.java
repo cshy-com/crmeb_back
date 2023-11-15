@@ -84,7 +84,7 @@ public class StoreOrderRefundServiceImpl extends ServiceImpl<StoreOrderDao, Stor
         wxRefundVo.setMch_id(mchId);
         wxRefundVo.setNonce_str(WxPayUtil.getNonceStr());
         wxRefundVo.setOut_trade_no(storeOrder.getOutTradeNo());
-        wxRefundVo.setOut_refund_no(storeOrder.getOrderNo());
+        wxRefundVo.setOut_refund_no(storeOrder.getOrderId());
         wxRefundVo.setTotal_fee(storeOrder.getPayPrice().multiply(BigDecimal.TEN).multiply(BigDecimal.TEN).intValue());
         wxRefundVo.setRefund_fee(request.getAmount().multiply(BigDecimal.TEN).multiply(BigDecimal.TEN).intValue());
         wxRefundVo.setNotify_url(apiDomain + PayConstants.WX_PAY_REFUND_NOTIFY_API_URI);

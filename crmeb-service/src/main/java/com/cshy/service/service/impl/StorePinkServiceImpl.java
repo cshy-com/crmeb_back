@@ -264,7 +264,7 @@ public class StorePinkServiceImpl extends ServiceImpl<StorePinkDao, StorePink> i
                     User tempUser = userService.getById(i.getUid());
                     // 发送微信模板消息
                     MyRecord record = new MyRecord();
-                    record.set("orderNo", storeOrder.getOrderNo());
+                    record.set("orderNo", storeOrder.getOrderId());
                     record.set("proName", storeCombination.getTitle());
                     record.set("payType", storeOrder.getPayType());
                     record.set("isChannel", storeOrder.getPaymentChannel());

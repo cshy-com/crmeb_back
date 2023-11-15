@@ -189,7 +189,7 @@ public class WeChatPayServiceImpl implements WeChatPayService {
                     storePink.setUid(user.getUid());
                     storePink.setAvatar(user.getAvatar());
                     storePink.setNickname(user.getNickname());
-                    storePink.setOrderId(storeOrder.getOrderNo());
+                    storePink.setOrderId(storeOrder.getOrderId());
                     storePink.setOrderIdKey(storeOrder.getId());
                     storePink.setTotalNum(storeOrder.getTotalNum());
                     storePink.setTotalPrice(storeOrder.getTotalPrice());

@@ -175,7 +175,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
     private Boolean rollbackStock(StoreOrder storeOrder) {
         try{
             // 查找出商品详情
-            List<StoreOrderInfo> orderInfoList = storeOrderInfoService.getListByOrderNo(storeOrder.getOrderNo());
+            List<StoreOrderInfo> orderInfoList = storeOrderInfoService.getListByOrderNo(storeOrder.getOrderId());
             if(null == orderInfoList || orderInfoList.size() < 1){
                 return true;
             }
@@ -257,7 +257,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
         }
 
         // 回滚经验
-        UserExperienceRecord userExperienceRecord = userExperienceRecordService.getByOrderNoAndUid(storeOrder.getOrderNo(), storeOrder.getUid());
+        UserExperienceRecord userExperienceRecord = userExperienceRecordService.getByOrderNoAndUid(storeOrder.getOrderId(), storeOrder.getUid());
         user.setExperience(user.getExperience() - userExperienceRecord.getExperience());
 
         UserExperienceRecord experienceRecord = new UserExperienceRecord();
@@ -270,7 +270,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
         experienceRecord.setCreateTime(cn.hutool.core.date.DateUtil.date());
 
         // 回滚积分
-        List<UserIntegralRecord> integralRecordList = userIntegralRecordService.findListByOrderIdAndUid(storeOrder.getOrderNo(), storeOrder.getUid());
+        List<UserIntegralRecord> integralRecordList = userIntegralRecordService.findListByOrderIdAndUid(storeOrder.getOrderId(), storeOrder.getUid());
         integralRecordList.forEach(record -> {
             if (record.getType().equals(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_SUB)) {// 订单抵扣部分
                 user.setIntegral(user.getIntegral() + record.getIntegral());
@@ -295,7 +295,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
         // 佣金处理：只处理冻结期佣金
         // 查询佣金记录
         List<UserBrokerageRecord> brokerageRecordList = CollUtil.newArrayList();
-        List<UserBrokerageRecord> recordList = userBrokerageRecordService.findListByLinkIdAndLinkType(storeOrder.getOrderNo(), BrokerageRecordConstants.BROKERAGE_RECORD_LINK_TYPE_ORDER);
+        List<UserBrokerageRecord> recordList = userBrokerageRecordService.findListByLinkIdAndLinkType(storeOrder.getOrderId(), BrokerageRecordConstants.BROKERAGE_RECORD_LINK_TYPE_ORDER);
         if (CollUtil.isNotEmpty(recordList)) {
             recordList.forEach(r -> {
                 //创建、冻结期佣金置为失效状态
@@ -337,7 +337,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
 
             // 拼团状态处理
             if (storeOrder.getCombinationId() > 0) {
-                StorePink storePink = storePinkService.getByOrderId(storeOrder.getOrderNo());
+                StorePink storePink = storePinkService.getByOrderId(storeOrder.getOrderId());
                 storePink.setStatus(3);
                 storePink.setIsRefund(true);
                 storePinkService.updateById(storePink);
@@ -423,7 +423,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
         User user = userService.getById(storeOrder.getUid());
 
         // 获取佣金记录
-        List<UserBrokerageRecord> recordList = userBrokerageRecordService.findListByLinkIdAndLinkType(storeOrder.getOrderNo(), BrokerageRecordConstants.BROKERAGE_RECORD_LINK_TYPE_ORDER);
+        List<UserBrokerageRecord> recordList = userBrokerageRecordService.findListByLinkIdAndLinkType(storeOrder.getOrderId(), BrokerageRecordConstants.BROKERAGE_RECORD_LINK_TYPE_ORDER);
         logger.info("收货处理佣金条数：" + recordList.size());
         for (UserBrokerageRecord record : recordList) {
             if (!record.getStatus().equals(BrokerageRecordConstants.BROKERAGE_RECORD_STATUS_CREATE)) {
@@ -441,7 +441,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
         }
 
         // 获取积分记录
-        List<UserIntegralRecord> integralRecordList = userIntegralRecordService.findListByOrderIdAndUid(storeOrder.getOrderNo(), storeOrder.getUid());
+        List<UserIntegralRecord> integralRecordList = userIntegralRecordService.findListByOrderIdAndUid(storeOrder.getOrderId(), storeOrder.getUid());
         logger.info("收货处理积分条数：" + integralRecordList.size());
         List<UserIntegralRecord> userIntegralRecordList = integralRecordList.stream().filter(e -> e.getType().equals(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD)).collect(Collectors.toList());
         for (UserIntegralRecord record : userIntegralRecordList) {
@@ -483,7 +483,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
                     Integer tempId = Integer.valueOf(smsTemplate.getTempId());
                     // 发送短信
                     systemAdminList.forEach(admin -> {
-                        smsService.sendOrderReceiptNotice(admin.getPhone(), storeOrder.getOrderNo(), admin.getRealName(), tempId);
+                        smsService.sendOrderReceiptNotice(admin.getPhone(), storeOrder.getOrderId(), admin.getRealName(), tempId);
                     });
                 }
             }
@@ -519,7 +519,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
             }
             // 发送微信模板消息
             temMap.put(Constants.WE_CHAT_TEMP_KEY_FIRST, "您购买的商品已确认收货！");
-            temMap.put("keyword1", storeOrder.getOrderNo());
+            temMap.put("keyword1", storeOrder.getOrderId());
             temMap.put("keyword2", "已收货");
             temMap.put("keyword3", DateUtil.nowDateTimeStr());
             temMap.put("keyword4", "详情请进入订单查看");
@@ -545,7 +545,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
 //        temMap.put("time7", DateUtil.nowDateTimeStr());
 //        temMap.put("thing1", storeNameAndCarNumString);
 //        temMap.put("thing5", "您购买的商品已确认收货！");
-            temMap.put("character_string6", storeOrder.getOrderNo());
+            temMap.put("character_string6", storeOrder.getOrderId());
             temMap.put("date5", DateUtil.nowDateTimeStr());
             temMap.put("thing2", storeNameAndCarNumString);
             templateMessageService.pushMiniTemplateMessage(notification.getRoutineId(), temMap, userToken.getToken());
