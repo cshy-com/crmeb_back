@@ -1,7 +1,7 @@
 package com.cshy.front.controller;
 
 
-import com.cshy.common.enums.SmsTemplateEnum;
+import com.cshy.common.enums.SmsTriggerEnum;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.request.LoginMobileRequest;
 import com.cshy.common.model.request.LoginRequest;
@@ -89,7 +89,7 @@ public class LoginController {
             @ApiImplicitParam(name = "phone", value = "手机号码", required = true)
     })
     public CommonResult<Object> sendCode(@RequestParam String phone, HttpServletRequest request) {
-        smsService.sendCode(phone, SmsTemplateEnum.VERIFICATION_CODE, request, null);
+        smsService.sendCode(phone, SmsTriggerEnum.VERIFICATION_CODE.getCode(), request, null);
         return CommonResult.success("发送成功");
     }
 }

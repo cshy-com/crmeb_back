@@ -10,7 +10,7 @@ import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cshy.common.constants.OnePassConstants;
 import com.cshy.common.constants.SmsConstants;
-import com.cshy.common.enums.SmsTemplateEnum;
+import com.cshy.common.enums.SmsTriggerEnum;
 import com.cshy.common.model.entity.sms.SmsRecord;
 import com.cshy.common.model.entity.sms.SmsTemplate;
 import com.cshy.common.model.page.CommonPage;
@@ -151,7 +151,7 @@ public class SmsServiceImpl implements SmsService {
 
         SendSmsRequest sendSmsRequest = new SendSmsRequest()
                 .setSignName("清云私享")
-                .setTemplateCode(SmsTemplateEnum.VERIFICATION_CODE.getCode())
+                .setTemplateCode(SmsTriggerEnum.VERIFICATION_CODE.getCode())
                 .setPhoneNumbers(phone)
                 .setTemplateParam(templateParam);
         logger.info("向手机号 {} 发送验证码：{}", phone, code);

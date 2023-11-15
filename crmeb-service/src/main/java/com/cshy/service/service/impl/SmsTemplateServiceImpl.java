@@ -1,6 +1,7 @@
 package com.cshy.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import com.aliyun.dysmsapi20170525.Client;
 import com.aliyun.dysmsapi20170525.models.QuerySmsTemplateListResponse;
@@ -101,6 +102,7 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
                 String auditStatus = switchAuditStatus(smsTemplate);
                 template.setStatus(auditStatus);
 
+                template.setTempName(smsTemplate.getTemplateName());
 
                 if (StringUtils.isBlank(template.getId())){
                     SmsTemplateDto smsTemplateDto = new SmsTemplateDto();
@@ -134,6 +136,8 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
         }
 
         SmsTemplate smsTemplate = this.getById(id);
+        Assert.isTrue("审核通过".equals(smsTemplate.getStatus()), "不能修改审核未通过的数据");
+
         smsTemplate.setTriggerPosition(triggerPosition);
         smsTemplate.setSignId(signId);
         smsTemplate.setSignName(smsSign.getTempName());

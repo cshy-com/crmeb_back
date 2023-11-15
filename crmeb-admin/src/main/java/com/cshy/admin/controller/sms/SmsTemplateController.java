@@ -7,6 +7,7 @@ import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.query.sms.SmsTemplateQuery;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.vo.sms.SmsTemplateVo;
+import com.cshy.service.service.SmsService;
 import com.cshy.service.service.SmsTemplateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -24,6 +25,9 @@ import org.springframework.web.bind.annotation.*;
 public class SmsTemplateController {
     @Autowired
     private SmsTemplateService smsTemplateService;
+
+    @Autowired
+    private SmsService smsService;
 
     @ApiOperation(value = "短信模板分页查询")
     @RequestMapping(value = "/page", method = RequestMethod.POST)
@@ -54,5 +58,12 @@ public class SmsTemplateController {
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
     public CommonResult<SmsTemplate> get(@PathVariable String id) {
         return CommonResult.success(smsTemplateService.getById(id));
+    }
+
+    @ApiOperation(value = "查看详情")
+    @RequestMapping(value = "/test/{id}", method = RequestMethod.GET)
+    public CommonResult<SmsTemplate> get(@PathVariable Integer id) {
+        smsService.sendCode("15285143252", id, null, "测试发送", "123测试");
+        return CommonResult.success();
     }
 }

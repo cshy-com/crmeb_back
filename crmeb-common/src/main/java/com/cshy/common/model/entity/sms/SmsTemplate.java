@@ -1,7 +1,5 @@
 package com.cshy.common.model.entity.sms;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.cshy.common.model.entity.base.BaseModel;
 import io.swagger.annotations.ApiModel;
@@ -10,7 +8,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 短信模板表

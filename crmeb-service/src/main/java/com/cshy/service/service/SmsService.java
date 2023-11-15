@@ -1,14 +1,10 @@
 package com.cshy.service.service;
 
 
-import com.cshy.common.enums.SmsTemplateEnum;
 import com.cshy.common.model.entity.sms.SmsRecord;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.sms.SmsApplyTempRequest;
-import com.cshy.common.model.request.sms.SmsModifySignRequest;
 import com.cshy.common.model.request.sms.SmsRecordsRequest;
-import com.cshy.common.model.vo.MyRecord;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -22,7 +18,7 @@ public interface SmsService {
     /**
      *
      * @param phoneNumber
-     * @param smsTemplateEnum
+     * @param triggerPosition
      * @param request
      * @param params
      */

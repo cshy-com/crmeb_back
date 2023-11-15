@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cshy.common.constants.*;
+import com.cshy.common.enums.SmsTriggerEnum;
 import com.cshy.common.model.entity.giftCard.GiftCardOrder;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.order.OrderComputedPriceRequest;
@@ -1279,7 +1280,7 @@ public class OrderServiceImpl implements OrderService {
             UserAddress userAddress = userAddressService.getById(cardOrder.getAddressId(), true);
             userMobile = userAddress.getPhone();
         }
-        smsService.sendCode(userMobile, 3, request, nameStr);
+        smsService.sendCode(userMobile, SmsTriggerEnum.ITEMS_SHIPPED.getCode(), request, nameStr);
     }
 
     /**

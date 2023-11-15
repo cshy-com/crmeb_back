@@ -12,7 +12,7 @@ public interface GiftCardProductDao extends BaseMapper<GiftCardProduct> {
             "   delete from b_gift_card_product " +
             "   where 1=1 " +
             "   <if test=\"null != idList and idList.size > 0\"> " +
-            "       AND id not in ( " +
+            "       AND id in " +
             "       <foreach collection=\"idList\" item=\"id\" open=\"(\" separator=\",\"  close=\")\"> " +
             "           #{id} " +
             "       </foreach> " +
