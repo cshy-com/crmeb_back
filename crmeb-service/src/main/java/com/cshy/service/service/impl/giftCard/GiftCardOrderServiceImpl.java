@@ -224,7 +224,7 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
         StoreProductInfoResponse productServiceInfo = this.storeProductService.getInfo(cardOrder.getProductId());
         //发送短信
         UserAddress userAddress = userAddressService.getById(cardOrder.getAddressId(), true);
-        smsService.sendCode(userAddress.getPhone(), SmsTemplateEnum.ORDER_SHIPPING_Multi_PARAM,  request, productServiceInfo.getStoreName(), "tempMobile");
+        smsService.sendCode(userAddress.getPhone(), 3,  request, productServiceInfo.getStoreName(), "tempMobile");
     }
 
     @Override
@@ -237,11 +237,11 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
         String phone = systemConfigService.getValueByKey(Constants.SMS_EMPLOYEE_NUMBER);
 
         //短信通知
-        smsService.sendCode(phone, SmsTemplateEnum.ORDER_SUCCESSFUL_2_EMPLOYEE, request, dto.getProductName());
+        smsService.sendCode(phone, 2, request, dto.getProductName());
 
         User info = userService.getInfo();
 
-        smsService.sendCode(info.getPhone(), SmsTemplateEnum.ORDER_SUCCESSFUL_2_CUSTOMER, request, dto.getProductName());
+        smsService.sendCode(info.getPhone(), 1, request, dto.getProductName());
         return id;
     }
 

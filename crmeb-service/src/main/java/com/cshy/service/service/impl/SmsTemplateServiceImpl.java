@@ -9,22 +9,23 @@ import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.dto.sms.SmsTemplateDto;
 import com.cshy.common.model.entity.base.BaseServiceImpl;
+import com.cshy.common.model.entity.sms.SmsSign;
 import com.cshy.common.model.entity.sms.SmsTemplate;
 import com.cshy.common.model.query.sms.SmsTemplateQuery;
 import com.cshy.common.model.vo.sms.SmsTemplateVo;
 import com.cshy.common.utils.StringUtils;
 import com.cshy.service.dao.SmsTemplateDao;
 import com.cshy.service.service.SmsService;
+import com.cshy.service.service.SmsSignService;
 import com.cshy.service.service.SmsTemplateService;
 import com.cshy.service.service.SystemConfigService;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,8 +39,12 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
 
     @Resource
     private SmsService smsService;
+
     @Resource
     private SystemConfigService systemConfigService;
+
+    @Resource
+    private SmsSignService smsSignService;
 
     /**
      * 获取详情
@@ -57,7 +62,6 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
     }
 
     @Override
-    @Async
     public void sync() throws Exception {
         //查询accessKeyID / accessKeySecret
         String smsKey = systemConfigService.getValueByKey(Constants.SMS_KEY);
@@ -66,11 +70,13 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
         Client client = smsService.createClient(smsKey, smsSecret);
         int pageIndex = 1;
         try {
-            // 复制代码运行请自行打印 API 的返回值
             List<QuerySmsTemplateListResponseBody.QuerySmsTemplateListResponseBodySmsTemplateList> smsTemplateList = Lists.newArrayList();
             totalTemplate(smsTemplateList, pageIndex, client);
+
             //查询现有模板
             List<SmsTemplate> list = this.list();
+
+            //数据赋值
             smsTemplateList.stream().forEach(smsTemplate -> {
                 Optional<SmsTemplate> first = list.stream().filter(temp -> temp.getTempCode().equals(smsTemplate.getTemplateCode())).findFirst();
                 SmsTemplate template;
@@ -88,21 +94,36 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
 
                 String auditStatus = switchAuditStatus(smsTemplate);
                 template.setStatus(auditStatus);
-//                if (StringUtils.isBlank(template.getId()))
-//                    this.save(template);
-//                else
-//                    this.updateById(template);
+
+
+                if (StringUtils.isBlank(template.getId())){
+                    SmsTemplateDto smsTemplateDto = new SmsTemplateDto();
+                    BeanUtils.copyProperties(template, smsTemplateDto);
+                    this.add(smsTemplateDto);
+                }
+                else
+                    this.updateById(template);
             });
         } catch (TeaException error) {
-            // 如有需要，请打印 error
             com.aliyun.teautil.Common.assertAsString(error.message);
             log.error(error.message);
         } catch (Exception _error) {
             TeaException error = new TeaException(_error.getMessage(), _error);
-            // 如有需要，请打印 error
             com.aliyun.teautil.Common.assertAsString(error.message);
             log.error(error.message);
         }
+    }
+
+    @Override
+    public void update(String id, Integer triggerPosition, String signId) {
+        //查询签名
+        SmsSign smsSign = smsSignService.getById(signId);
+
+        SmsTemplate smsTemplate = this.getById(id);
+        smsTemplate.setTriggerPosition(triggerPosition);
+        smsTemplate.setSignId(signId);
+        smsTemplate.setSignName(smsSign.getTempName());
+        this.updateById(smsTemplate);
     }
 
     private static String switchAuditStatus(QuerySmsTemplateListResponseBody.QuerySmsTemplateListResponseBodySmsTemplateList smsTemplate) {
@@ -158,7 +179,6 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
                 .setPageSize(pageSize);
         com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
         try {
-            // 复制代码运行请自行打印 API 的返回值
             QuerySmsTemplateListResponse querySmsTemplateListResponse = client.querySmsTemplateListWithOptions(querySmsTemplateListRequest, runtime);
             if (200 == querySmsTemplateListResponse.getStatusCode()) {
                 smsTemplateList.addAll(querySmsTemplateListResponse.getBody().getSmsTemplateList());
@@ -169,12 +189,10 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
                 return smsTemplateList;
             }
         } catch (TeaException error) {
-            // 如有需要，请打印 error
             com.aliyun.teautil.Common.assertAsString(error.message);
             log.error(error.message);
         } catch (Exception _error) {
             TeaException error = new TeaException(_error.getMessage(), _error);
-            // 如有需要，请打印 error
             com.aliyun.teautil.Common.assertAsString(error.message);
             log.error(error.message);
         }

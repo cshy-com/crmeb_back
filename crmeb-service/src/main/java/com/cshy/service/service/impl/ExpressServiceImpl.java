@@ -288,7 +288,12 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
                 .in(GiftCardOrder::getOrderStatus, Lists.newArrayList(1, 2)));
         logger.info("正在同步礼品卡订单数据， 共{}条", giftCardOrderList.size());
         giftCardOrderList.stream().filter(giftCardOrder -> StringUtils.isNotBlank(giftCardOrder.getTrackingNo())).forEach(giftCardOrder -> {
-            this.findExpressDetail(giftCardOrder.getTrackingNo(), 1);
+            try {
+                this.findExpressDetail(giftCardOrder.getTrackingNo(), 1);
+            } catch (Exception e) {
+                if (!e.getMessage().equals("没有信息"))
+                    throw new RuntimeException(e);
+            }
         });
     }
 

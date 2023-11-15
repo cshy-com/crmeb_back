@@ -1281,7 +1281,7 @@ public class OrderServiceImpl implements OrderService {
             UserAddress userAddress = userAddressService.getById(cardOrder.getAddressId(), true);
             userMobile = userAddress.getPhone();
         }
-        smsService.sendCode(userMobile, SmsTemplateEnum.ORDER_SHIPPING, request, nameStr);
+        smsService.sendCode(userMobile, 3, request, nameStr);
     }
 
     /**

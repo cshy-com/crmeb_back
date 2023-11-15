@@ -135,7 +135,6 @@ public class ExpressController {
 //    @PreAuthorize("hasAuthority('admin:express:all')")
     @ApiOperation(value = "手动更新快递信息")
     @RequestMapping(value = "/syncExpressStatus", method = RequestMethod.GET)
-    @ApiImplicitParam(name="trackingNo", value="快递单号（包括前缀）")
     public CommonResult<String> syncExpressStatus() {
         expressService.syncExpressStatus();
         return CommonResult.success();

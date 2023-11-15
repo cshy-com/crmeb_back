@@ -20,4 +20,6 @@ public interface SmsTemplateService extends BaseService<SmsTemplate, SmsTemplate
     SmsTemplate getDetail(Integer id);
 
     void sync() throws Exception;
+
+    void update(String id, Integer triggerPosition, String signId);
 }

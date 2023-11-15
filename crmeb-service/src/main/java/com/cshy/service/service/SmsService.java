@@ -26,7 +26,7 @@ public interface SmsService {
      * @param request
      * @param params
      */
-    void sendCode(String phoneNumber, SmsTemplateEnum smsTemplateEnum, HttpServletRequest request, String... params);
+    void sendCode(String phoneNumber, Integer triggerPosition, HttpServletRequest request, String... params);
 
     /**
      * 阿里云短信服务建立通信

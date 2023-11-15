@@ -1,11 +1,8 @@
 package com.cshy.service.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.dysmsapi20170525.Client;
 import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
@@ -15,12 +12,10 @@ import com.cshy.common.constants.OnePassConstants;
 import com.cshy.common.constants.SmsConstants;
 import com.cshy.common.enums.SmsTemplateEnum;
 import com.cshy.common.model.entity.sms.SmsRecord;
+import com.cshy.common.model.entity.sms.SmsTemplate;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.sms.SmsApplyTempRequest;
-import com.cshy.common.model.request.sms.SmsModifySignRequest;
 import com.cshy.common.model.request.sms.SmsRecordsRequest;
-import com.cshy.common.model.vo.MyRecord;
 import com.cshy.common.model.vo.OnePassLoginVo;
 import com.cshy.common.model.vo.SendSmsVo;
 import com.cshy.common.utils.*;
@@ -31,6 +26,7 @@ import com.cshy.service.service.*;
 import com.cshy.service.util.OnePassUtil;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +40,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * SmsServiceImpl 接口实现
@@ -73,6 +70,9 @@ public class SmsServiceImpl implements SmsService {
     @Resource
     private SmsRecordDao smsRecordDao;
 
+    @Resource
+    private SmsTemplateService smsTemplateService;
+
     private static final Logger logger = LoggerFactory.getLogger(SmsServiceImpl.class);
 
     @Override
@@ -87,22 +87,25 @@ public class SmsServiceImpl implements SmsService {
     }
 
     @Override
-    public void sendCode(String phoneNumber, SmsTemplateEnum smsTemplateEnum, HttpServletRequest request, String... params) {
+    public void sendCode(String phoneNumber, Integer triggerPosition, HttpServletRequest request, String... params) {
         ValidateFormUtil.isPhone(phoneNumber, "手机号码错误");
         try {
             //查询accessKeyID / accessKeySecret
             String smsKey = systemConfigService.getValueByKey(Constants.SMS_KEY);
             String smsSecret = systemConfigService.getValueByKey(Constants.SMS_SECRET);
-            logger.info("向手机号 {} 发送短信，短信模板code为：{}, 名称为：{}", phoneNumber, smsTemplateEnum.getCode(), smsTemplateEnum.getName());
+
+            //查询对应的消息模板
+            SmsTemplate smsTemplate = smsTemplateService.getOne(new LambdaQueryWrapper<SmsTemplate>().eq(SmsTemplate::getTriggerPosition, triggerPosition));
+            logger.info("向手机号 {} 发送短信，短信模板编码为：{}, 名称为：{}", phoneNumber, smsTemplate.getTempCode(), smsTemplate.getTempName());
             Client client = this.createClient(smsKey, smsSecret);
 
             com.aliyun.dysmsapi20170525.models.SendSmsRequest sendSmsRequest;
-            if (smsTemplateEnum.equals(SmsTemplateEnum.VERIFICATION_CODE))
+            if (0 == smsTemplate.getTriggerPosition())
                 //验证码
-                sendSmsRequest = this.sendVerificationCode(phoneNumber);
+                sendSmsRequest = this.sendVerificationCode(phoneNumber, smsTemplate);
             else
                 //其他模板
-                sendSmsRequest = sendCommonCode(phoneNumber, smsTemplateEnum, params);
+                sendSmsRequest = sendCommonCode(phoneNumber, smsTemplate, params);
 
             com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
             SendSmsResponse sendSmsResponse = client.sendSmsWithOptions(sendSmsRequest, runtime);
@@ -110,8 +113,8 @@ public class SmsServiceImpl implements SmsService {
             //添加发送短信记录
             SmsRecord smsRecord = new SmsRecord()
                     .setResultCode(sendSmsResponse.getBody().getCode())
-                    .setTemplate(smsTemplateEnum.getCode())
-                    .setTemplateName(smsTemplateEnum.getName())
+                    .setTemplate(smsTemplate.getTempCode())
+                    .setTemplateName(smsTemplate.getTempName())
                     .setMemo(JSON.toJSONString(sendSmsResponse.getBody()))
                     .setPhone(phoneNumber);
             if (Objects.nonNull(params))
@@ -128,7 +131,7 @@ public class SmsServiceImpl implements SmsService {
         }
     }
 
-    private SendSmsRequest sendVerificationCode(String phone) {
+    private SendSmsRequest sendVerificationCode(String phone, SmsTemplate smsTemplate) {
         String code = RandomUtil.randomNumbers(4);
         //获取短信验证码过期时间
         String codeExpireStr = systemConfigService.getValueByKey(Constants.CONFIG_KEY_SMS_CODE_EXPIRE);
@@ -136,25 +139,34 @@ public class SmsServiceImpl implements SmsService {
             codeExpireStr = Constants.NUM_FIVE + "";// 默认5分钟过期
         }
         redisUtil.set(userService.getValidateCodeRedisKey(phone), code, Long.valueOf(codeExpireStr), TimeUnit.MINUTES);
+
+        List<String> inputParams = findInputParams(smsTemplate.getContent());
+        Map<Object, Object> map = new HashMap<>();
+        AtomicInteger i = new AtomicInteger();
+        inputParams.forEach(inputParam -> {
+            map.put(inputParam, code);
+            i.getAndIncrement();
+        });
+        String templateParam = JSON.toJSONString(map);
+
         SendSmsRequest sendSmsRequest = new SendSmsRequest()
                 .setSignName("清云私享")
                 .setTemplateCode(SmsTemplateEnum.VERIFICATION_CODE.getCode())
                 .setPhoneNumbers(phone)
-                .setTemplateParam("{\"code\":\"" + code + "\"}");
+                .setTemplateParam(templateParam);
         logger.info("向手机号 {} 发送验证码：{}", phone, code);
         return sendSmsRequest;
     }
 
-    private SendSmsRequest sendCommonCode(String phone, SmsTemplateEnum type, String... params) {
+    private SendSmsRequest sendCommonCode(String phone, SmsTemplate smsTemplate, String... params) {
         //构建templateParam参数
-        String typeParam = type.getParam();
-        String[] split = typeParam.split(",");
+        List<String> inputParams = findInputParams(smsTemplate.getContent());
         List<String> paramList = Arrays.asList(params);
 
         Map<Object, Object> map = new HashMap<>();
         AtomicInteger i = new AtomicInteger();
-        Arrays.asList(split).forEach(typeP -> {
-            map.put(typeP, paramList.get(i.get()));
+        inputParams.forEach(inputParam -> {
+            map.put(inputParam, paramList.get(i.get()));
             i.getAndIncrement();
         });
         String templateParam = JSON.toJSONString(map);
@@ -164,10 +176,25 @@ public class SmsServiceImpl implements SmsService {
         redisUtil.set(userService.getValidateCodeRedisKey(phone), params, Long.valueOf(codeExpireStr), TimeUnit.MINUTES);
         SendSmsRequest sendSmsRequest = new SendSmsRequest()
                 .setSignName("清云私享")
-                .setTemplateCode(type.getCode())
+                .setTemplateCode(smsTemplate.getTempCode())
                 .setPhoneNumbers(phone)
                 .setTemplateParam(templateParam);
         return sendSmsRequest;
+    }
+
+    private List<String> findInputParams(String content) {
+        String regex = "\\$\\{[^}]+\\}";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
+
+        List<String> list = Lists.newArrayList();
+        while (matcher.find()) {
+            String match = matcher.group();
+            String replace = match.replace("${", "");
+            replace = replace.replace("}", "");
+            list.add(replace);
+        }
+        return list;
     }
 
     /**
