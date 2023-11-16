@@ -59,6 +59,11 @@ public class GiftCardProductServiceImpl extends BaseServiceImpl<GiftCardProduct,
         this.giftCardProductDao.batchDeleteByIds(idList);
     }
 
+    @Override
+    public void restore(Integer id) {
+        this.giftCardProductDao.restore(id);
+    }
+
     private void findIdList(List<Integer> oldList, List<Integer> newList, List<Integer> addList) {
         oldList.forEach(id1 -> {
             AtomicBoolean isAdd = new AtomicBoolean(true);

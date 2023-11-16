@@ -34,6 +34,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.cshy.service.dao.StoreProductDao;
 import com.cshy.service.delete.ProductUtils;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -924,7 +925,11 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         }
         lambdaUpdateWrapper.eq(StoreProduct::getId, productId);
         lambdaUpdateWrapper.set(StoreProduct::getIsRecycle, true);
-        return update(lambdaUpdateWrapper);
+        update(lambdaUpdateWrapper);
+
+        //查询礼品卡中的关联商品 如果存在则删除
+        this.giftCardProductService.update(new LambdaUpdateWrapper<GiftCardProduct>().eq(GiftCardProduct::getProductId, productId).set(GiftCardProduct::getIsDel, 1));
+        return true;
     }
 
     /**
@@ -962,10 +967,12 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         LambdaUpdateWrapper<StoreProduct> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
         lambdaUpdateWrapper.eq(StoreProduct::getId, productId);
         lambdaUpdateWrapper.set(StoreProduct::getIsRecycle, false);
-        return update(lambdaUpdateWrapper);
-    }
 
-    ///////////////////////////////////////////自定义方法
+        update(lambdaUpdateWrapper);
+        //礼品卡关联商品重新上架
+        this.giftCardProductService.restore(productId);
+        return true;
+    }
 
     /**
      * 扣减库存任务操作
@@ -1091,10 +1098,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
             // 商品下架时，清除用户收藏
             storeProductRelationService.deleteByProId(storeProduct.getId());
             //查询礼品卡中的关联商品 如果存在则删除
-            List<GiftCardProduct> giftCardProductList = this.giftCardProductService.list(new LambdaQueryWrapper<GiftCardProduct>().eq(GiftCardProduct::getProductId, id));
-            List<String> idList = giftCardProductList.stream().map(GiftCardProduct::getId).collect(Collectors.toList());
-            if (CollUtil.isNotEmpty(idList))
-                giftCardProductService.batchDeleteByIds(idList);
+            this.giftCardProductService.update(new LambdaUpdateWrapper<GiftCardProduct>().eq(GiftCardProduct::getProductId, id).set(GiftCardProduct::getIsDel, 1));
             return Boolean.TRUE;
         });
 
@@ -1128,6 +1132,9 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         Boolean execute = transactionTemplate.execute(e -> {
             dao.updateById(storeProduct);
             storeCartService.productStatusNoEnable(skuIdList);
+
+            //礼品卡关联商品重新上架
+            this.giftCardProductService.restore(id);
             return Boolean.TRUE;
         });
         return execute;
@@ -1280,10 +1287,12 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
                 StoreProduct::getOtPrice, StoreProduct::getStock, StoreProduct::getSales, StoreProduct::getPrice, StoreProduct::getActivity,
                 StoreProduct::getFicti, StoreProduct::getIsSub, StoreProduct::getStoreInfo, StoreProduct::getBrowse, StoreProduct::getUnitName);
         lqw.eq(StoreProduct::getId, id);
-        lqw.eq(StoreProduct::getIsRecycle, false);
+        if (!isDel)
+            lqw.eq(StoreProduct::getIsRecycle, false);
         if (!isDel)
             lqw.eq(StoreProduct::getIsDel, false);
-        lqw.eq(StoreProduct::getIsShow, true);
+        if (!isDel)
+            lqw.eq(StoreProduct::getIsShow, true);
         StoreProduct storeProduct = dao.selectOne(lqw);
         if (ObjectUtil.isNull(storeProduct)) {
             throw new CrmebException(StrUtil.format("未找到编号为{}的商品", id));

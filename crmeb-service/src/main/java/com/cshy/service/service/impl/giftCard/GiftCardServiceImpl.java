@@ -189,7 +189,7 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
 
             //商品
             Integer productId = giftCardOrder.getProductId();
-            StoreProduct product = storeProductService.getH5Detail(productId);
+            StoreProduct product = storeProductService.getH5Detail(productId, true);
 
             //商品规格
             StoreProductAttrValue attrValue = storeProductAttrValueService.getById(giftCardOrder.getAttrValueId());
