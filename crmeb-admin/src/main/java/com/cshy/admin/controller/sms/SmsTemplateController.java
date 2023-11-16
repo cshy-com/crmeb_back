@@ -54,6 +54,17 @@ public class SmsTemplateController {
         return CommonResult.success();
     }
 
+    @ApiOperation(value = "修改")
+    @RequestMapping(value = "/update/isInternal", method = RequestMethod.GET)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name="id", value="手机号"),
+            @ApiImplicitParam(name="isInternal", value="是否为内部短信(0 否 1 是)"),
+    })
+    public CommonResult<String> updateIsInterNal(@RequestParam String id, @RequestParam Integer isInternal) {
+        smsTemplateService.updateIsInterNal(id, isInternal);
+        return CommonResult.success();
+    }
+
     @ApiOperation(value = "查看详情")
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
     public CommonResult<SmsTemplate> get(@PathVariable String id) {

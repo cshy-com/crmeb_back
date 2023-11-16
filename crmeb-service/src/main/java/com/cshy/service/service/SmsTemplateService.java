@@ -22,4 +22,6 @@ public interface SmsTemplateService extends BaseService<SmsTemplate, SmsTemplate
     void sync() throws Exception;
 
     void update(String id, Integer triggerPosition, String signId);
+
+    void updateIsInterNal(String id, Integer isInterNal);
 }

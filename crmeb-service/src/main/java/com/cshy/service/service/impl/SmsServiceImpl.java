@@ -1,5 +1,6 @@
 package com.cshy.service.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
@@ -10,9 +11,9 @@ import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cshy.common.constants.OnePassConstants;
 import com.cshy.common.constants.SmsConstants;
-import com.cshy.common.enums.SmsTriggerEnum;
 import com.cshy.common.model.entity.sms.SmsRecord;
 import com.cshy.common.model.entity.sms.SmsTemplate;
+import com.cshy.common.model.entity.system.SystemAdmin;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.sms.SmsRecordsRequest;
@@ -40,8 +41,10 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * SmsServiceImpl 接口实现
@@ -73,6 +76,9 @@ public class SmsServiceImpl implements SmsService {
     @Resource
     private SmsTemplateService smsTemplateService;
 
+    @Resource
+    private SystemAdminService systemAdminService;
+
     private static final Logger logger = LoggerFactory.getLogger(SmsServiceImpl.class);
 
     @Override
@@ -96,39 +102,75 @@ public class SmsServiceImpl implements SmsService {
 
             //查询对应的消息模板
             SmsTemplate smsTemplate = smsTemplateService.getOne(new LambdaQueryWrapper<SmsTemplate>().eq(SmsTemplate::getTriggerPosition, triggerPosition));
-            logger.info("向手机号 {} 发送短信，短信模板编码为：{}, 名称为：{}", phoneNumber, smsTemplate.getTempCode(), smsTemplate.getTempName());
+            List<String> phoneList = Lists.newArrayList();
+            if (smsTemplate.getIsInternal() == 1) {
+                //查询员工短信开关
+                List<SystemAdmin> systemAdminList = systemAdminService.list(new LambdaQueryWrapper<SystemAdmin>().eq(SystemAdmin::getIsSms, 1));
+                phoneList = systemAdminList.stream().map(SystemAdmin::getPhone).collect(Collectors.toList());
+                String phoneStr = StringUtils.join(phoneList, ",");
+                logger.info("向内部手机号 {} 发送短信，短信模板编码为：{}, 名称为：{}", phoneStr, smsTemplate.getTempCode(), smsTemplate.getTempName());
+            } else {
+                logger.info("向手机号 {} 发送短信，短信模板编码为：{}, 名称为：{}", phoneNumber, smsTemplate.getTempCode(), smsTemplate.getTempName());
+            }
             Client client = this.createClient(smsKey, smsSecret);
 
-            com.aliyun.dysmsapi20170525.models.SendSmsRequest sendSmsRequest;
+            AtomicReference<SendSmsRequest> sendSmsRequest = new AtomicReference<>();
             if (0 == smsTemplate.getTriggerPosition())
                 //验证码
-                sendSmsRequest = this.sendVerificationCode(phoneNumber, smsTemplate);
-            else
+                sendSmsRequest.set(this.sendVerificationCode(phoneNumber, smsTemplate));
+            else {
                 //其他模板
-                sendSmsRequest = sendCommonCode(phoneNumber, smsTemplate, params);
+                if (CollUtil.isNotEmpty(phoneList)){
+                    phoneList.forEach(phone -> {
+                        sendSmsRequest.set(this.sendCommonCode(phone, smsTemplate, params));
+                        SendSmsResponse sendSmsResponse = null;
+                        try {
+                            sendSmsResponse = doSend(client, sendSmsRequest.get());
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                        addRecord(phone, request, smsTemplate, sendSmsResponse, params);
 
-            com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
-            SendSmsResponse sendSmsResponse = client.sendSmsWithOptions(sendSmsRequest, runtime);
+                        if (Objects.nonNull(sendSmsResponse) && !sendSmsResponse.getBody().getCode().equals("OK")) {
+                            throw new CrmebException(sendSmsResponse.getBody().getMessage());
+                        }
+                    });
+                } else{
+                    sendSmsRequest.set(this.sendCommonCode(phoneNumber, smsTemplate, params));
+                    SendSmsResponse sendSmsResponse = doSend(client, sendSmsRequest.get());
+                    addRecord(phoneNumber, request, smsTemplate, sendSmsResponse, params);
 
-            //添加发送短信记录
-            SmsRecord smsRecord = new SmsRecord()
-                    .setResultCode(sendSmsResponse.getBody().getCode())
-                    .setTemplate(smsTemplate.getTempCode())
-                    .setTemplateName(smsTemplate.getTempName())
-                    .setMemo(JSON.toJSONString(sendSmsResponse.getBody()))
-                    .setPhone(phoneNumber);
-            if (Objects.nonNull(params))
-                smsRecord.setContent(String.join(",", params));
-            if (Objects.nonNull(request))
-                smsRecord.setAddIp(CrmebUtil.getClientIp(request));
-            smsRecordService.save(smsRecord);
-
-            if (!sendSmsResponse.getBody().getCode().equals("OK")) {
-                throw new CrmebException(sendSmsResponse.getBody().getMessage());
+                    if (!sendSmsResponse.getBody().getCode().equals("OK")) {
+                        throw new CrmebException(sendSmsResponse.getBody().getMessage());
+                    }
+                }
             }
+
+
         } catch (Exception e) {
             throw new CrmebException(e.getMessage(), e);
         }
+    }
+
+    private static SendSmsResponse doSend(Client client, SendSmsRequest sendSmsRequest) throws Exception {
+        com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
+        SendSmsResponse sendSmsResponse = client.sendSmsWithOptions(sendSmsRequest, runtime);
+        return sendSmsResponse;
+    }
+
+    private void addRecord(String phoneNumber, HttpServletRequest request, SmsTemplate smsTemplate, SendSmsResponse sendSmsResponse, String[] params) {
+        //添加发送短信记录
+        SmsRecord smsRecord = new SmsRecord()
+                .setResultCode(sendSmsResponse.getBody().getCode())
+                .setTemplate(smsTemplate.getTempCode())
+                .setTemplateName(smsTemplate.getTempName())
+                .setMemo(JSON.toJSONString(sendSmsResponse.getBody()))
+                .setPhone(phoneNumber);
+        if (Objects.nonNull(params))
+            smsRecord.setContent(String.join(",", params));
+        if (Objects.nonNull(request))
+            smsRecord.setAddIp(CrmebUtil.getClientIp(request));
+        smsRecordService.save(smsRecord);
     }
 
     private SendSmsRequest sendVerificationCode(String phone, SmsTemplate smsTemplate) {
@@ -150,8 +192,8 @@ public class SmsServiceImpl implements SmsService {
         String templateParam = JSON.toJSONString(map);
 
         SendSmsRequest sendSmsRequest = new SendSmsRequest()
-                .setSignName("清云私享")
-                .setTemplateCode(SmsTriggerEnum.VERIFICATION_CODE.getCode())
+                .setSignName(smsTemplate.getSignName())
+                .setTemplateCode(smsTemplate.getTempCode())
                 .setPhoneNumbers(phone)
                 .setTemplateParam(templateParam);
         logger.info("向手机号 {} 发送验证码：{}", phone, code);

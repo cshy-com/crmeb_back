@@ -8,6 +8,7 @@ import com.aliyun.dysmsapi20170525.models.QuerySmsTemplateListResponse;
 import com.aliyun.dysmsapi20170525.models.QuerySmsTemplateListResponseBody;
 import com.aliyun.tea.TeaException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.dto.sms.SmsTemplateDto;
@@ -94,6 +95,7 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
                             .tempName(smsTemplate.getTemplateName())
                             .tempCode(smsTemplate.getTemplateCode())
                             .content(smsTemplate.getTemplateContent())
+                            .isInternal(0)
                             .build();
 
                 String type = switchType(smsTemplate);
@@ -142,6 +144,11 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
         smsTemplate.setSignId(signId);
         smsTemplate.setSignName(smsSign.getTempName());
         this.updateById(smsTemplate);
+    }
+
+    @Override
+    public void updateIsInterNal(String id, Integer isInterNal) {
+        this.update(null, new LambdaUpdateWrapper<SmsTemplate>().eq(SmsTemplate::getId, id).set(SmsTemplate::getIsInternal, isInterNal));
     }
 
     private static String switchAuditStatus(QuerySmsTemplateListResponseBody.QuerySmsTemplateListResponseBodySmsTemplateList smsTemplate) {

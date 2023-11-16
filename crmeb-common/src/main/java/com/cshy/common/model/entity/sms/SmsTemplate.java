@@ -55,4 +55,7 @@ public class SmsTemplate extends BaseModel<SmsTemplate>  implements Serializable
 
     @ApiModelProperty(value = "触发位置 0 发送验证码 1 下单成功通知客户 2 下单成功通知员工 3 发货后通知用户 4 退货到达通知 5 退款申请提交通知 6 退款申请通过通知 ")
     private Integer triggerPosition;
+
+    @ApiModelProperty(value = "是否为内部短信(0 否 1 是)")
+    private Integer isInternal;
 }
