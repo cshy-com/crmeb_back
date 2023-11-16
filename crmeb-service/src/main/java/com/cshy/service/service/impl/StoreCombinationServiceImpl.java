@@ -391,7 +391,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
 //        storeProductResponse.setStopTimeStr(DateUtil.timestamp2DateStr(storeCombination.getStopTime(), Constants.DATE_FORMAT_DATE));
 
         // 查询attr
-        List<StoreProductAttr> attrs = storeProductAttrService.getListByProductIdAndType(id, Constants.PRODUCT_TYPE_PINGTUAN);
+        List<StoreProductAttr> attrs = storeProductAttrService.getListByProductIdAndTypeNotDel(id, Constants.PRODUCT_TYPE_PINGTUAN);
         storeProductResponse.setAttr(attrs);
         storeProductResponse.setSliderImage(String.join(",", storeCombination.getImages()));
 
@@ -549,7 +549,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
         detailResponse.setStoreCombination(infoResponse);
 
         // 获取拼团商品规格
-        List<StoreProductAttr> attrList = storeProductAttrService.getListByProductIdAndType(comId, Constants.PRODUCT_TYPE_PINGTUAN);
+        List<StoreProductAttr> attrList = storeProductAttrService.getListByProductIdAndTypeNotDel(comId, Constants.PRODUCT_TYPE_PINGTUAN);
         // 根据制式设置attr属性
 //        List<ProductAttrResponse> skuAttr = getSkuAttr(attrList);
         detailResponse.setProductAttr(attrList);

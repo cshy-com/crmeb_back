@@ -26,4 +26,6 @@ public class PreOrderRequest {
     @ApiModelProperty(value = "订单详情列表")
     private List<PreOrderDetailRequest> orderDetails;
 
+    @ApiModelProperty(value = "是否为礼品卡订单 (0 否 1 是)")
+    private Integer isGiftCard;
 }

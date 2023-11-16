@@ -33,11 +33,13 @@ public interface ProductService {
 
     /**
      * 获取商品详情
-     * @param id 商品编号
-     * @param type normal-正常，void-视频
+     *
+     * @param id         商品编号
+     * @param type       normal-正常，void-视频
+     * @param isGiftCard
      * @return 商品详情信息
      */
-    ProductDetailResponse getDetail(Integer id, String type);
+    ProductDetailResponse getDetail(Integer id, String type, Integer isGiftCard);
 
     /**
      * 获取商品SKU详情

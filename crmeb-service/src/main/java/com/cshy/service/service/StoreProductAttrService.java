@@ -39,5 +39,13 @@ public interface StoreProductAttrService extends IService<StoreProductAttr> {
      * @param type 商品类型
      * @return List
      */
+    List<StoreProductAttr> getListByProductIdAndTypeNotDel(Integer productId, Integer type);
+
+    /**
+     * 获取商品规格列表
+     * @param productId 商品id
+     * @param type 商品类型
+     * @return List
+     */
     List<StoreProductAttr> getListByProductIdAndType(Integer productId, Integer type);
 }

@@ -11,6 +11,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * 同步物流数据 定时器
+ */
 @Component
 @Configuration //读取配置
 @EnableScheduling // 2.开启定时任务

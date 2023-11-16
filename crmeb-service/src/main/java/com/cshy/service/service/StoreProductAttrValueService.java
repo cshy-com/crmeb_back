@@ -2,7 +2,6 @@ package com.cshy.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.entity.product.StoreProductAttrValue;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.util.List;
 
@@ -35,6 +34,14 @@ public interface StoreProductAttrValueService extends IService<StoreProductAttrV
      * @return 删除结果
      */
     boolean removeByProductId(Integer productId,int type);
+
+    /**
+     * 根据id、类型查询
+     * @param id ID
+     * @param type 类型
+     * @return StoreProductAttrValue
+     */
+    StoreProductAttrValue getByIdAndProductIdAndTypeNotDel(Integer id, Integer productId, Integer type);
 
     /**
      * 根据id、类型查询

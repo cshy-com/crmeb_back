@@ -81,12 +81,27 @@ public class StoreProductAttrValueServiceImpl extends ServiceImpl<StoreProductAt
      * @return StoreProductAttrValue
      */
     @Override
-    public StoreProductAttrValue getByIdAndProductIdAndType(Integer id, Integer productId, Integer type) {
+    public StoreProductAttrValue getByIdAndProductIdAndTypeNotDel(Integer id, Integer productId, Integer type) {
         LambdaQueryWrapper<StoreProductAttrValue> lqw = Wrappers.lambdaQuery();
         lqw.eq(StoreProductAttrValue::getId, id);
         lqw.eq(StoreProductAttrValue::getProductId, productId);
         lqw.eq(StoreProductAttrValue::getType, type);
         lqw.eq(StoreProductAttrValue::getIsDel, false);
+        return dao.selectOne(lqw);
+    }
+
+    /**
+     * 根据id、类型查询
+     * @param id ID
+     * @param type 类型
+     * @return StoreProductAttrValue
+     */
+    @Override
+    public StoreProductAttrValue getByIdAndProductIdAndType(Integer id, Integer productId, Integer type) {
+        LambdaQueryWrapper<StoreProductAttrValue> lqw = Wrappers.lambdaQuery();
+        lqw.eq(StoreProductAttrValue::getId, id);
+        lqw.eq(StoreProductAttrValue::getProductId, productId);
+        lqw.eq(StoreProductAttrValue::getType, type);
         return dao.selectOne(lqw);
     }
 

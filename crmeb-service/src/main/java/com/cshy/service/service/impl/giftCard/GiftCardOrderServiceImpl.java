@@ -1,6 +1,7 @@
 package com.cshy.service.service.impl.giftCard;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -14,6 +15,7 @@ import com.cshy.common.model.entity.giftCard.GiftCardOrder;
 import com.cshy.common.model.entity.giftCard.GiftCardProduct;
 import com.cshy.common.model.entity.giftCard.GiftCardType;
 import com.cshy.common.model.entity.product.StoreProduct;
+import com.cshy.common.model.entity.product.StoreProductAttr;
 import com.cshy.common.model.entity.product.StoreProductAttrValue;
 import com.cshy.common.model.entity.user.User;
 import com.cshy.common.model.entity.user.UserAddress;
@@ -247,13 +249,17 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
 
         String phone = systemConfigService.getValueByKey(Constants.SMS_EMPLOYEE_NUMBER);
 
+        //查询商品名称
+        StoreProduct storeProduct = storeProductService.getOne(new LambdaQueryWrapper<StoreProduct>().eq(StoreProduct::getId, dto.getProductId()));
+        Assert.notNull(storeProduct, "未查询到商品");
+
         //短信通知
         //TODO 员工短信配置
-        smsService.sendCode(phone, SmsTriggerEnum.ORDER_PLACED_TO_EMPLOYEE.getCode(), request, dto.getProductName());
+        smsService.sendCode(phone, SmsTriggerEnum.ORDER_PLACED_TO_EMPLOYEE.getCode(), request, storeProduct.getStoreName());
 
         User info = userService.getInfo();
 
-        smsService.sendCode(info.getPhone(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), request, dto.getProductName());
+        smsService.sendCode(info.getPhone(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), request, storeProduct.getStoreName());
         return id;
     }
 

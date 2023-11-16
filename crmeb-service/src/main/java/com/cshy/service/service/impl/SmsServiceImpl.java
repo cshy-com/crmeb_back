@@ -208,16 +208,21 @@ public class SmsServiceImpl implements SmsService {
         Map<Object, Object> map = new HashMap<>();
         AtomicInteger i = new AtomicInteger();
         inputParams.forEach(inputParam -> {
-            map.put(inputParam, paramList.get(i.get()));
+            String p;
+            try {
+                p = paramList.get(i.get());
+                if (p.length() > 35)
+                    p = p.substring(0, 32) + "...";
+            } catch (IndexOutOfBoundsException e) {
+                p = "";
+            }
+            map.put(inputParam, p);
             i.getAndIncrement();
         });
         String templateParam = JSON.toJSONString(map);
 
-        String codeExpireStr = systemConfigService.getValueByKey(Constants.CONFIG_KEY_SMS_CODE_EXPIRE);
-
-        redisUtil.set(userService.getValidateCodeRedisKey(phone), params, Long.valueOf(codeExpireStr), TimeUnit.MINUTES);
         SendSmsRequest sendSmsRequest = new SendSmsRequest()
-                .setSignName("清云私享")
+                .setSignName(smsTemplate.getSignName())
                 .setTemplateCode(smsTemplate.getTempCode())
                 .setPhoneNumbers(phone)
                 .setTemplateParam(templateParam);

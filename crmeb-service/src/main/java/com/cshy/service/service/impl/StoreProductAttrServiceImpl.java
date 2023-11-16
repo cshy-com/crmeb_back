@@ -77,11 +77,25 @@ public class StoreProductAttrServiceImpl extends ServiceImpl<StoreProductAttrDao
      * @return List
      */
     @Override
-    public List<StoreProductAttr> getListByProductIdAndType(Integer productId, Integer type) {
+    public List<StoreProductAttr> getListByProductIdAndTypeNotDel(Integer productId, Integer type) {
         LambdaQueryWrapper<StoreProductAttr> lqw = Wrappers.lambdaQuery();
         lqw.eq(StoreProductAttr::getProductId, productId);
         lqw.eq(StoreProductAttr::getType, type);
         lqw.eq(StoreProductAttr::getIsDel, false);
+        return dao.selectList(lqw);
+    }
+
+    /**
+     * 获取商品规格列表
+     * @param productId 商品id
+     * @param type 商品类型
+     * @return List
+     */
+    @Override
+    public List<StoreProductAttr> getListByProductIdAndType(Integer productId, Integer type) {
+        LambdaQueryWrapper<StoreProductAttr> lqw = Wrappers.lambdaQuery();
+        lqw.eq(StoreProductAttr::getProductId, productId);
+        lqw.eq(StoreProductAttr::getType, type);
         return dao.selectList(lqw);
     }
 }

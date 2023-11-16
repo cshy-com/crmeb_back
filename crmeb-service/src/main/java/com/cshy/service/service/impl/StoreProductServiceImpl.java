@@ -663,7 +663,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         List<String> activityList = getProductActivityList(storeProduct.getActivity());
         storeProductResponse.setActivity(activityList);
 
-        List<StoreProductAttr> attrList = attrService.getListByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
         storeProductResponse.setAttr(attrList);
 
         List<StoreProductAttrValue> attrValueList = storeProductAttrValueService.getListByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);

@@ -11,6 +11,7 @@ import com.cshy.common.model.vo.CategoryTreeVo;
 import com.cshy.front.service.ProductService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,6 @@ import java.util.List;
 
 /**
  * 用户 -- 用户中心
- 
  */
 @Slf4j
 @RestController("ProductController")
@@ -74,8 +74,12 @@ public class ProductController {
     @ApiOperation(value = "商品详情")
     @RequestMapping(value = "/product/detail/{id}", method = RequestMethod.GET)
     @ApiImplicitParam(name = "type", value = "normal-正常，video-视频")
-    public CommonResult<ProductDetailResponse> getDetail(@PathVariable Integer id, @RequestParam(value = "type", defaultValue = "normal") String type) {
-        return CommonResult.success(productService.getDetail(id, type));
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "normal-正常，video-视频"),
+            @ApiImplicitParam(name = "isGiftCard", value = "是否为礼品卡订单 (0 否 1 是)")
+    })
+    public CommonResult<ProductDetailResponse> getDetail(@PathVariable Integer id, @RequestParam(value = "type", defaultValue = "normal") String type, @RequestParam(value = "isGiftCard") Integer isGiftCard) {
+        return CommonResult.success(productService.getDetail(id, type, isGiftCard));
     }
 
     /**

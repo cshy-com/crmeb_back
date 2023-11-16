@@ -1,6 +1,8 @@
-package com.cshy.admin.task.giftCard;
+package com.cshy.admin.task.sms;
 
 import com.cshy.common.utils.DateUtil;
+import com.cshy.service.service.SmsSignService;
+import com.cshy.service.service.SmsTemplateService;
 import com.cshy.service.service.giftCard.GiftCardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,25 +13,29 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * 更新礼品卡券状态 定时器
+ * 同步短信模板/签名 定时器
  */
 @Component
 @Configuration //读取配置
 @EnableScheduling // 2.开启定时任务
-public class GiftCardTask {
-    private static final Logger logger = LoggerFactory.getLogger(GiftCardTask.class);
+public class SmsSyncTask {
+    private static final Logger logger = LoggerFactory.getLogger(SmsSyncTask.class);
 
     @Autowired
-    private GiftCardService giftCardService;
+    private SmsTemplateService smsTemplateService;
+
+    @Autowired
+    private SmsSignService smsSignService;
 
     @Scheduled(cron = "0 0 0 * * ?") //0点执行一次
     public void sync(){
-        logger.info("正在更新礼品卡券状态， 当前时间：{}", DateUtil.nowDateTime());
+        logger.info("正在同步短信模板/签名， 当前时间：{}", DateUtil.nowDateTime());
         try {
-            giftCardService.syncStatus();
+            smsTemplateService.sync();
+            smsSignService.sync();
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("更新礼品卡券状态， 错误信息：{}", e.getMessage());
+            logger.error("同步短信模板/签名失败， 错误信息：{}", e.getMessage());
         }
 
     }

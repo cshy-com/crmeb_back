@@ -432,7 +432,7 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
         storeProductResponse.setStatus(storeBargain.getStatus().equals(true) ? 1 : 0);
 
         // 查询attr
-        List<StoreProductAttr> attrs = attrService.getListByProductIdAndType(storeBargain.getId(), ProductConstants.PRODUCT_TYPE_BARGAIN);
+        List<StoreProductAttr> attrs = attrService.getListByProductIdAndTypeNotDel(storeBargain.getId(), ProductConstants.PRODUCT_TYPE_BARGAIN);
         storeProductResponse.setAttr(attrs);
         storeProductResponse.setSliderImage(String.join(",",storeBargain.getImages()));
 

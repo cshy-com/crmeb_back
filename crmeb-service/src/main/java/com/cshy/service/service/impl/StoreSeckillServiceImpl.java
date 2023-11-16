@@ -505,7 +505,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         productDetailResponse.setStoreSeckill(detailH5Response);
 
         // 获取秒杀商品规格
-        List<StoreProductAttr> attrList = attrService.getListByProductIdAndType(skillId, Constants.PRODUCT_TYPE_SECKILL);
+        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(skillId, Constants.PRODUCT_TYPE_SECKILL);
         // 根据制式设置attr属性
         productDetailResponse.setProductAttr(attrList);
 
@@ -604,7 +604,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         infoResponse.setProductId(storeSeckill.getProductId());
 
         // 查询attr
-        List<StoreProductAttr> attrList = attrService.getListByProductIdAndType(skillId, Constants.PRODUCT_TYPE_SECKILL);
+        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(skillId, Constants.PRODUCT_TYPE_SECKILL);
         infoResponse.setAttr(attrList);
 
         // 注意：数据瓶装步骤：分别查询秒杀和商品本山信息组装sku信息之后，再对比sku属性是否相等来赋值是否秒杀sku信息
