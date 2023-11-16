@@ -1282,18 +1282,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
      */
     @Override
     public StoreProduct getH5Detail(Integer id, Boolean isDel) {
-        LambdaQueryWrapper<StoreProduct> lqw = Wrappers.lambdaQuery();
-        lqw.select(StoreProduct::getId, StoreProduct::getImage, StoreProduct::getStoreName, StoreProduct::getSliderImage,
-                StoreProduct::getOtPrice, StoreProduct::getStock, StoreProduct::getSales, StoreProduct::getPrice, StoreProduct::getActivity,
-                StoreProduct::getFicti, StoreProduct::getIsSub, StoreProduct::getStoreInfo, StoreProduct::getBrowse, StoreProduct::getUnitName);
-        lqw.eq(StoreProduct::getId, id);
-        if (!isDel)
-            lqw.eq(StoreProduct::getIsRecycle, false);
-        if (!isDel)
-            lqw.eq(StoreProduct::getIsDel, false);
-        if (!isDel)
-            lqw.eq(StoreProduct::getIsShow, true);
-        StoreProduct storeProduct = dao.selectOne(lqw);
+        StoreProduct storeProduct = dao.getOne(id);
         if (ObjectUtil.isNull(storeProduct)) {
             throw new CrmebException(StrUtil.format("未找到编号为{}的商品", id));
         }
