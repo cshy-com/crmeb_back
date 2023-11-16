@@ -167,6 +167,13 @@ public interface StoreProductService extends IService<StoreProduct> {
     StoreProduct getH5Detail(Integer id);
 
     /**
+     * 获取移动端商品详情
+     * @param id 商品id
+     * @return StoreProduct
+     */
+    StoreProduct getH5Detail(Integer id, Boolean isDel);
+
+    /**
      * 获取购物车商品信息
      * @param productId 商品编号
      * @return StoreProduct

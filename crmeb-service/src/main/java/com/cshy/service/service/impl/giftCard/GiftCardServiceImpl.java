@@ -81,6 +81,9 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
     @Autowired
     private StoreProductAttrValueService storeProductAttrValueService;
 
+    @Autowired
+    private GiftCardDao giftCardDao;
+
     @Override
     public void batchAdd(GiftCardDto dto) {
         //获取需要生成的数量
@@ -239,7 +242,7 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
     public void syncStatus() {
         List<GiftCard> list = this.list();
         list.stream().forEach(giftCard -> {
-            if (Objects.nonNull(giftCard.getEffectiveTime())){
+            if (Objects.nonNull(giftCard.getEffectiveTime())) {
                 String effectiveTime = DateUtil.dateToStr(giftCard.getEffectiveTime(), Constants.DATE_FORMAT_START);
                 String now = DateUtil.nowDate(Constants.DATE_FORMAT_START);
 
@@ -253,6 +256,12 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
                 this.save(giftCard);
             }
         });
+    }
+
+    @Override
+    public GiftCard getById(String id, Boolean isDel) {
+        GiftCard giftCard = giftCardDao.getById(id, isDel);
+        return giftCard;
     }
 
     @Override

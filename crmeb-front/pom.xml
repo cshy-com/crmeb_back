@@ -31,7 +31,7 @@
 
     <build>
         <!--打包配置-->
-        <finalName>Crmeb-front</finalName>
+        <finalName>crmeb-front</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

@@ -2,6 +2,7 @@ package com.cshy.service.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.entity.product.StoreProductAttrValue;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import java.util.List;
 
@@ -76,4 +77,6 @@ public interface StoreProductAttrValueService extends IService<StoreProductAttrV
      * @return List
      */
     List<StoreProductAttrValue> getListByProductIdAndType(Integer productId, Integer type);
+
+    StoreProductAttrValue getById(Integer id, Boolean isDel);
 }

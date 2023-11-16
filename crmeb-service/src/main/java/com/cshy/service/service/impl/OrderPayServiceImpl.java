@@ -271,6 +271,7 @@ public class OrderPayServiceImpl implements OrderPayService {
                 // 发送短信
                 if (StrUtil.isNotBlank(user.getPhone()) && payNotification.getIsSms().equals(1)) {
                     SmsTemplate smsTemplate = smsTemplateService.getDetail(payNotification.getSmsId());
+
                     //TODO 修改短信通知
                     smsService.sendPaySuccess(user.getPhone(), storeOrder.getOrderId(), storeOrder.getPayPrice(), 0);
                 }

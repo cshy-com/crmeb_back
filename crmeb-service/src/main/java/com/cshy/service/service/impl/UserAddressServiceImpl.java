@@ -139,11 +139,7 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressDao, UserAddr
 
     @Override
     public UserAddress getById(Integer addressId, Boolean isDel) {
-        LambdaQueryWrapper<UserAddress> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(UserAddress::getId, addressId);
-        if (!isDel)
-            lambdaQueryWrapper.eq(UserAddress::getIsDel, false);
-        return dao.selectOne(lambdaQueryWrapper);
+        return dao.getById(addressId, isDel);
     }
 
     /**

@@ -1495,6 +1495,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
                 if (voList.size() > 1) {
                     proName = proName.concat("等");
                 }
+
                 //TODO 修改短信通知
                 smsService.sendOrderDeliverNotice(user.getPhone(), user.getNickname(), proName, storeOrder.getOrderId(), 0);
             }

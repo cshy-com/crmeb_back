@@ -1268,6 +1268,38 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
     }
 
     /**
+     * 获取移动端商品详情
+     *
+     * @param id 商品id
+     * @return StoreProduct
+     */
+    @Override
+    public StoreProduct getH5Detail(Integer id, Boolean isDel) {
+        LambdaQueryWrapper<StoreProduct> lqw = Wrappers.lambdaQuery();
+        lqw.select(StoreProduct::getId, StoreProduct::getImage, StoreProduct::getStoreName, StoreProduct::getSliderImage,
+                StoreProduct::getOtPrice, StoreProduct::getStock, StoreProduct::getSales, StoreProduct::getPrice, StoreProduct::getActivity,
+                StoreProduct::getFicti, StoreProduct::getIsSub, StoreProduct::getStoreInfo, StoreProduct::getBrowse, StoreProduct::getUnitName);
+        lqw.eq(StoreProduct::getId, id);
+        lqw.eq(StoreProduct::getIsRecycle, false);
+        if (!isDel)
+            lqw.eq(StoreProduct::getIsDel, false);
+        lqw.eq(StoreProduct::getIsShow, true);
+        StoreProduct storeProduct = dao.selectOne(lqw);
+        if (ObjectUtil.isNull(storeProduct)) {
+            throw new CrmebException(StrUtil.format("未找到编号为{}的商品", id));
+        }
+
+        StoreProductDescription sd = storeProductDescriptionService.getOne(
+                new LambdaQueryWrapper<StoreProductDescription>()
+                        .eq(StoreProductDescription::getProductId, storeProduct.getId())
+                        .eq(StoreProductDescription::getType, Constants.PRODUCT_TYPE_NORMAL));
+        if (ObjectUtil.isNotNull(sd)) {
+            storeProduct.setContent(StrUtil.isBlank(sd.getDescription()) ? "" : sd.getDescription());
+        }
+        return storeProduct;
+    }
+
+    /**
      * 获取购物车商品信息
      *
      * @param productId 商品编号
