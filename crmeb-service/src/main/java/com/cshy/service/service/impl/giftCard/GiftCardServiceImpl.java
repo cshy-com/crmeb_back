@@ -232,6 +232,14 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
 
         if (giftCard.getCardStatus() != 0)
             throw new CrmebException("礼品卡未生效，请联系客服");
+
+        String effectiveTime = DateUtil.dateToStr(giftCard.getEffectiveTime(), Constants.DATE_FORMAT_START);
+        String now = DateUtil.nowDate(Constants.DATE_FORMAT_START);
+
+        Date effectiveDate = DateUtil.strToDate(effectiveTime, Constants.DATE_FORMAT_START);
+        Date nowDate = DateUtil.strToDate(now, Constants.DATE_FORMAT_START);
+        if (effectiveDate.after(nowDate))
+            throw new CrmebException("该礼品卡未到可使用时间，生效时间为：" + now);
         String encryptPassword = CrmebUtil.encryptPassword(secret, this.pickupSecretKey);
         if (encryptPassword.equals(giftCard.getPickupSecret()))
             return true;
@@ -248,9 +256,9 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
 
                 Date effectiveDate = DateUtil.strToDate(effectiveTime, Constants.DATE_FORMAT_START);
                 Date nowDate = DateUtil.strToDate(now, Constants.DATE_FORMAT_START);
-                if (effectiveDate.equals(nowDate) || effectiveDate.after(nowDate))
+                if (effectiveDate.equals(nowDate) || effectiveDate.before(nowDate))
                     giftCard.setCardStatus(0);
-                if (effectiveDate.before(nowDate))
+                if (effectiveDate.after(nowDate))
                     giftCard.setCardStatus(1);
 
                 this.save(giftCard);
