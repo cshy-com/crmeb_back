@@ -5,7 +5,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.order.StoreOrderStatus;
 import com.cshy.common.model.request.store.StoreOrderStatusSearchRequest;
-import com.cshy.service.service.StoreOrderStatusService;
+import com.cshy.service.service.store.StoreOrderStatusService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

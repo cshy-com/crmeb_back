@@ -8,7 +8,7 @@ import com.cshy.common.model.request.system.SystemAdminRequest;
 import com.cshy.common.model.request.system.SystemAdminUpdateRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.SystemAdminResponse;
-import com.cshy.service.service.SystemAdminService;
+import com.cshy.service.service.system.SystemAdminService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

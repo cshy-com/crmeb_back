@@ -6,7 +6,7 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.model.*;
 import com.cshy.service.service.CosService;
-import com.cshy.service.service.SystemAttachmentService;
+import com.cshy.service.service.system.SystemAttachmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

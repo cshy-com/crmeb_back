@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.cshy.service.dao.UserRechargeDao">
+<mapper namespace="com.cshy.service.dao.user.UserRechargeDao">
 <!--    根据类型获取该类型充值金额-->
     <select id="getSumByType" resultType="java.math.BigDecimal" parameterType="string">
         select sum(price) as price from u_recharge

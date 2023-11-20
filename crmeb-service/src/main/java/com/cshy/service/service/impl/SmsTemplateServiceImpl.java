@@ -22,7 +22,7 @@ import com.cshy.service.dao.SmsTemplateDao;
 import com.cshy.service.service.SmsService;
 import com.cshy.service.service.SmsSignService;
 import com.cshy.service.service.SmsTemplateService;
-import com.cshy.service.service.SystemConfigService;
+import com.cshy.service.service.system.SystemConfigService;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**

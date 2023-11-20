@@ -1,6 +1,6 @@
 package com.cshy.admin.task.pink;
 import com.cshy.common.utils.DateUtil;
-import com.cshy.service.service.StorePinkService;
+import com.cshy.service.service.store.StorePinkService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

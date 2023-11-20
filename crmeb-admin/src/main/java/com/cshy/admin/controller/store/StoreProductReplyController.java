@@ -8,7 +8,7 @@ import com.cshy.common.model.request.store.StoreProductReplyAddRequest;
 import com.cshy.common.model.request.store.StoreProductReplyCommentRequest;
 import com.cshy.common.model.request.store.StoreProductReplySearchRequest;
 import com.cshy.common.model.response.StoreProductReplyResponse;
-import com.cshy.service.service.StoreProductReplyService;
+import com.cshy.service.service.store.StoreProductReplyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

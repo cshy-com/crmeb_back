@@ -5,7 +5,7 @@ import com.cshy.common.model.entity.system.SystemMenu;
 import com.cshy.common.model.request.system.SystemMenuRequest;
 import com.cshy.common.model.request.system.SystemMenuSearchRequest;
 import com.cshy.common.model.vo.MenuCheckVo;
-import com.cshy.service.service.SystemMenuService;
+import com.cshy.service.service.system.SystemMenuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

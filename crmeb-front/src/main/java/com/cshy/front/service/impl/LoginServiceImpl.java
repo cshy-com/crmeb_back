@@ -13,7 +13,7 @@ import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.common.utils.RedisUtil;
 import com.cshy.front.service.LoginService;
-import com.cshy.service.service.UserService;
+import com.cshy.service.service.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 
 /**
  * 移动端登录服务类

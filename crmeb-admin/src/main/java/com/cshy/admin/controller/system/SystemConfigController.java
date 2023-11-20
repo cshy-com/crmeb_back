@@ -4,7 +4,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.entity.system.SystemConfig;
 import com.cshy.common.model.request.system.SystemConfigAdminRequest;
 import com.cshy.common.model.request.system.SystemFormCheckRequest;
-import com.cshy.service.service.SystemConfigService;
+import com.cshy.service.service.system.SystemConfigService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

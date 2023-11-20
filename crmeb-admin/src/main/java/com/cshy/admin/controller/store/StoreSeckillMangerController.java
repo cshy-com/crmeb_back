@@ -6,7 +6,7 @@ import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.store.StoreSeckillMangerRequest;
 import com.cshy.common.model.request.store.StoreSeckillMangerSearchRequest;
 import com.cshy.common.model.response.StoreSeckillManagerResponse;
-import com.cshy.service.service.StoreSeckillMangerService;
+import com.cshy.service.service.store.StoreSeckillMangerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

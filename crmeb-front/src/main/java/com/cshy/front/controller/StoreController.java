@@ -5,7 +5,7 @@ import com.cshy.common.model.request.store.StoreNearRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.response.StoreNearResponse;
-import com.cshy.service.service.SystemStoreService;
+import com.cshy.service.service.system.SystemStoreService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

@@ -7,7 +7,7 @@ import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.model.entity.product.StoreProductRule;
 import com.cshy.common.model.request.store.StoreProductRuleRequest;
 import com.cshy.common.model.request.store.StoreProductRuleSearchRequest;
-import com.cshy.service.service.StoreProductRuleService;
+import com.cshy.service.service.store.StoreProductRuleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

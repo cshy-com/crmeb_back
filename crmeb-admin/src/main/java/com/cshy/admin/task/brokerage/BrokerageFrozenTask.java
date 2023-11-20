@@ -3,7 +3,7 @@ package com.cshy.admin.task.brokerage;
 
 import com.cshy.admin.task.order.OrderReceiptTask;
 import com.cshy.common.utils.DateUtil;
-import com.cshy.service.service.UserBrokerageRecordService;
+import com.cshy.service.service.user.UserBrokerageRecordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

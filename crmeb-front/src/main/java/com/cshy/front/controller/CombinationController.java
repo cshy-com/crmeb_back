@@ -6,7 +6,7 @@ import com.cshy.common.model.response.*;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.entity.combination.StoreCombination;
 import com.cshy.common.model.request.store.StorePinkRequest;
-import com.cshy.service.service.StoreCombinationService;
+import com.cshy.service.service.store.StoreCombinationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

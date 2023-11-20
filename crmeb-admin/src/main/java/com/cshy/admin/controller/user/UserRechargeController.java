@@ -5,7 +5,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.user.UserRechargeSearchRequest;
 import com.cshy.common.model.response.UserRechargeResponse;
-import com.cshy.service.service.UserRechargeService;
+import com.cshy.service.service.user.UserRechargeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

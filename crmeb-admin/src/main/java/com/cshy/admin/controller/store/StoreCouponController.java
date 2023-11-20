@@ -8,7 +8,7 @@ import com.cshy.common.model.entity.coupon.StoreCoupon;
 import com.cshy.common.model.request.store.StoreCouponRequest;
 import com.cshy.common.model.request.store.StoreCouponSearchRequest;
 import com.cshy.common.model.response.StoreCouponInfoResponse;
-import com.cshy.service.service.StoreCouponService;
+import com.cshy.service.service.store.StoreCouponService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;

@@ -5,7 +5,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.OrderPayResultResponse;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.service.service.OrderPayService;
-import com.cshy.service.service.WeChatPayService;
+import com.cshy.service.service.wechat.WeChatPayService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

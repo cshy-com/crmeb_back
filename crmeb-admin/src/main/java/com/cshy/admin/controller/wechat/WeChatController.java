@@ -2,7 +2,7 @@ package com.cshy.admin.controller.wechat;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cshy.common.model.response.CommonResult;
-import com.cshy.service.service.WechatPublicService;
+import com.cshy.service.service.wechat.WechatPublicService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

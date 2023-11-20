@@ -1,6 +1,6 @@
 package com.cshy.admin.controller.wechat;
 
-import com.cshy.service.service.WechatCallbackService;
+import com.cshy.service.service.wechat.WechatCallbackService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

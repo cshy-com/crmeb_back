@@ -7,7 +7,7 @@ import com.cshy.common.model.request.system.SystemRoleRequest;
 import com.cshy.common.model.request.system.SystemRoleSearchRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.RoleInfoResponse;
-import com.cshy.service.service.SystemRoleService;
+import com.cshy.service.service.system.SystemRoleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

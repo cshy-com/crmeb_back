@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.cshy.service.dao.UserBillDao">
+<mapper namespace="com.cshy.service.dao.user.UserBillDao">
 
     <select id="getListAdminAndIntegeal" resultType="com.cshy.common.model.response.UserBillResponse" parameterType="map">
         SELECT ub.id,ub.link_id AS linkId,ub.pm,ub.title,ub.category,ub.type,ub.number,ub.balance,ub.mark,ub.status,ub.create_time AS createTime,ub.update_time AS updateTime,u.nickname,ub.uid FROM u_bill ub

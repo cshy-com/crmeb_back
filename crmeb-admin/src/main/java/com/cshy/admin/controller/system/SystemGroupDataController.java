@@ -6,7 +6,7 @@ import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.system.SystemGroupData;
 import com.cshy.common.model.request.system.SystemGroupDataRequest;
 import com.cshy.common.model.request.system.SystemGroupDataSearchRequest;
-import com.cshy.service.service.SystemGroupDataService;
+import com.cshy.service.service.system.SystemGroupDataService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

@@ -6,7 +6,7 @@ import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.wechat.WechatReply;
 import com.cshy.common.model.request.wechat.WechatReplyRequest;
 import com.cshy.common.model.request.wechat.WechatReplySearchRequest;
-import com.cshy.service.service.WechatReplyService;
+import com.cshy.service.service.wechat.WechatReplyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

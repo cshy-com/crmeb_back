@@ -10,7 +10,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.model.vo.CategoryTreeVo;
 import com.cshy.service.service.CategoryService;
-import com.cshy.service.service.SystemAttachmentService;
+import com.cshy.service.service.system.SystemAttachmentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

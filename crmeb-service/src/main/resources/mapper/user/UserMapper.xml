@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.cshy.service.dao.UserDao">
+<mapper namespace="com.cshy.service.dao.user.UserDao">
 
     <select id="getSpreadPeopleList" resultType="com.cshy.common.model.response.UserSpreadPeopleItemResponse" parameterType="map">
         SELECT u.uid,u.nickname, u.avatar, DATE_FORMAT(u.spread_time, '%Y-%m-%d %H:%i:%s') AS `time`, u.spread_count AS childCount FROM sys_user AS u

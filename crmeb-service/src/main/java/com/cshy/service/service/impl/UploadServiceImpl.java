@@ -7,6 +7,8 @@ import com.cshy.common.model.vo.CloudVo;
 import com.cshy.common.model.vo.FileResultVo;
 import com.cshy.common.model.vo.UploadCommonVo;
 import com.cshy.service.service.*;
+import com.cshy.service.service.system.SystemAttachmentService;
+import com.cshy.service.service.system.SystemConfigService;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;

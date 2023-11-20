@@ -6,7 +6,7 @@ import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.system.SystemStoreStaff;
 import com.cshy.common.model.request.system.SystemStoreStaffRequest;
 import com.cshy.common.model.response.SystemStoreStaffResponse;
-import com.cshy.service.service.SystemStoreStaffService;
+import com.cshy.service.service.system.SystemStoreStaffService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

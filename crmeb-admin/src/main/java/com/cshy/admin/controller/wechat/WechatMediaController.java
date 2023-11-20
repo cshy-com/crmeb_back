@@ -1,7 +1,7 @@
 package com.cshy.admin.controller.wechat;
 
 import com.cshy.common.model.response.CommonResult;
-import com.cshy.service.service.WechatMediaService;
+import com.cshy.service.service.wechat.WechatMediaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

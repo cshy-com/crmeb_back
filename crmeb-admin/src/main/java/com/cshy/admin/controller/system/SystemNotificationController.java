@@ -6,7 +6,7 @@ import com.cshy.common.model.request.NotificationSearchRequest;
 import com.cshy.common.model.request.NotificationUpdateRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.NotificationInfoResponse;
-import com.cshy.service.service.SystemNotificationService;
+import com.cshy.service.service.system.SystemNotificationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

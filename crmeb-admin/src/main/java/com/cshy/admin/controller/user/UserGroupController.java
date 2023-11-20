@@ -5,7 +5,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.user.UserGroup;
 import com.cshy.common.model.request.user.UserGroupRequest;
-import com.cshy.service.service.UserGroupService;
+import com.cshy.service.service.user.UserGroupService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

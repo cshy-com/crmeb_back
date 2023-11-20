@@ -3,8 +3,19 @@ package com.cshy.front.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.cshy.common.model.dto.user.UserVisitHistoryDto;
+import com.cshy.common.model.entity.product.StoreProductRelation;
+import com.cshy.common.model.entity.user.UserVisitHistory;
 import com.cshy.common.model.response.*;
+import com.cshy.common.utils.StringUtils;
 import com.cshy.service.service.*;
+import com.cshy.service.service.store.*;
+import com.cshy.service.service.system.SystemConfigService;
+import com.cshy.service.service.system.SystemUserLevelService;
+import com.cshy.service.service.user.UserService;
+import com.cshy.service.service.user.UserVisitHistoryService;
+import com.cshy.service.service.user.UserVisitRecordService;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.constants.CategoryConstants;
 import com.cshy.common.constants.Constants;
@@ -12,7 +23,7 @@ import com.cshy.common.constants.SysConfigConstants;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttr;
 import com.cshy.common.model.entity.product.StoreProductAttrValue;
-import com.cshy.common.model.entity.record.UserVisitRecord;
+import com.cshy.common.model.entity.user.UserVisitRecord;
 import com.cshy.common.model.entity.system.SystemUserLevel;
 import com.cshy.common.model.entity.user.User;
 import com.cshy.common.model.page.CommonPage;
@@ -25,7 +36,6 @@ import com.cshy.common.model.vo.CategoryTreeVo;
 import com.cshy.common.model.vo.MyRecord;
 import com.cshy.front.service.ProductService;
 import com.cshy.service.delete.ProductUtils;
-import com.google.common.collect.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +45,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * IndexServiceImpl 接口实现
@@ -80,6 +91,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private UserVisitRecordService userVisitRecordService;
+
+    @Autowired
+    private UserVisitHistoryService userVisitHistoryService;
 
     /**
      * 获取分类
@@ -185,6 +199,10 @@ public class ProductServiceImpl implements ProductService {
         if (ObjectUtil.isNotNull(userLevel)) {
             storeProduct.setVipPrice(storeProduct.getPrice());
         }
+        //查询收藏量
+        List<StoreProductRelation> productRelationList = storeProductRelationService.getList(id, "collect");
+        storeProduct.setCollectNum(productRelationList.size());
+
         productDetailResponse.setProductInfo(storeProduct);
 
 
@@ -246,6 +264,22 @@ public class ProductServiceImpl implements ProductService {
             visitRecord.setUid(userService.getUserId());
             visitRecord.setVisitType(2);
             userVisitRecordService.save(visitRecord);
+        }
+
+        // 创建用户浏览记录
+        if (userService.getUserId() > 0 && isGiftCard == 0) {
+            UserVisitHistoryDto userVisitHistoryDto = new UserVisitHistoryDto();
+            //如果存在记录 更新
+            UserVisitHistory userVisitHistory = userVisitHistoryService.getOne(new LambdaQueryWrapper<UserVisitHistory>().eq(UserVisitHistory::getProductId, id).eq(UserVisitHistory::getUserId, userService.getUserId()));
+            if (Objects.nonNull(userVisitHistory))
+                BeanUtils.copyProperties(userVisitHistory, userVisitHistoryDto);
+            userVisitHistoryDto.setUserId(userService.getUserId());
+            userVisitHistoryDto.setProductId(id);
+            userVisitHistoryDto.setCreateTime(DateUtil.now());
+            if (StringUtils.isNotBlank(userVisitHistoryDto.getId()))
+                userVisitHistoryService.update(userVisitHistoryDto);
+            else
+                userVisitHistoryService.add(userVisitHistoryDto);
         }
 
         return productDetailResponse;

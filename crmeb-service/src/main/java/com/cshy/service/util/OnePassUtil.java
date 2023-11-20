@@ -1,7 +1,5 @@
 package com.cshy.service.util;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -11,7 +9,7 @@ import com.cshy.common.utils.DateUtil;
 import com.cshy.common.utils.RedisUtil;
 import com.cshy.common.utils.RestTemplateUtil;
 import com.cshy.common.model.vo.OnePassLoginVo;
-import com.cshy.service.service.SystemConfigService;
+import com.cshy.service.service.system.SystemConfigService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

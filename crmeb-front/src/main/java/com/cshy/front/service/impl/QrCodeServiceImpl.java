@@ -6,7 +6,7 @@ import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.utils.QRCodeUtil;
 import com.cshy.common.utils.RestTemplateUtil;
 import com.cshy.front.service.QrCodeService;
-import com.cshy.service.service.WechatNewService;
+import com.cshy.service.service.wechat.WechatNewService;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

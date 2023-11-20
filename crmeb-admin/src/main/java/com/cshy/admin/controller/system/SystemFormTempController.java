@@ -6,7 +6,7 @@ import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.system.SystemFormTemp;
 import com.cshy.common.model.request.system.SystemFormTempRequest;
 import com.cshy.common.model.request.system.SystemFormTempSearchRequest;
-import com.cshy.service.service.SystemFormTempService;
+import com.cshy.service.service.system.SystemFormTempService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

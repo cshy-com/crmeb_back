@@ -4,7 +4,7 @@ import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.user.UserTagRequest;
-import com.cshy.service.service.UserTagService;
+import com.cshy.service.service.user.UserTagService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

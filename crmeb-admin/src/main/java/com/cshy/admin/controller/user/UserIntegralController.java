@@ -5,7 +5,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.AdminIntegralSearchRequest;
 import com.cshy.common.model.response.UserIntegralRecordResponse;
-import com.cshy.service.service.UserIntegralRecordService;
+import com.cshy.service.service.user.UserIntegralRecordService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

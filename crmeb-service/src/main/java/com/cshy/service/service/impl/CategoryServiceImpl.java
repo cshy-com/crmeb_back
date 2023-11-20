@@ -20,7 +20,7 @@ import com.cshy.common.model.request.category.CategoryRequest;
 import com.cshy.common.model.request.category.CategorySearchRequest;
 import com.cshy.service.dao.CategoryDao;
 import com.cshy.service.service.CategoryService;
-import com.cshy.service.service.SystemAttachmentService;
+import com.cshy.service.service.system.SystemAttachmentService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

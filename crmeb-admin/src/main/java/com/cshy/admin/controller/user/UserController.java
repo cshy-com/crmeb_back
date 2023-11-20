@@ -11,7 +11,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.entity.user.User;
 import com.cshy.common.model.response.TopDetail;
 import com.cshy.common.model.response.UserResponse;
-import com.cshy.service.service.UserService;
+import com.cshy.service.service.user.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

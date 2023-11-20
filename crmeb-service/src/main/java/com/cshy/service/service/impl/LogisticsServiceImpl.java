@@ -14,7 +14,7 @@ import com.cshy.common.model.vo.LogisticsResultVo;
 import com.cshy.common.model.vo.OnePassLogisticsQueryVo;
 import com.cshy.service.service.LogisticService;
 import com.cshy.service.service.OnePassService;
-import com.cshy.service.service.SystemConfigService;
+import com.cshy.service.service.system.SystemConfigService;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

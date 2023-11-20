@@ -7,7 +7,7 @@ import com.cshy.common.model.entity.express.ShippingTemplatesRegion;
 import com.cshy.common.model.request.shipping.ShippingTemplatesRegionRequest;
 import com.cshy.service.dao.ShippingTemplatesRegionDao;
 import com.cshy.service.service.ShippingTemplatesRegionService;
-import com.cshy.service.service.SystemCityService;
+import com.cshy.service.service.system.SystemCityService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;

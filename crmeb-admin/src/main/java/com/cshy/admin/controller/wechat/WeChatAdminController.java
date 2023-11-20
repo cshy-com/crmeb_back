@@ -2,7 +2,7 @@ package com.cshy.admin.controller.wechat;
 
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.WeChatJsSdkConfigResponse;
-import com.cshy.service.service.WechatNewService;
+import com.cshy.service.service.wechat.WechatNewService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;

@@ -6,7 +6,7 @@ import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.store.StoreCouponUserRequest;
 import com.cshy.common.model.request.store.StoreCouponUserSearchRequest;
 import com.cshy.common.model.response.StoreCouponUserResponse;
-import com.cshy.service.service.StoreCouponUserService;
+import com.cshy.service.service.store.StoreCouponUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

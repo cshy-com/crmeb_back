@@ -7,7 +7,7 @@ import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.model.entity.system.SystemAttachment;
 import com.cshy.common.model.request.system.SystemAttachmentMoveRequest;
 import com.cshy.common.model.request.system.SystemAttachmentRequest;
-import com.cshy.service.service.SystemAttachmentService;
+import com.cshy.service.service.system.SystemAttachmentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

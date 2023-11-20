@@ -7,7 +7,7 @@ import com.cshy.common.model.request.store.StoreSeckillAddRequest;
 import com.cshy.common.model.request.store.StoreSeckillSearchRequest;
 import com.cshy.common.model.response.StoreSeckillResponse;
 import com.cshy.common.model.response.StoreProductInfoResponse;
-import com.cshy.service.service.StoreSeckillService;
+import com.cshy.service.service.store.StoreSeckillService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

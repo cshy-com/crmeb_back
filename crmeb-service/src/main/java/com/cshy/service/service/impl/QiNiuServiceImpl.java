@@ -6,7 +6,7 @@ import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.UploadManager;
 import com.cshy.service.service.QiNiuService;
-import com.cshy.service.service.SystemAttachmentService;
+import com.cshy.service.service.system.SystemAttachmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

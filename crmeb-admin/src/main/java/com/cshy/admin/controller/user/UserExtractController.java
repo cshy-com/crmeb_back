@@ -7,7 +7,7 @@ import com.cshy.common.model.entity.finance.UserExtract;
 import com.cshy.common.model.request.user.UserExtractRequest;
 import com.cshy.common.model.request.user.UserExtractSearchRequest;
 import com.cshy.common.model.response.BalanceResponse;
-import com.cshy.service.service.UserExtractService;
+import com.cshy.service.service.user.UserExtractService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

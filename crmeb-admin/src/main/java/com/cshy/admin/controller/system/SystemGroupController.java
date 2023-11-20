@@ -5,7 +5,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.system.SystemGroupRequest;
 import com.cshy.common.model.request.system.SystemGroupSearchRequest;
-import com.cshy.service.service.SystemGroupService;
+import com.cshy.service.service.system.SystemGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

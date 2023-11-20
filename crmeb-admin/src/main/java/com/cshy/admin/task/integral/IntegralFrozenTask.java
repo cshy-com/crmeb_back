@@ -2,7 +2,7 @@ package com.cshy.admin.task.integral;
 
 
 import com.cshy.common.utils.DateUtil;
-import com.cshy.service.service.UserIntegralRecordService;
+import com.cshy.service.service.user.UserIntegralRecordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

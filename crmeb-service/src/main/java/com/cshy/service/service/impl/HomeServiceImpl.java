@@ -5,9 +5,9 @@ import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.response.HomeRateResponse;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.service.service.HomeService;
-import com.cshy.service.service.StoreOrderService;
-import com.cshy.service.service.UserService;
-import com.cshy.service.service.UserVisitRecordService;
+import com.cshy.service.service.store.StoreOrderService;
+import com.cshy.service.service.user.UserService;
+import com.cshy.service.service.user.UserVisitRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
