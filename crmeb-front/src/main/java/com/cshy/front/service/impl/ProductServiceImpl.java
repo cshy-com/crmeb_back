@@ -25,7 +25,6 @@ import com.cshy.common.model.vo.CategoryTreeVo;
 import com.cshy.common.model.vo.MyRecord;
 import com.cshy.front.service.ProductService;
 import com.cshy.service.delete.ProductUtils;
-import com.google.common.collect.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -168,6 +167,7 @@ public class ProductServiceImpl implements ProductService {
      * @param id         商品编号
      * @param type       normal-正常，video-视频
      * @param isGiftCard
+     * @param isOrder
      * @return 商品详情信息
      */
     @Override
@@ -190,10 +190,7 @@ public class ProductServiceImpl implements ProductService {
 
         // 获取商品规格
         List<StoreProductAttr> attrList;
-        if (0 == isGiftCard)
-            attrList = attrService.getListByProductIdAndTypeNotDel(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
-        else
-            attrList = attrService.getListByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+        attrList = attrService.getListByProductIdAndTypeNotDel(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
 
         // 根据制式设置attr属性
         productDetailResponse.setProductAttr(attrList);
