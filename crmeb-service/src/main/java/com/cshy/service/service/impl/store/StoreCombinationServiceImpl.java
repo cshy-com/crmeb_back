@@ -842,7 +842,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
             throw new CrmebException("拼团已申请取消");
         }
 
-        StoreOrder order = storeOrderService.getByOderId(userPink.getOrderId());
+        StoreOrder order = storeOrderService.getByOrderId(userPink.getOrderId());
         if (ObjectUtil.isNull(order) || order.getIsDel()) throw new CrmebException("拼团订单不存在");
         if (order.getStatus() == -1 && order.getRefundStatus() != 0) {
             throw new CrmebException("拼团订单已进入退款流程");

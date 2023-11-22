@@ -111,7 +111,7 @@ public class WeChatPayServiceImpl implements WeChatPayService {
         // 切割字符串，判断是支付订单还是充值订单
         String pre = StrUtil.subPre(orderNo, 5);
         if ("order".equals(pre)) {// 支付订单
-            StoreOrder storeOrder = storeOrderService.getByOderId(orderNo);
+            StoreOrder storeOrder = storeOrderService.getByOrderId(orderNo);
             if (ObjectUtil.isNull(storeOrder)) {
                 throw new CrmebException("订单不存在");
             }

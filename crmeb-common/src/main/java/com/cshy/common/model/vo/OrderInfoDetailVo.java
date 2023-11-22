@@ -1,6 +1,5 @@
 package com.cshy.common.model.vo;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -22,7 +21,10 @@ public class OrderInfoDetailVo {
     private Integer attrValueId;
 
     /** 商品图片 */
-    private String image;
+    private String mainImage;
+
+    /** 规格图片 */
+    private String attrValueImage;
 
     /** sku */
     private String sku;

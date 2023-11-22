@@ -1,7 +1,6 @@
 package com.cshy.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -341,7 +340,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         SystemNotification notification = systemNotificationService.getByMark(NotifyConstants.GROUP_SUCCESS_MARK);
         if (notification.getIsWechat().equals(1) || notification.getIsRoutine().equals(1)) {
             pinkList.forEach(i -> {
-                StoreOrder order = storeOrderService.getByOderId(i.getOrderId());
+                StoreOrder order = storeOrderService.getByOrderId(i.getOrderId());
                 StoreCombination storeCombination = storeCombinationService.getById(i.getCid());
                 User tempUser = userService.getById(i.getUid());
                 // 发送微信模板消息
@@ -561,14 +560,14 @@ public class OrderPayServiceImpl implements OrderPayService {
      * @param storeOrder 订单
      * @return Boolean Boolean
      */
-    private Boolean yuePay(StoreOrder storeOrder) {
+    private Boolean balancePay(StoreOrder storeOrder) {
 
-        // 用户余额扣除
+        // 用户积分扣除
         User user = userService.getById(storeOrder.getUid());
         if (ObjectUtil.isNull(user)) throw new CrmebException("用户不存在");
-        if (user.getNowMoney().compareTo(storeOrder.getPayPrice()) < 0) {
-            throw new CrmebException("用户余额不足");
-        }
+//        if (user.getNowMoney().compareTo(storeOrder.getPayPrice()) < 0) {
+//            throw new CrmebException("用户余额不足");
+//        }
         if (user.getIntegral() < storeOrder.getUseIntegral()) {
             throw new CrmebException("用户积分不足");
         }
@@ -577,8 +576,8 @@ public class OrderPayServiceImpl implements OrderPayService {
         Boolean execute = transactionTemplate.execute(e -> {
             // 订单修改
             storeOrderService.updateById(storeOrder);
-            // 这里只扣除金额，账单记录在task中处理
-            userService.updateNowMoney(user, storeOrder.getPayPrice(), "sub");
+//            // 这里只扣除金额，账单记录在task中处理
+//            userService.updateNowMoney(user, storeOrder.getPayPrice(), "sub");
             // 扣除积分
             if (storeOrder.getUseIntegral() > 0) {
                 userService.updateIntegral(user, storeOrder.getUseIntegral(), "sub");
@@ -586,60 +585,61 @@ public class OrderPayServiceImpl implements OrderPayService {
             // 添加支付成功redis队列
             redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, storeOrder.getOrderId());
 
-            // 处理拼团
-            if (storeOrder.getCombinationId() > 0) {
-                // 判断拼团团长是否存在
-                StorePink headPink = new StorePink();
-                Integer pinkId = storeOrder.getPinkId();
-                if (pinkId > 0) {
-                    headPink = storePinkService.getById(pinkId);
-                    if (ObjectUtil.isNull(headPink) || headPink.getIsRefund().equals(true) || headPink.getStatus() == 3) {
-                        pinkId = 0;
-                    }
-                }
-                StoreCombination storeCombination = storeCombinationService.getById(storeOrder.getCombinationId());
-                // 如果拼团人数已满，重新开团
-                if (pinkId > 0) {
-                    Integer count = storePinkService.getCountByKid(pinkId);
-                    if (count >= storeCombination.getPeople()) {
-                        pinkId = 0;
-                    }
-                }
-                // 生成拼团表数据
-                StorePink storePink = new StorePink();
-                storePink.setUid(user.getUid());
-                storePink.setAvatar(user.getAvatar());
-                storePink.setNickname(user.getNickname());
-                storePink.setOrderId(storeOrder.getOrderId());
-                storePink.setOrderIdKey(storeOrder.getId());
-                storePink.setTotalNum(storeOrder.getTotalNum());
-                storePink.setTotalPrice(storeOrder.getTotalPrice());
-                storePink.setCid(storeCombination.getId());
-                storePink.setPid(storeCombination.getProductId());
-                storePink.setPeople(storeCombination.getPeople());
-                storePink.setPrice(storeCombination.getPrice());
-                Integer effectiveTime = storeCombination.getEffectiveTime();// 有效小时数
-                DateTime dateTime = cn.hutool.core.date.DateUtil.date();
-                storePink.setAddTime(dateTime.getTime());
-                if (pinkId > 0) {
-                    storePink.setStopTime(headPink.getStopTime());
-                } else {
-                    DateTime hourTime = cn.hutool.core.date.DateUtil.offsetHour(dateTime, effectiveTime);
-                    long stopTime =  hourTime.getTime();
-                    if (stopTime > storeCombination.getStopTime()) {
-                        stopTime = storeCombination.getStopTime();
-                    }
-                    storePink.setStopTime(stopTime);
-                }
-                storePink.setKId(pinkId);
-                storePink.setIsTpl(false);
-                storePink.setIsRefund(false);
-                storePink.setStatus(1);
-                storePinkService.save(storePink);
-                // 如果是开团，需要更新订单数据
-                storeOrder.setPinkId(storePink.getId());
-                storeOrderService.updateById(storeOrder);
-            }
+            //TODO 分离代码
+//            // 处理拼团
+//            if (storeOrder.getCombinationId() > 0) {
+//                // 判断拼团团长是否存在
+//                StorePink headPink = new StorePink();
+//                Integer pinkId = storeOrder.getPinkId();
+//                if (pinkId > 0) {
+//                    headPink = storePinkService.getById(pinkId);
+//                    if (ObjectUtil.isNull(headPink) || headPink.getIsRefund().equals(true) || headPink.getStatus() == 3) {
+//                        pinkId = 0;
+//                    }
+//                }
+//                StoreCombination storeCombination = storeCombinationService.getById(storeOrder.getCombinationId());
+//                // 如果拼团人数已满，重新开团
+//                if (pinkId > 0) {
+//                    Integer count = storePinkService.getCountByKid(pinkId);
+//                    if (count >= storeCombination.getPeople()) {
+//                        pinkId = 0;
+//                    }
+//                }
+//                // 生成拼团表数据
+//                StorePink storePink = new StorePink();
+//                storePink.setUid(user.getUid());
+//                storePink.setAvatar(user.getAvatar());
+//                storePink.setNickname(user.getNickname());
+//                storePink.setOrderId(storeOrder.getOrderId());
+//                storePink.setOrderIdKey(storeOrder.getId());
+//                storePink.setTotalNum(storeOrder.getTotalNum());
+//                storePink.setTotalPrice(storeOrder.getTotalPrice());
+//                storePink.setCid(storeCombination.getId());
+//                storePink.setPid(storeCombination.getProductId());
+//                storePink.setPeople(storeCombination.getPeople());
+//                storePink.setPrice(storeCombination.getPrice());
+//                Integer effectiveTime = storeCombination.getEffectiveTime();// 有效小时数
+//                DateTime dateTime = cn.hutool.core.date.DateUtil.date();
+//                storePink.setAddTime(dateTime.getTime());
+//                if (pinkId > 0) {
+//                    storePink.setStopTime(headPink.getStopTime());
+//                } else {
+//                    DateTime hourTime = cn.hutool.core.date.DateUtil.offsetHour(dateTime, effectiveTime);
+//                    long stopTime =  hourTime.getTime();
+//                    if (stopTime > storeCombination.getStopTime()) {
+//                        stopTime = storeCombination.getStopTime();
+//                    }
+//                    storePink.setStopTime(stopTime);
+//                }
+//                storePink.setKId(pinkId);
+//                storePink.setIsTpl(false);
+//                storePink.setIsRefund(false);
+//                storePink.setStatus(1);
+//                storePinkService.save(storePink);
+//                // 如果是开团，需要更新订单数据
+//                storeOrder.setPinkId(storePink.getId());
+//                storeOrderService.updateById(storeOrder);
+//            }
 
             return Boolean.TRUE;
         });
@@ -657,7 +657,7 @@ public class OrderPayServiceImpl implements OrderPayService {
      */
     @Override
     public OrderPayResultResponse payment(OrderPayRequest orderPayRequest, String ip) {
-        StoreOrder storeOrder = storeOrderService.getByOderId(orderPayRequest.getOrderNo());
+        StoreOrder storeOrder = storeOrderService.getByOrderId(orderPayRequest.getOrderNo());
         if (ObjectUtil.isNull(storeOrder)) {
             throw new CrmebException("订单不存在");
         }
@@ -675,12 +675,12 @@ public class OrderPayServiceImpl implements OrderPayService {
             // 根据支付类型进行校验,更换支付类型
             storeOrder.setPayType(orderPayRequest.getPayType());
             // 余额支付
-            if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
-                if (user.getNowMoney().compareTo(storeOrder.getPayPrice()) < 0) {
-                    throw new CrmebException("用户余额不足");
-                }
-                storeOrder.setPaymentChannel(3);
-            }
+//            if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
+//                if (user.getNowMoney().compareTo(storeOrder.getPayPrice()) < 0) {
+//                    throw new CrmebException("用户余额不足");
+//                }
+//                storeOrder.setPaymentChannel(3);
+//            }
             if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
                 switch (orderPayRequest.getPayChannel()){
                     case PayConstants.PAY_CHANNEL_WE_CHAT_H5:// H5
@@ -708,13 +708,6 @@ public class OrderPayServiceImpl implements OrderPayService {
         OrderPayResultResponse response = new OrderPayResultResponse();
         response.setOrderNo(storeOrder.getOrderId());
         response.setPayType(storeOrder.getPayType());
-        // 0元付
-        if (storeOrder.getPayPrice().compareTo(BigDecimal.ZERO) <= 0) {
-            Boolean aBoolean = yuePay(storeOrder);
-            response.setPayType(PayConstants.PAY_TYPE_YUE);
-            response.setStatus(aBoolean);
-            return response;
-        }
 
         // 微信支付，调用微信预下单，返回拉起微信支付需要的信息
         if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
@@ -741,15 +734,15 @@ public class OrderPayServiceImpl implements OrderPayService {
             response.setJsConfig(vo);
             return response;
         }
-        // 余额支付
-        if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
-            Boolean yueBoolean = yuePay(storeOrder);
-            response.setStatus(yueBoolean);
+//         余额支付
+        if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_INTEGRAL)) {
+            Boolean balancePay = balancePay(storeOrder);
+            response.setStatus(balancePay);
             return response;
         }
-        if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_OFFLINE)) {
-            throw new CrmebException("暂时不支持线下支付");
-        }
+//        if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_OFFLINE)) {
+//            throw new CrmebException("暂时不支持线下支付");
+//        }
         response.setStatus(false);
         return response;
     }

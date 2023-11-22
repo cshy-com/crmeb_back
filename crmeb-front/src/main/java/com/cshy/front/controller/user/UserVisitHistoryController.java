@@ -1,12 +1,10 @@
-package com.cshy.admin.controller.user;
+package com.cshy.front.controller.user;
 
 import com.cshy.common.model.Type;
-import com.cshy.common.model.dto.user.UserVisitHistoryDto;
 import com.cshy.common.model.entity.base.BasePage;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.query.user.UserVisitHistoryQuery;
 import com.cshy.common.model.response.CommonResult;
-import com.cshy.common.model.vo.giftCard.GiftCardVo;
 import com.cshy.common.model.vo.user.UserVisitHistoryVo;
 import com.cshy.service.service.user.UserService;
 import com.cshy.service.service.user.UserVisitHistoryService;
@@ -15,8 +13,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +38,7 @@ public class UserVisitHistoryController {
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     @ApiImplicitParam(name = "ids", value = "浏览历史ID")
     public CommonResult<String> delete(@RequestBody List<String> ids) {
         ids.forEach(id -> {

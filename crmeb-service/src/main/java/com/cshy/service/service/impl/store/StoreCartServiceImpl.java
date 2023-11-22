@@ -129,6 +129,7 @@ public class StoreCartServiceImpl extends ServiceImpl<StoreCartDao, StoreCart> i
             cartInfoResponse.setAttrId(attrValue.getId());
             cartInfoResponse.setAttrStatus(attrValue.getStock() > 0);
             cartInfoResponse.setStock(attrValue.getStock());
+            cartInfoResponse.setAttrValueImage(attrValue.getImage());
             if (ObjectUtil.isNotNull(userLevel)) {
                 BigDecimal vipPrice = attrValue.getPrice().multiply(new BigDecimal(userLevel.getDiscount())).divide(new BigDecimal(100), 2 ,BigDecimal.ROUND_HALF_UP);
                 cartInfoResponse.setVipPrice(vipPrice);

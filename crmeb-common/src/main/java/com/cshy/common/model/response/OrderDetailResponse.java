@@ -96,4 +96,7 @@ public class OrderDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单")
     private Integer type;
+
+    @ApiModelProperty(value = "退款金额")
+    private BigDecimal refundPrice;
 }

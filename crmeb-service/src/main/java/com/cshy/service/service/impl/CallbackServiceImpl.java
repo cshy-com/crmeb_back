@@ -294,7 +294,7 @@ public class CallbackServiceImpl implements CallbackService {
             return refundRecord.getStr("returnXml");
         }
         String outRefundNo = notifyRecord.getStr("out_refund_no");
-        StoreOrder storeOrder = storeOrderService.getByOderId(outRefundNo);
+        StoreOrder storeOrder = storeOrderService.getByOrderId(outRefundNo);
         if (ObjectUtil.isNull(storeOrder)) {
             logger.error("微信退款订单查询失败==>" + refundRecord.getColumns() + ", rawData==>" + xmlInfo + ", data==>" + notifyRecord);
             return refundRecord.getStr("returnXml");

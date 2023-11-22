@@ -383,7 +383,8 @@ public class Constants {
     public static final String ORDER_STATUS_DELETED = "deleted"; //已删除
 
     public static final String ORDER_STATUS_STR_UNPAID = "未支付"; //未支付
-    public static final String ORDER_STATUS_STR_NOT_SHIPPED = "未发货"; //未发货
+    public static final String ORDER_STATUS_STR_NOT_SHIPPING = "未发货"; //未发货
+    public static final String ORDER_STATUS_STR_SHIPPING = "已发货"; //未发货
     public static final String ORDER_STATUS_STR_SPIKE = "待收货"; //待收货
     public static final String ORDER_STATUS_STR_BARGAIN = "待评价"; //已收货待评价
     public static final String ORDER_STATUS_STR_TAKE = "用户已收货"; //用户已收货
@@ -424,6 +425,7 @@ public class Constants {
     public static final String PAY_TYPE_YUE = "yue"; //余额支付
     public static final String PAY_TYPE_OFFLINE = "offline"; //线下支付
     public static final String PAY_TYPE_ALI_PAY = "alipay"; //支付宝
+    public static final String PAY_TYPE_INTEGRAL = "integral"; //支付宝
 
     //支付客户端类型
     public static final String PAY_TYPE_WE_CHAT_FROM_H5 = "weixinh5"; //H5唤起微信支付
@@ -437,6 +439,7 @@ public class Constants {
 
     //支付方式
     public static final String PAY_TYPE_STR_WE_CHAT = "微信支付"; //微信支付
+    public static final String PAY_TYPE_STR_INTEGRAL = "积分支付"; //微信支付
     public static final String PAY_TYPE_STR_YUE = "余额支付"; //余额支付
     public static final String PAY_TYPE_STR_OFFLINE = "线下支付"; //线下支付
     public static final String PAY_TYPE_STR_ALI_PAY = "支付宝支付"; //支付宝
@@ -449,10 +452,8 @@ public class Constants {
 
 
     //订单操作类型
-    public static final String ORDER_STATUS_STR_SPIKE_KEY = "send"; //待收货 KEY
     public static final String ORDER_LOG_REFUND_PRICE = "refund_price"; //退款
     public static final String ORDER_LOG_EXPRESS = "express"; //快递
-    public static final String ORDER_LOG_DELIVERY = "delivery"; //送货
     public static final String ORDER_LOG_DELIVERY_GOODS = "delivery_goods"; //送货
     public static final String ORDER_LOG_REFUND_REFUSE = "refund_refuse"; //不退款
     public static final String ORDER_LOG_REFUND_APPLY = "apply_refund"; //

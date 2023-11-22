@@ -157,7 +157,7 @@ public class StorePinkServiceImpl extends ServiceImpl<StorePinkDao, StorePink> i
         List<StorePinkDetailResponse> responseList = pinkList.stream().map(pink -> {
             StorePinkDetailResponse response = new StorePinkDetailResponse();
             BeanUtils.copyProperties(pink, response);
-            StoreOrder storeOrder = storeOrderService.getByOderId(pink.getOrderId());
+            StoreOrder storeOrder = storeOrderService.getByOrderId(pink.getOrderId());
             if (ObjectUtil.isNotNull(storeOrder)) {
                 response.setOrderStatus(storeOrder.getStatus());
                 response.setRefundStatus(storeOrder.getRefundStatus());
@@ -265,7 +265,7 @@ public class StorePinkServiceImpl extends ServiceImpl<StorePinkDao, StorePink> i
             SystemNotification notification = systemNotificationService.getByMark(NotifyConstants.GROUP_SUCCESS_MARK);
             if (notification.getIsRoutine().equals(1) || notification.getIsWechat().equals(1)) {
                 pinkSuccessList.forEach(i -> {
-                    StoreOrder storeOrder = storeOrderService.getByOderId(i.getOrderId());
+                    StoreOrder storeOrder = storeOrderService.getByOrderId(i.getOrderId());
                     StoreCombination storeCombination = storeCombinationService.getById(i.getCid());
                     User tempUser = userService.getById(i.getUid());
                     // 发送微信模板消息

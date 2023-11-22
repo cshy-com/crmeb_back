@@ -34,6 +34,9 @@ public class OrderProductReplyResponse implements Serializable {
     @ApiModelProperty(value = "图片")
     private String image;
 
+    @ApiModelProperty(value = "规格图片")
+    private String attrValueImage;
+
     @ApiModelProperty(value = "商品编号")
     private Integer productId;
 

@@ -300,6 +300,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         existStoreOrder.setRefundStatus(1);
+        existStoreOrder.setRefundReceivingStatus(request.getRefundReceivingStatus());
+        existStoreOrder.setRefundType(request.getRefundType());
         existStoreOrder.setRefundReasonTime(DateUtil.nowDateTime());
         existStoreOrder.setRefundReasonWap(request.getText());
         existStoreOrder.setRefundReasonWapExplain(request.getExplain());
@@ -423,6 +425,7 @@ public class OrderServiceImpl implements OrderService {
                 orderInfoResponse.setCartNum(e.getPayNum());
                 orderInfoResponse.setPrice(ObjectUtil.isNotNull(e.getVipPrice()) ? e.getVipPrice() : e.getPrice());
                 orderInfoResponse.setProductId(e.getProductId());
+                orderInfoResponse.setSku(e.getSku());
                 infoResponseList.add(orderInfoResponse);
             });
             infoResponse.setOrderInfoList(infoResponseList);
@@ -502,7 +505,7 @@ public class OrderServiceImpl implements OrderService {
 
         StoreOrderDetailInfoResponse storeOrderDetailResponse = new StoreOrderDetailInfoResponse();
         // 查询订单
-        StoreOrder storeOrder = storeOrderService.getByOderId(orderId);
+        StoreOrder storeOrder = storeOrderService.getByOrderId(orderId);
         if (ObjectUtil.isNull(storeOrder) || storeOrder.getIsDel() || storeOrder.getIsSystemDel()) {
             throw new CrmebException("订单不存在");
         }
@@ -535,12 +538,15 @@ public class OrderServiceImpl implements OrderService {
         storeOrderDetailResponse.setSystemStore(systemStoreService.getByCondition(systemStorePram));
         // 腾讯云地图key
         storeOrderDetailResponse.setMapKey(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_SITE_TENG_XUN_MAP_KEY));
+
         BeanUtils.copyProperties(storeOrder, storeOrderDetailResponse);
         storeOrderDetailResponse.setStatusPic(orderStatusVo.getStr("statusPic"));
         storeOrderDetailResponse.setOrderStatusMsg(orderStatusVo.getStr("msg"));
         storeOrderDetailResponse.setPayTypeStr(orderStatusVo.getStr("payTypeStr"));
+        storeOrderDetailResponse.setOrderDeliveryTime(orderStatusVo.getStr("time"));
         BigDecimal proTotalPrice = storeOrderDetailResponse.getPayPrice().add(storeOrderDetailResponse.getCouponPrice()).add(storeOrderDetailResponse.getDeductionPrice()).subtract(storeOrderDetailResponse.getPayPostage());
         storeOrderDetailResponse.setProTotalPrice(proTotalPrice);
+
         return storeOrderDetailResponse;
     }
 
@@ -583,17 +589,7 @@ public class OrderServiceImpl implements OrderService {
             record.set("msg", "商家未发货,请耐心等待");
         } else if (storeOrder.getStatus() == 1) { // 待收货处理
             // 待收货
-            if (null != storeOrder.getDeliveryType() && storeOrder.getDeliveryType().equals(Constants.ORDER_STATUS_STR_SPIKE_KEY)) { // 送货
-                StoreOrderStatus storeOrderStatus = new StoreOrderStatus();
-                storeOrderStatus.setOid(storeOrder.getId());
-                storeOrderStatus.setChangeType(Constants.ORDER_LOG_DELIVERY);
-                List<StoreOrderStatus> sOrderStatusResults = storeOrderStatusService.getByEntity(storeOrderStatus);
-                if (sOrderStatusResults.size() > 0) {
-                    record.set("type", 2);
-                    record.set("title", "待收货");
-                    record.set("msg", "商家已送货,请耐心等待");
-                }
-            } else if (null != storeOrder.getDeliveryType() && storeOrder.getDeliveryType().equals(Constants.ORDER_LOG_EXPRESS)) {
+            if (null != storeOrder.getDeliveryType() && storeOrder.getDeliveryType().equals(Constants.ORDER_LOG_EXPRESS)) {
                 StoreOrderStatus storeOrderStatus = new StoreOrderStatus();
                 storeOrderStatus.setOid(storeOrder.getId());
                 storeOrderStatus.setChangeType(Constants.ORDER_LOG_EXPRESS);
@@ -602,6 +598,9 @@ public class OrderServiceImpl implements OrderService {
                     record.set("type", 2);
                     record.set("title", "待收货");
                     record.set("msg", "商家已发货,请耐心等待");
+                    Optional<StoreOrderStatus> first = sOrderStatusResults.stream().filter(orderStatus -> orderStatus.getChangeType().equals(Constants.ORDER_LOG_EXPRESS)).findFirst();
+                    if (first.isPresent())
+                        record.set("time", DateUtil.dateToStr(first.get().getCreateTime(), Constants.DATE_FORMAT));
                 }
             } else {
                 StoreOrderStatus storeOrderStatus = new StoreOrderStatus();
@@ -737,7 +736,8 @@ public class OrderServiceImpl implements OrderService {
             cartInfo.put("payNum", infoVo.getInfo().getPayNum());
             cartInfo.put("price", infoVo.getInfo().getPrice());
             cartInfo.put("productName", infoVo.getInfo().getProductName());
-            cartInfo.put("productImg", infoVo.getInfo().getImage());
+            cartInfo.put("productImg", infoVo.getInfo().getMainImage());
+            cartInfo.put("attrValueImg", infoVo.getInfo().getAttrValueImage());
             cartInfos.add(cartInfo);
         }
         HashMap<String, Object> orderInfo = new HashMap<>();
@@ -763,7 +763,8 @@ public class OrderServiceImpl implements OrderService {
         response.setCartNum(scr.getPayNum());
         response.setTruePrice(scr.getPrice());
         response.setProductId(scr.getProductId());
-        response.setImage(scr.getImage());
+        response.setImage(scr.getMainImage());
+        response.setAttrValueImage(scr.getAttrValueImage());
         response.setSku(scr.getSku());
         response.setStoreName(scr.getProductName());
         return response;
@@ -786,7 +787,8 @@ public class OrderServiceImpl implements OrderService {
         infoVoList.forEach(e -> {
             OrderInfoResponse orderInfoResponse = new OrderInfoResponse();
             orderInfoResponse.setStoreName(e.getInfo().getProductName());
-            orderInfoResponse.setImage(e.getInfo().getImage());
+            orderInfoResponse.setImage(e.getInfo().getMainImage());
+            orderInfoResponse.setAttrValueImage(e.getInfo().getAttrValueImage());
             orderInfoResponse.setCartNum(e.getInfo().getPayNum());
             orderInfoResponse.setPrice(e.getInfo().getPrice());
             orderInfoResponse.setProductId(e.getProductId());
@@ -870,19 +872,19 @@ public class OrderServiceImpl implements OrderService {
         String payWeixinOpen = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_PAY_WEIXIN_OPEN);
         if (orderInfoVo.getIsVideo()) {
             // 关闭余额支付和到店自提
-            preOrderResponse.setYuePayStatus("0");
+//            preOrderResponse.setYuePayStatus("0");
             preOrderResponse.setPayWeixinOpen(payWeixinOpen);
-            preOrderResponse.setStoreSelfMention("false");
-            preOrderResponse.setAliPayStatus("0");
+//            preOrderResponse.setStoreSelfMention("false");
+//            preOrderResponse.setAliPayStatus("0");
             return preOrderResponse;
         }
-        String yuePayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YUE_PAY_STATUS);// 1开启 2关闭
-        String storeSelfMention = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_STORE_SELF_MENTION);
-        String aliPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_ALI_PAY_STATUS);// 1开启
-        preOrderResponse.setYuePayStatus(yuePayStatus);
+//        String yuePayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YUE_PAY_STATUS);// 1开启 2关闭
+//        String aliPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_ALI_PAY_STATUS);// 1开启
+//        String storeSelfMention = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_STORE_SELF_MENTION);
+//        preOrderResponse.setYuePayStatus(yuePayStatus);
         preOrderResponse.setPayWeixinOpen(payWeixinOpen);
-        preOrderResponse.setStoreSelfMention(storeSelfMention);
-        preOrderResponse.setAliPayStatus(aliPayStatus);
+//        preOrderResponse.setStoreSelfMention(storeSelfMention);
+//        preOrderResponse.setAliPayStatus(aliPayStatus);
         return preOrderResponse;
     }
 
@@ -940,6 +942,7 @@ public class OrderServiceImpl implements OrderService {
         // 校验收货信息
         String verifyCode = "";
         String userAddressStr = "";
+        String userAddressDetailStr = "";
         if (request.getShippingType() == 1) { // 快递配送
             if (request.getAddressId() <= 0) throw new CrmebException("请选择收货地址");
             UserAddress userAddress = userAddressService.getById(request.getAddressId(), false);
@@ -948,22 +951,8 @@ public class OrderServiceImpl implements OrderService {
             }
             request.setRealName(userAddress.getRealName());
             request.setPhone(userAddress.getPhone());
-            userAddressStr = userAddress.getProvince() + userAddress.getCity() + userAddress.getDistrict() + userAddress.getDetail();
-        } else if (request.getShippingType() == 2) { // 到店自提
-            if (StringUtils.isBlank(request.getRealName()) || StringUtils.isBlank(request.getPhone())) {
-                throw new CrmebException("请填写姓名和电话");
-            }
-            // 自提开关是否打开
-            String storeSelfMention = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_STORE_SELF_MENTION);
-            if ("false".equals(storeSelfMention)) {
-                throw new CrmebException("请先联系管理员开启门店自提");
-            }
-            SystemStore systemStore = systemStoreService.getById(request.getStoreId());
-            if (ObjectUtil.isNull(systemStore) || systemStore.getIsDel() || !systemStore.getIsShow()) {
-                throw new CrmebException("暂无门店无法选择门店自提");
-            }
-            verifyCode = CrmebUtil.randomCount(1111111111, 999999999) + "";
-            userAddressStr = systemStore.getName();
+            userAddressStr = userAddress.getProvince() + userAddress.getCity() + userAddress.getDistrict();
+            userAddressDetailStr = userAddress.getDetail();
         }
 
         //TODO 分离代码
@@ -1010,7 +999,8 @@ public class OrderServiceImpl implements OrderService {
             soInfo.setOrderNo(orderNo);
             soInfo.setProductName(detailVo.getProductName());
             soInfo.setAttrValueId(detailVo.getAttrValueId());
-            soInfo.setImage(detailVo.getImage());
+            soInfo.setImage(detailVo.getMainImage());
+            soInfo.setAttrValueImage(detailVo.getAttrValueImage());
             soInfo.setSku(detailVo.getSku());
             soInfo.setPrice(detailVo.getPrice());
             soInfo.setPayNum(detailVo.getPayNum());
@@ -1068,19 +1058,20 @@ public class OrderServiceImpl implements OrderService {
                     break;
             }
         }
-        if (request.getPayType().equals(PayConstants.PAY_TYPE_ALI_PAY)) {
-            isChannel = 6;
-            if (request.getPayChannel().equals(PayConstants.PAY_CHANNEL_ALI_APP_PAY)) {
-                isChannel = 7;
-            }
-        }
+//        if (request.getPayType().equals(PayConstants.PAY_TYPE_ALI_PAY)) {
+//            isChannel = 6;
+//            if (request.getPayChannel().equals(PayConstants.PAY_CHANNEL_ALI_APP_PAY)) {
+//                isChannel = 7;
+//            }
+//        }
 
         StoreOrder storeOrder = new StoreOrder();
         storeOrder.setUid(user.getUid());
         storeOrder.setOrderId(orderNo);
         storeOrder.setRealName(request.getRealName());
         storeOrder.setUserMobile(request.getPhone());
-        storeOrder.setUserAddress(userAddressStr);
+        storeOrder.setAddress(userAddressStr);
+        storeOrder.setAddressDetail(userAddressDetailStr);
         // 如果是自提
         if (request.getShippingType() == 2) {
             storeOrder.setVerifyCode(verifyCode);
@@ -1217,13 +1208,13 @@ public class OrderServiceImpl implements OrderService {
     public PreOrderResponse getPayConfig() {
         PreOrderResponse preOrderResponse = new PreOrderResponse();
         String payWeixinOpen = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_PAY_WEIXIN_OPEN);
-        String yuePayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YUE_PAY_STATUS);// 1开启 2关闭
-        String storeSelfMention = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_STORE_SELF_MENTION);
-        String aliPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_ALI_PAY_STATUS);// 1开启
-        preOrderResponse.setYuePayStatus(yuePayStatus);
+//        String yuePayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YUE_PAY_STATUS);// 1开启 2关闭
+//        String storeSelfMention = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_STORE_SELF_MENTION);
+//        String aliPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_ALI_PAY_STATUS);// 1开启
+//        preOrderResponse.setYuePayStatus(yuePayStatus);
         preOrderResponse.setPayWeixinOpen(payWeixinOpen);
-        preOrderResponse.setStoreSelfMention(storeSelfMention);
-        preOrderResponse.setAliPayStatus(aliPayStatus);
+//        preOrderResponse.setStoreSelfMention(storeSelfMention);
+//        preOrderResponse.setAliPayStatus(aliPayStatus);
         return preOrderResponse;
     }
 
@@ -1260,7 +1251,10 @@ public class OrderServiceImpl implements OrderService {
 
             storeOrder.setStatus(1);
             storeOrder.setTrackingNo(trackingNo);
+            storeOrder.setDeliveryType(Constants.ORDER_LOG_EXPRESS);
             this.storeOrderService.updateById(storeOrder);
+
+            this.storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_EXPRESS, Constants.ORDER_STATUS_STR_SHIPPING);
 
             //查询同一订单商品
             List<StoreOrderInfo> storeOrderInfoList = this.storeOrderInfoService.getListByOrderNo(storeOrder.getOrderId());
@@ -1479,7 +1473,8 @@ public class OrderServiceImpl implements OrderService {
                 detailVo.setSku(attrValue.getSuk());
                 detailVo.setPrice(attrValue.getPrice());
                 detailVo.setPayNum(detailRequest.getProductNum());
-                detailVo.setImage(StrUtil.isNotBlank(attrValue.getImage()) ? attrValue.getImage() : storeProduct.getImage());
+                detailVo.setMainImage(storeProduct.getImage());
+                detailVo.setAttrValueImage(attrValue.getImage());
                 detailVo.setVolume(attrValue.getVolume());
                 detailVo.setWeight(attrValue.getWeight());
                 detailVo.setTempId(storeProduct.getTempId());
@@ -1556,7 +1551,8 @@ public class OrderServiceImpl implements OrderService {
             detailVo.setSku(attrValue.getSuk());
             detailVo.setPrice(attrValue.getPrice());
             detailVo.setPayNum(storeCart.getCartNum());
-            detailVo.setImage(StrUtil.isNotBlank(attrValue.getImage()) ? attrValue.getImage() : storeProduct.getImage());
+            detailVo.setMainImage(storeProduct.getImage());
+            detailVo.setAttrValueImage(attrValue.getImage());
             detailVo.setVolume(attrValue.getVolume());
             detailVo.setWeight(attrValue.getWeight());
             detailVo.setTempId(storeProduct.getTempId());
@@ -1599,7 +1595,8 @@ public class OrderServiceImpl implements OrderService {
         detailVo.setSku(seckillAttrValue.getSuk());
         detailVo.setPrice(seckillAttrValue.getPrice());
         detailVo.setPayNum(detailRequest.getProductNum());
-        detailVo.setImage(StrUtil.isNotBlank(seckillAttrValue.getImage()) ? seckillAttrValue.getImage() : storeSeckill.getImage());
+        detailVo.setMainImage(storeSeckill.getImage());
+        detailVo.setAttrValueImage(seckillAttrValue.getImage());
         detailVo.setVolume(seckillAttrValue.getVolume());
         detailVo.setWeight(seckillAttrValue.getWeight());
         detailVo.setTempId(storeSeckill.getTempId());
@@ -1706,7 +1703,8 @@ public class OrderServiceImpl implements OrderService {
         detailVo.setSku(bargainAttrValue.getSuk());
         detailVo.setPrice(storeBargain.getMinPrice());
         detailVo.setPayNum(detailRequest.getProductNum());
-        detailVo.setImage(StrUtil.isNotBlank(bargainAttrValue.getImage()) ? bargainAttrValue.getImage() : bargainAttrValue.getImage());
+        detailVo.setMainImage(storeBargain.getImage());
+        detailVo.setAttrValueImage(bargainAttrValue.getImage());
         detailVo.setVolume(bargainAttrValue.getVolume());
         detailVo.setWeight(bargainAttrValue.getWeight());
         detailVo.setTempId(storeBargain.getTempId());
@@ -1817,7 +1815,8 @@ public class OrderServiceImpl implements OrderService {
         detailVo.setSku(combinationAttrValue.getSuk());
         detailVo.setPrice(combinationAttrValue.getPrice());
         detailVo.setPayNum(detailRequest.getProductNum());
-        detailVo.setImage(StrUtil.isNotBlank(combinationAttrValue.getImage()) ? combinationAttrValue.getImage() : combinationAttrValue.getImage());
+        detailVo.setMainImage(storeCombination.getImage());
+        detailVo.setAttrValueImage(combinationAttrValue.getImage());
         detailVo.setVolume(combinationAttrValue.getVolume());
         detailVo.setWeight(combinationAttrValue.getWeight());
         detailVo.setTempId(storeCombination.getTempId());
@@ -1950,7 +1949,8 @@ public class OrderServiceImpl implements OrderService {
             tempDetailVo.setSku(attrValue.getSuk());
             tempDetailVo.setPrice(attrValue.getPrice());
             tempDetailVo.setPayNum(detailVo.getPayNum());
-            tempDetailVo.setImage(StrUtil.isNotBlank(attrValue.getImage()) ? attrValue.getImage() : storeProduct.getImage());
+            detailVo.setMainImage(storeProduct.getImage());
+            detailVo.setAttrValueImage(attrValue.getImage());
             tempDetailVo.setVolume(attrValue.getVolume());
             tempDetailVo.setWeight(attrValue.getWeight());
             tempDetailVo.setTempId(storeProduct.getTempId());
@@ -1967,7 +1967,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private StoreOrder getByOrderIdException(String orderId) {
-        StoreOrder storeOrder = storeOrderService.getByOderId(orderId);
+        StoreOrder storeOrder = storeOrderService.getByOrderId(orderId);
         if (ObjectUtil.isNull(storeOrder)) {
             throw new CrmebException("订单不存在");
         }

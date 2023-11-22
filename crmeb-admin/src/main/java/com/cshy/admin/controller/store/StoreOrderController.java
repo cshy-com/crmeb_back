@@ -6,6 +6,7 @@ import com.cshy.common.model.request.store.*;
 import com.cshy.common.model.response.*;
 import com.cshy.common.model.vo.ExpressSheetVo;
 import com.cshy.common.model.vo.LogisticsResultVo;
+import com.cshy.service.service.OrderService;
 import com.cshy.service.service.store.StoreOrderService;
 import com.cshy.service.service.store.StoreOrderVerification;
 import io.swagger.annotations.Api;
@@ -19,11 +20,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
  * 订单表 前端控制器
-
  */
 @Slf4j
 @RestController
@@ -37,9 +38,13 @@ public class StoreOrderController {
     @Autowired
     private StoreOrderVerification storeOrderVerification;
 
+    @Autowired
+    private OrderService orderService;
+
     /**
      * 分页显示订单表
-     *  @param request          搜索条件
+     *
+     * @param request          搜索条件
      * @param pageParamRequest 分页参数
      */
     @PreAuthorize("hasAuthority('admin:order:list')")
@@ -67,7 +72,7 @@ public class StoreOrderController {
     @PreAuthorize("hasAuthority('admin:order:list:data')")
     @ApiOperation(value = "获取订单统计数据")
     @RequestMapping(value = "/list/data", method = RequestMethod.GET)
-    public CommonResult<StoreOrderTopItemResponse> getOrderData(@RequestParam(value = "dateLimit", defaultValue = "")String dateLimit) {
+    public CommonResult<StoreOrderTopItemResponse> getOrderData(@RequestParam(value = "dateLimit", defaultValue = "") String dateLimit) {
         return CommonResult.success(storeOrderService.getOrderData(dateLimit));
     }
 
@@ -122,19 +127,6 @@ public class StoreOrderController {
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public CommonResult<StoreOrderInfoResponse> info(@RequestParam(value = "orderNo") String orderNo) {
         return CommonResult.success(storeOrderService.info(orderNo));
-    }
-
-    /**
-     * 发送货
-     */
-    @PreAuthorize("hasAuthority('admin:order:send')")
-    @ApiOperation(value = "发送货")
-    @RequestMapping(value = "/send", method = RequestMethod.POST)
-    public CommonResult<Boolean> send(@RequestBody @Validated StoreOrderSendRequest request) {
-        if (storeOrderService.send(request)) {
-            return CommonResult.success();
-        }
-        return CommonResult.failed();
     }
 
     /**
@@ -251,6 +243,13 @@ public class StoreOrderController {
     @RequestMapping(value = "/sheet/info", method = RequestMethod.GET)
     public CommonResult<ExpressSheetVo> getDeliveryInfo() {
         return CommonResult.success(storeOrderService.getDeliveryInfo());
+    }
+
+    @ApiOperation(value = "发货")
+    @RequestMapping(value = "/ship", method = RequestMethod.GET)
+    public CommonResult<String> ship(@RequestParam String orderId, @RequestParam String trackingNo, @RequestParam Integer type, HttpServletRequest request) {
+        orderService.ship(orderId, trackingNo, type, request);
+        return CommonResult.success();
     }
 
 }

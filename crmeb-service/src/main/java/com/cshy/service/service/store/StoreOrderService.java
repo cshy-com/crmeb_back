@@ -88,8 +88,6 @@ public interface StoreOrderService extends IService<StoreOrder> {
      */
     StoreOrderInfoResponse info(String orderNo);
 
-    Boolean send(StoreOrderSendRequest request);
-
     /**
      * 订单备注
      * @param orderNo 订单编号
@@ -146,7 +144,7 @@ public interface StoreOrderService extends IService<StoreOrder> {
      */
     List<StoreOrder> getUserCurrentCombinationOrders(Integer uid, Integer combinationId);
 
-    StoreOrder getByOderId(String orderId);
+    StoreOrder getByOrderId(String orderId);
 
     /**
      * 获取面单默认配置信息

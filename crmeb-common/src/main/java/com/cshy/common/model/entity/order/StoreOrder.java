@@ -42,8 +42,11 @@ public class StoreOrder implements Serializable {
     @ApiModelProperty(value = "用户电话")
     private String userMobile;
 
+    @ApiModelProperty(value = "地址")
+    private String address;
+
     @ApiModelProperty(value = "详细地址")
-    private String userAddress;
+    private String addressDetail;
 
     @ApiModelProperty(value = "运费金额")
     private BigDecimal freightPrice;
@@ -108,13 +111,13 @@ public class StoreOrder implements Serializable {
     @ApiModelProperty(value = "退款金额")
     private BigDecimal refundPrice;
 
-    @ApiModelProperty(value = "快递名称/送货人姓名")
+    @ApiModelProperty(value = "送货人姓名")
     private String deliveryName;
 
     @ApiModelProperty(value = "发货类型")
     private String deliveryType;
 
-    @ApiModelProperty(value = "快递单号/手机号")
+    @ApiModelProperty(value = "快递单号")
     private String trackingNo;
 
     @ApiModelProperty(value = "消费赚取积分")
@@ -202,4 +205,10 @@ public class StoreOrder implements Serializable {
 
     @ApiModelProperty(value = "退货物流单号")
     private String refundTrackingNo;
+
+    @ApiModelProperty(value = "退款方式 0 退款 1 退货退款")
+    private Integer refundType;
+
+    @ApiModelProperty(value = "退款收货状态 0 未收货 1 已收货")
+    private Integer refundReceivingStatus;
 }

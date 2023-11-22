@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -39,10 +40,12 @@ public class StoreOrderInfoResponse implements Serializable {
     private String realName;
 
     @ApiModelProperty(value = "用户电话")
-    private String userPhone;
+    private String userMobile;
 
+    @ApiModelProperty(value = "地址")
+    private String address;
     @ApiModelProperty(value = "详细地址")
-    private String userAddress;
+    private String addressDetail;
 
     @ApiModelProperty(value = "订单商品总数")
     private Integer totalNum;
@@ -81,7 +84,7 @@ public class StoreOrderInfoResponse implements Serializable {
     private String deliveryType;
 
     @ApiModelProperty(value = "快递单号/手机号")
-    private String deliveryId;
+    private String trackingNo;
 
     @ApiModelProperty(value = "备注")
     private String mark;
@@ -133,4 +136,10 @@ public class StoreOrderInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "退款时间")
     private Date refundReasonTime;
+
+    @ApiModelProperty(value = "退款方式 0 退款 1 退货退款")
+    private Integer refundType;
+
+    @ApiModelProperty(value = "退款收货状态 0 未收货 1 已收货")
+    private Integer refundReceivingStatus;
 }

@@ -44,7 +44,7 @@ public class StoreOrderStatusServiceImpl extends ServiceImpl<StoreOrderStatusDao
     */
     @Override
     public List<StoreOrderStatus> getList(StoreOrderStatusSearchRequest request, PageParamRequest pageParamRequest) {
-        StoreOrder storeOrder = storeOrderService.getByOderId(request.getOrderNo());
+        StoreOrder storeOrder = storeOrderService.getByOrderId(request.getOrderNo());
         if (ObjectUtil.isNull(storeOrder)) {
             return CollUtil.newArrayList();
         }

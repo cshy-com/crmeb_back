@@ -156,7 +156,7 @@ public class StoreProductReplyServiceImpl extends ServiceImpl<StoreProductReplyD
     @Override
     public Boolean create(StoreProductReplyAddRequest request) {
         User user = userService.getInfoException();
-        StoreOrder storeOrder = storeOrderService.getByOderId(request.getOrderNo());
+        StoreOrder storeOrder = storeOrderService.getByOrderId(request.getOrderNo());
         if (ObjectUtil.isNull(storeOrder) || !storeOrder.getUid().equals(user.getUid())) {
             throw new CrmebException("该订单不存在");
         }

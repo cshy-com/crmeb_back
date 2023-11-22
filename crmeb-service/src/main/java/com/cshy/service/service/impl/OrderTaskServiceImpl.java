@@ -118,14 +118,12 @@ public class OrderTaskServiceImpl implements OrderTaskService {
             }
             try {
                 StoreOrder storeOrder = storeOrderService.getById(Integer.valueOf(orderId.toString()));
-                if (ObjectUtil.isNull(storeOrder)) {
-                    throw new CrmebException("订单不存在,orderNo = " + orderId);
-                }
-//                boolean result = storeOrderTaskService.refundApply(storeOrder);
-                boolean result = storeOrderTaskService.refundOrder(storeOrder);
-                if (!result) {
-                    logger.error("订单退款错误：result = " + result);
-                    redisUtil.lPush(redisKey, orderId);
+                if (ObjectUtil.isNotNull(storeOrder)) {
+                    boolean result = storeOrderTaskService.refundOrder(storeOrder);
+                    if (!result) {
+                        logger.error("订单退款错误：result = " + result);
+                        redisUtil.lPush(redisKey, orderId);
+                    }
                 }
             } catch (Exception e) {
                 logger.error("订单退款错误：" + e.getMessage());
@@ -183,7 +181,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
                 continue;
             }
             try {
-                StoreOrder storeOrder = storeOrderService.getByOderId(String.valueOf(data));
+                StoreOrder storeOrder = storeOrderService.getByOrderId(String.valueOf(data));
                 if (ObjectUtil.isNull(storeOrder)) {
                     logger.error("OrderTaskServiceImpl.orderPaySuccessAfter | 订单不存在，orderNo: " + data);
                     throw new CrmebException("订单不存在，orderNo: " + data);
@@ -217,14 +215,12 @@ public class OrderTaskServiceImpl implements OrderTaskService {
                 continue;
             }
             try {
-                StoreOrder storeOrder = storeOrderService.getByOderId(String.valueOf(data));
-                if (ObjectUtil.isNull(storeOrder)) {
-                    logger.error("OrderTaskServiceImpl.autoCancel | 订单不存在，orderNo: " + data);
-                    throw new CrmebException("订单不存在，orderNo: " + data);
-                }
-                boolean result = storeOrderTaskService.autoCancel(storeOrder);
-                if (!result) {
-                    redisUtil.lPush(redisKey, data);
+                StoreOrder storeOrder = storeOrderService.getByOrderId(String.valueOf(data));
+                if (ObjectUtil.isNotNull(storeOrder)) {
+                    boolean result = storeOrderTaskService.autoCancel(storeOrder);
+                    if (!result) {
+                        redisUtil.lPush(redisKey, data);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

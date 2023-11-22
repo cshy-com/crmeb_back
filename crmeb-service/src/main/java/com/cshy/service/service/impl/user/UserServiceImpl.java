@@ -1198,7 +1198,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         PageInfo<UserBrokerageRecord> recordPageInfo = userBrokerageRecordService.findAdminSpreadListByUid(request, pageParamRequest);
         List<SpreadOrderResponse> responseList = recordPageInfo.getList().stream().map(e -> {
             SpreadOrderResponse response = new SpreadOrderResponse();
-            StoreOrder storeOrder = storeOrderService.getByOderId(e.getLinkId());
+            StoreOrder storeOrder = storeOrderService.getByOrderId(e.getLinkId());
             response.setId(storeOrder.getId());
             response.setOrderId(storeOrder.getOrderId());
             response.setRealName(storeOrder.getRealName());

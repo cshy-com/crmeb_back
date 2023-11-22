@@ -7,6 +7,7 @@ import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.query.giftCard.GiftCardOrderQuery;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.vo.giftCard.GiftCardOrderVo;
+import com.cshy.service.service.OrderService;
 import com.cshy.service.service.SmsService;
 import com.cshy.service.service.giftCard.GiftCardOrderService;
 import io.swagger.annotations.Api;
@@ -32,7 +33,7 @@ public class GiftCardOrderController {
     @Autowired
     private GiftCardOrderService giftCardOrderService;
     @Autowired
-    private SmsService smsService;
+    private OrderService orderService;
 
     @ApiOperation(value = "分页列表")
     @RequestMapping(value = "/page", method = RequestMethod.POST)
@@ -92,7 +93,7 @@ public class GiftCardOrderController {
             @ApiImplicitParam(name = "trackingNo", value = "物流单号")
     })
     public CommonResult<String> ship(@RequestParam String orderId, @RequestParam String trackingNo, @RequestParam Integer type, HttpServletRequest request) {
-        giftCardOrderService.ship(orderId, trackingNo, type, request);
+        orderService.ship(orderId, trackingNo, type, request);
         return CommonResult.success();
     }
 }
