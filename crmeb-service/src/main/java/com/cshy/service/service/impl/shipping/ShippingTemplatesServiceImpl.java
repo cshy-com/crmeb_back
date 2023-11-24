@@ -1,4 +1,4 @@
-package com.cshy.service.service.impl;
+package com.cshy.service.service.impl.shipping;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -13,9 +13,9 @@ import com.cshy.common.model.request.shipping.ShippingTemplatesRegionRequest;
 import com.cshy.common.model.request.shipping.ShippingTemplatesRequest;
 import com.cshy.common.model.request.shipping.ShippingTemplatesSearchRequest;
 import com.cshy.service.dao.ShippingTemplatesDao;
-import com.cshy.service.service.ShippingTemplatesFreeService;
-import com.cshy.service.service.ShippingTemplatesRegionService;
-import com.cshy.service.service.ShippingTemplatesService;
+import com.cshy.service.service.shipping.ShippingTemplatesFreeService;
+import com.cshy.service.service.shipping.ShippingTemplatesRegionService;
+import com.cshy.service.service.shipping.ShippingTemplatesService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.cshy.service.service.impl;
+package com.cshy.service.service.impl.shipping;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -6,7 +6,7 @@ import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.model.entity.express.ShippingTemplatesRegion;
 import com.cshy.common.model.request.shipping.ShippingTemplatesRegionRequest;
 import com.cshy.service.dao.ShippingTemplatesRegionDao;
-import com.cshy.service.service.ShippingTemplatesRegionService;
+import com.cshy.service.service.shipping.ShippingTemplatesRegionService;
 import com.cshy.service.service.system.SystemCityService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -7,7 +7,7 @@ import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.query.sms.SmsSignQuery;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.vo.sms.SmsSignVo;
-import com.cshy.service.service.SmsSignService;
+import com.cshy.service.service.sms.SmsSignService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

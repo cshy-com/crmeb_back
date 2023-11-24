@@ -454,14 +454,11 @@ public class Constants {
     //订单操作类型
     public static final String ORDER_LOG_REFUND_PRICE = "refund_price"; //退款
     public static final String ORDER_LOG_EXPRESS = "express"; //快递
-    public static final String ORDER_LOG_DELIVERY_GOODS = "delivery_goods"; //送货
     public static final String ORDER_LOG_REFUND_REFUSE = "refund_refuse"; //不退款
     public static final String ORDER_LOG_REFUND_APPLY = "apply_refund"; //
     public static final String ORDER_LOG_PAY_SUCCESS = "pay_success"; //支付成功
     public static final String ORDER_LOG_DELIVERY_VI = "delivery_fictitious"; //虚拟发货
     public static final String ORDER_LOG_EDIT = "order_edit"; //编辑订单
-    public static final String ORDER_LOG_PAY_OFFLINE = "offline"; //线下付款订单
-
 
     // 订单缓存
     public static final long ORDER_CASH_CONFIRM = (60);
@@ -471,8 +468,7 @@ public class Constants {
     public static final String ORDER_LOG_MESSAGE_REFUND_PRICE = "退款给用户{amount}元"; //退款
     public static final String ORDER_LOG_MESSAGE_EXPRESS = "已发货 快递公司：{deliveryName}, 快递单号：{deliveryCode}"; //快递
     public static final String ORDER_LOG_MESSAGE_DELIVERY = "已配送 发货人：{deliveryName}, 发货人电话：{deliveryCode}"; //送货
-    public static final String ORDER_LOG_MESSAGE_DELIVERY_FICTITIOUS = "已虚拟发货"; //已虚拟发货
-    public static final String ORDER_LOG_MESSAGE_REFUND_REFUSE = "不退款款因：{reason}"; //不退款款因
+    public static final String ORDER_LOG_MESSAGE_REFUND_REFUSE = "{reason}"; //不退款款因
     public static final String ORDER_LOG_MESSAGE_PAY_SUCCESS = "用户付款成功"; //用户付款成功
 
     public static final String ORDER_NO_PREFIX_WE_CHAT = "wx"; //微信平台下单订单号前缀

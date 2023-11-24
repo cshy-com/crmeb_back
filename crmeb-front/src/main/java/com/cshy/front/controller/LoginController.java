@@ -9,7 +9,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.LoginResponse;
 import com.cshy.common.utils.StringUtils;
 import com.cshy.front.service.LoginService;
-import com.cshy.service.service.SmsService;
+import com.cshy.service.service.sms.SmsService;
 import com.cshy.service.service.giftCard.GiftCardService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

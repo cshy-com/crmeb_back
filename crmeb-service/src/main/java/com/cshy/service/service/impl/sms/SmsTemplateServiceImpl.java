@@ -1,4 +1,4 @@
-package com.cshy.service.service.impl;
+package com.cshy.service.service.impl.sms;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
@@ -19,9 +19,9 @@ import com.cshy.common.model.query.sms.SmsTemplateQuery;
 import com.cshy.common.model.vo.sms.SmsTemplateVo;
 import com.cshy.common.utils.StringUtils;
 import com.cshy.service.dao.SmsTemplateDao;
-import com.cshy.service.service.SmsService;
-import com.cshy.service.service.SmsSignService;
-import com.cshy.service.service.SmsTemplateService;
+import com.cshy.service.service.sms.SmsService;
+import com.cshy.service.service.sms.SmsSignService;
+import com.cshy.service.service.sms.SmsTemplateService;
 import com.cshy.service.service.system.SystemConfigService;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * SmsTemplateServiceImpl 接口实现
@@ -113,6 +114,15 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
                 else
                     this.updateById(template);
             });
+
+            //数据删除
+            List<String> idList = list.stream().filter(temp ->
+                    !smsTemplateList.stream().map(QuerySmsTemplateListResponseBody.QuerySmsTemplateListResponseBodySmsTemplateList::getTemplateCode)
+                            .collect(Collectors.toList())
+                            .contains(temp.getTempCode())).map(SmsTemplate::getId).collect(Collectors.toList());
+            if (CollUtil.isNotEmpty(idList))
+                this.smsTemplateDao.batchDeleteByIds(idList);
+
         } catch (TeaException error) {
             com.aliyun.teautil.Common.assertAsString(error.message);
             log.error(error.message);

@@ -1,9 +1,9 @@
-package com.cshy.service.service.impl;
+package com.cshy.service.service.impl.sms;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.model.entity.sms.SmsRecord;
 import com.cshy.service.dao.SmsRecordDao;
-import com.cshy.service.service.SmsRecordService;
+import com.cshy.service.service.sms.SmsRecordService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

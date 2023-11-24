@@ -1,4 +1,4 @@
-package com.cshy.service.service;
+package com.cshy.service.service.order;
 
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.*;
@@ -11,6 +11,7 @@ import com.cshy.common.model.vo.MyRecord;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * H5端订单操作
@@ -142,4 +143,6 @@ public interface OrderService {
     void refundTrackingNo(String trackingNo, String uni);
 
     void ship(String orderId, String trackingNo, Integer type, HttpServletRequest request);
+
+    List<Map<String, Object>> refundList(Integer id);
 }

@@ -1,4 +1,4 @@
-package com.cshy.service.service;
+package com.cshy.service.service.sms;
 
 import com.cshy.common.model.dto.sms.SmsTemplateDto;
 import com.cshy.common.model.entity.base.BaseService;

@@ -17,7 +17,7 @@ import com.cshy.common.model.request.NotificationSearchRequest;
 import com.cshy.common.model.request.NotificationUpdateRequest;
 import com.cshy.common.model.response.NotificationInfoResponse;
 import com.cshy.service.dao.system.SystemNotificationDao;
-import com.cshy.service.service.SmsTemplateService;
+import com.cshy.service.service.sms.SmsTemplateService;
 import com.cshy.service.service.system.SystemNotificationService;
 import com.cshy.service.service.TemplateMessageService;
 import org.springframework.beans.BeanUtils;

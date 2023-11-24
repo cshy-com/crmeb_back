@@ -1,4 +1,4 @@
-package com.cshy.service.service.impl;
+package com.cshy.service.service.impl.sms;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
@@ -23,7 +23,9 @@ import com.cshy.common.utils.*;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.service.dao.SmsRecordDao;
-import com.cshy.service.service.*;
+import com.cshy.service.service.sms.SmsRecordService;
+import com.cshy.service.service.sms.SmsService;
+import com.cshy.service.service.sms.SmsTemplateService;
 import com.cshy.service.service.system.SystemAdminService;
 import com.cshy.service.service.system.SystemConfigService;
 import com.cshy.service.service.user.UserService;
@@ -97,14 +99,15 @@ public class SmsServiceImpl implements SmsService {
 
     @Override
     public void sendCode(String phoneNumber, Integer triggerPosition, HttpServletRequest request, String... params) {
-        ValidateFormUtil.isPhone(phoneNumber, "手机号码错误");
+        if (StringUtils.isNotBlank(phoneNumber))
+            ValidateFormUtil.isPhone(phoneNumber, "手机号码错误");
+        SmsTemplate smsTemplate = smsTemplateService.getOne(new LambdaQueryWrapper<SmsTemplate>().eq(SmsTemplate::getTriggerPosition, triggerPosition));
         try {
             //查询accessKeyID / accessKeySecret
             String smsKey = systemConfigService.getValueByKey(Constants.SMS_KEY);
             String smsSecret = systemConfigService.getValueByKey(Constants.SMS_SECRET);
 
             //查询对应的消息模板
-            SmsTemplate smsTemplate = smsTemplateService.getOne(new LambdaQueryWrapper<SmsTemplate>().eq(SmsTemplate::getTriggerPosition, triggerPosition));
             List<String> phoneList = Lists.newArrayList();
             if (smsTemplate.getIsInternal() == 1) {
                 //查询员工短信开关
@@ -123,7 +126,7 @@ public class SmsServiceImpl implements SmsService {
                 sendSmsRequest.set(this.sendVerificationCode(phoneNumber, smsTemplate));
             else {
                 //其他模板
-                if (CollUtil.isNotEmpty(phoneList)){
+                if (CollUtil.isNotEmpty(phoneList)) {
                     phoneList.forEach(phone -> {
                         sendSmsRequest.set(this.sendCommonCode(phone, smsTemplate, params));
                         SendSmsResponse sendSmsResponse = null;
@@ -138,7 +141,7 @@ public class SmsServiceImpl implements SmsService {
                             throw new CrmebException(sendSmsResponse.getBody().getMessage());
                         }
                     });
-                } else{
+                } else {
                     sendSmsRequest.set(this.sendCommonCode(phoneNumber, smsTemplate, params));
                     SendSmsResponse sendSmsResponse = doSend(client, sendSmsRequest.get());
                     addRecord(phoneNumber, request, smsTemplate, sendSmsResponse, params);
@@ -151,7 +154,11 @@ public class SmsServiceImpl implements SmsService {
 
 
         } catch (Exception e) {
-            throw new CrmebException(e.getMessage(), e);
+            if (Objects.isNull(smsTemplate))
+                logger.error("向手机号（{}）发送短信失败， 找不到对应模板：{}", phoneNumber, e.getMessage());
+            else
+                logger.error("向手机号（{}）发送短信失败， 错误：{}", phoneNumber, e.getMessage());
+            addRecord(phoneNumber, null, smsTemplate, null, params);
         }
     }
 
@@ -164,13 +171,24 @@ public class SmsServiceImpl implements SmsService {
     private void addRecord(String phoneNumber, HttpServletRequest request, SmsTemplate smsTemplate, SendSmsResponse sendSmsResponse, String[] params) {
         //添加发送短信记录
         SmsRecord smsRecord = new SmsRecord()
-                .setResultCode(sendSmsResponse.getBody().getCode())
                 .setTemplate(smsTemplate.getTempCode())
-                .setTemplateName(smsTemplate.getTempName())
-                .setMemo(JSON.toJSONString(sendSmsResponse.getBody()))
                 .setPhone(phoneNumber);
+
+        if (Objects.nonNull(smsTemplate))
+            smsRecord.setTemplateName(smsTemplate.getTempName());
+        else
+            smsRecord.setMemo("找不到对应模板");
+
+        if (Objects.nonNull(sendSmsResponse)) {
+            smsRecord.setMemo(JSON.toJSONString(sendSmsResponse.getBody()));
+            smsRecord.setResultCode(sendSmsResponse.getBody().getCode());
+        } else {
+            smsRecord.setResultCode("ERROR");
+        }
+
         if (Objects.nonNull(params))
             smsRecord.setContent(String.join(",", params));
+
         if (Objects.nonNull(request))
             smsRecord.setAddIp(CrmebUtil.getClientIp(request));
         smsRecordService.save(smsRecord);

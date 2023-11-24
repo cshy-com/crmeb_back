@@ -7,7 +7,7 @@ import com.cshy.common.model.request.order.OrderRefundApplyRequest;
 import com.cshy.common.model.request.order.PreOrderRequest;
 import com.cshy.common.model.request.store.StoreProductReplyAddRequest;
 import com.cshy.common.model.response.*;
-import com.cshy.service.service.OrderService;
+import com.cshy.service.service.order.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -243,5 +243,11 @@ public class OrderController {
     @RequestMapping(value = "get/pay/config", method = RequestMethod.GET)
     public CommonResult<PreOrderResponse> getPayConfig() {
         return CommonResult.success(orderService.getPayConfig());
+    }
+
+    @ApiOperation(value = "查询申请退款列表")
+    @RequestMapping(value = "/refund/list", method = RequestMethod.GET)
+    public CommonResult<List<Map<String, Object>>> refundList(@RequestParam Integer id) {
+        return CommonResult.success(orderService.refundList(id));
     }
 }

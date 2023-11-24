@@ -211,4 +211,7 @@ public class StoreOrder implements Serializable {
 
     @ApiModelProperty(value = "退款收货状态 0 未收货 1 已收货")
     private Integer refundReceivingStatus;
+
+    @ApiModelProperty(value = "退款联系手机号")
+    private String refundMobile;
 }

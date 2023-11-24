@@ -50,4 +50,8 @@ public class OrderRefundApplyRequest {
     @ApiModelProperty(value = "退款收货状态 0 未收货 1 已收货")
     @NotNull(message = "退款收货状态")
     private Integer refundReceivingStatus;
+
+    @ApiModelProperty(value = "退款联系电话")
+    @NotNull(message = "退款联系电话不能为空")
+    private String mobile;
 }

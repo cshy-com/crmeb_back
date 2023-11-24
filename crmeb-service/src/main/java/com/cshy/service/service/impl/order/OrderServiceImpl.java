@@ -1,4 +1,4 @@
-package com.cshy.service.service.impl;
+package com.cshy.service.service.impl.order;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cshy.common.constants.*;
 import com.cshy.common.enums.SmsTriggerEnum;
 import com.cshy.common.model.entity.giftCard.GiftCardOrder;
@@ -42,16 +43,22 @@ import com.cshy.common.model.entity.system.SystemUserLevel;
 import com.cshy.common.model.entity.user.User;
 import com.cshy.common.model.entity.user.UserAddress;
 import com.cshy.common.model.page.CommonPage;
-import com.cshy.common.utils.CrmebUtil;
-import com.cshy.common.utils.DateUtil;
-import com.cshy.common.utils.RedisUtil;
+import com.cshy.common.utils.*;
 import com.cshy.service.delete.OrderUtils;
 import com.cshy.service.service.*;
 import com.cshy.service.service.giftCard.GiftCardOrderService;
+import com.cshy.service.service.order.OrderService;
+import com.cshy.service.service.order.ShortUrlService;
+import com.cshy.service.service.shipping.ShippingTemplatesFreeService;
+import com.cshy.service.service.shipping.ShippingTemplatesRegionService;
+import com.cshy.service.service.shipping.ShippingTemplatesService;
+import com.cshy.service.service.sms.SmsService;
+import com.cshy.service.service.sms.SmsTemplateService;
 import com.cshy.service.service.store.*;
 import com.cshy.service.service.system.*;
 import com.cshy.service.service.user.UserAddressService;
 import com.cshy.service.service.user.UserService;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -121,6 +128,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private StoreSeckillService storeSeckillService;
+
+    @Autowired
+    private ShortUrlService shortUrlService;
 
     private StoreCombinationService storeCombinationService;
 
@@ -281,6 +291,8 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public Boolean refundApply(OrderRefundApplyRequest request) {
+        ValidateFormUtil.isPhone(request.getMobile(), "手机号码错误");
+
         StoreOrder storeOrderPram = new StoreOrder();
         storeOrderPram.setOrderId(request.getUni());
         storeOrderPram.setIsDel(false);
@@ -307,31 +319,17 @@ public class OrderServiceImpl implements OrderService {
         existStoreOrder.setRefundReasonWapExplain(request.getExplain());
         existStoreOrder.setRefundReasonWapImg(systemAttachmentService.clearPrefix(request.getReasonImage()));
         existStoreOrder.setRefundPrice(BigDecimal.ZERO);
+        existStoreOrder.setRefundMobile(request.getMobile());
 
         Boolean execute = transactionTemplate.execute(e -> {
             storeOrderService.updateById(existStoreOrder);
-            storeOrderStatusService.createLog(existStoreOrder.getId(), Constants.ORDER_LOG_REFUND_APPLY, "用户申请退款原因：" + request.getText());
+            storeOrderStatusService.createLog(existStoreOrder.getId(), Constants.ORDER_LOG_REFUND_APPLY, request.getText());
             return Boolean.TRUE;
         });
 
-        if (execute) {
+        if (execute)
             // 发送用户退款管理员提醒短信
-            SystemNotification notification = systemNotificationService.getByMark(NotifyConstants.APPLY_ORDER_REFUND_ADMIN_MARK);
-            if (notification.getIsSms().equals(1)) {
-                // 查询可已发送短信的管理员
-                List<SystemAdmin> systemAdminList = systemAdminService.findIsSmsList();
-                if (CollUtil.isNotEmpty(systemAdminList)) {
-                    SmsTemplate smsTemplate = smsTemplateService.getDetail(notification.getSmsId());
-                    //TODO 修改短信通知
-//                    Integer tempId = Integer.valueOf(smsTemplate.getTempId());
-                    Integer tempId = 0;
-                    // 发送短信
-                    systemAdminList.forEach(admin -> {
-                        smsService.sendOrderRefundApplyNotice(admin.getPhone(), existStoreOrder.getOrderId(), admin.getRealName(), tempId);
-                    });
-                }
-            }
-        }
+            smsService.sendCode(request.getMobile(), SmsTriggerEnum.RETURN_REQUEST_SUBMITTED.getCode(), null, existStoreOrder.getOrderId(), request.getRefundType() == 0 ? "退款" : "退货退款");
         if (!execute) throw new CrmebException("申请退款失败");
         return execute;
     }
@@ -1161,7 +1159,9 @@ public class OrderServiceImpl implements OrderService {
 //                }
             }
 
+
             storeOrderService.create(storeOrder);
+
             storeOrderInfos.forEach(info -> info.setOrderId(storeOrder.getId()));
             // 优惠券修改
             if (storeOrder.getCouponId() > 0) {
@@ -1176,6 +1176,16 @@ public class OrderServiceImpl implements OrderService {
             if (CollUtil.isNotEmpty(orderInfoVo.getCartIdList())) {
                 storeCartService.deleteCartByIds(orderInfoVo.getCartIdList());
             }
+
+            //生成短连接
+            String param = "/pages/users/user_return_list/detail?order_id=" + storeOrder.getOrderId();
+            String shortenURL = shortUrlService.shortenURL(param, 0);
+
+            //短信通知员工
+            smsService.sendCode(null, SmsTriggerEnum.ORDER_PLACED_TO_EMPLOYEE.getCode(), null, "普通");
+            //短信通知客户
+            smsService.sendCode(request.getPhone(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), null, "购买", shortenURL.substring(shortenURL.lastIndexOf("/")));
+
             return Boolean.TRUE;
         });
         if (!execute) {
@@ -1189,10 +1199,6 @@ public class OrderServiceImpl implements OrderService {
 
         // 加入自动未支付自动取消队列
         redisUtil.lPush(Constants.ORDER_AUTO_CANCEL_KEY, storeOrder.getOrderId());
-
-        //TODO 修改短信通知
-//        // 发送后台管理员下单提醒通知短信
-//        sendAdminOrderNotice(storeOrder.getOrderNo());
 
         MyRecord record = new MyRecord();
         record.set("orderNo", storeOrder.getOrderId());
@@ -1279,6 +1285,30 @@ public class OrderServiceImpl implements OrderService {
             userMobile = userAddress.getPhone();
         }
         smsService.sendCode(userMobile, SmsTriggerEnum.ITEMS_SHIPPED.getCode(), request, nameStr);
+    }
+
+    @Override
+    public List<Map<String, Object>> refundList(Integer id) {
+        List<Map<String, Object>> resList = Lists.newArrayList();
+        StoreOrder storeOrder = this.storeOrderService.getById(id);
+        if (Objects.nonNull(storeOrder)) {
+            List<String> constantList = Lists.newArrayList(Constants.ORDER_LOG_EXPRESS, Constants.ORDER_LOG_PAY_SUCCESS
+                    , Constants.ORDER_LOG_DELIVERY_VI, Constants.ORDER_LOG_EDIT, Constants.ORDER_STATUS_CACHE_CREATE_ORDER);
+            List<StoreOrderStatus> orderStatusList = this.storeOrderStatusService.list(new LambdaQueryWrapper<StoreOrderStatus>()
+                    .eq(StoreOrderStatus::getOid, storeOrder.getId())
+                    .notIn(StoreOrderStatus::getChangeType, constantList)
+                    .orderByDesc(StoreOrderStatus::getCreateTime));
+            orderStatusList.forEach(orderStatus -> {
+                Map<String, Object> map = CommonUtil.objToMap(orderStatus, StoreOrderStatus.class);
+                if (orderStatus.getChangeType().equals(Constants.ORDER_LOG_REFUND_APPLY)) {
+                    map.put("reason", storeOrder.getRefundReason());
+                    map.put("mobile", storeOrder.getRefundMobile());
+                    map.put("desc", storeOrder.getRefundReasonWapExplain());
+                }
+                resList.add(map);
+            });
+        }
+        return resList;
     }
 
     /**

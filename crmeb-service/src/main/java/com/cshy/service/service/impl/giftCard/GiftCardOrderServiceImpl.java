@@ -25,11 +25,11 @@ import com.cshy.common.model.vo.giftCard.GiftCardOrderVo;
 import com.cshy.common.token.FrontTokenComponent;
 import com.cshy.common.utils.*;
 import com.cshy.service.dao.giftCard.GiftCardOrderDao;
-import com.cshy.service.service.*;
 import com.cshy.service.service.giftCard.GiftCardOrderService;
 import com.cshy.service.service.giftCard.GiftCardProductService;
 import com.cshy.service.service.giftCard.GiftCardService;
 import com.cshy.service.service.giftCard.GiftCardTypeService;
+import com.cshy.service.service.sms.SmsService;
 import com.cshy.service.service.store.StoreProductAttrValueService;
 import com.cshy.service.service.store.StoreProductService;
 import com.cshy.service.service.system.SystemConfigService;
@@ -89,6 +89,9 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
     @Autowired
     private SystemConfigService systemConfigService;
 
+    @Value("${domainUrl}")
+    private String domainUrl;
+
     @Override
     protected void onBeforeAdd(GiftCardOrderDto dto) {
         //查询礼品卡
@@ -114,11 +117,11 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
         if (Objects.isNull(attrValue) || !attrValue.getProductId().equals(dto.getProductId()))
             throw new CrmebException("规格属性错误");
 
-        //生成短连接
-        URLShortener urlShortener = new URLShortener();
-        String shortenURL = urlShortener.shortenURL(longURL.replace("PICKUPCODE", giftCard.getPickupCode()));
+        //TODO 生成短连接
+//        URLShortener urlShortener = new URLShortener();
+//        String shortenURL = urlShortener.shortenURL(longURL.replace("PICKUPCODE", giftCard.getPickupCode()), domainUrl);
 
-        dto.setShortenUrl(shortenURL);
+//        dto.setShortenUrl(shortenURL);
 
         Boolean execute = transactionTemplate.execute(e -> {
             //生成订单编号
@@ -225,23 +228,6 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
         res.put("all", list.size());
 
         return res;
-    }
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void ship(String orderId, String trackingNo, Integer type, HttpServletRequest request) {
-        //更新状态和物流单号
-        GiftCardOrder cardOrder = this.getById(orderId);
-        cardOrder.setOrderStatus(1);
-        cardOrder.setTrackingNo(trackingNo);
-        this.updateById(cardOrder);
-        //查询商品
-        StoreProductInfoResponse productServiceInfo = this.storeProductService.getInfo(cardOrder.getProductId());
-        //发送短信
-        UserAddress userAddress = userAddressService.getById(cardOrder.getAddressId(), true);
-
-        smsService.sendCode(userAddress.getPhone(), SmsTriggerEnum.ITEMS_SHIPPED.getCode(),  request, productServiceInfo.getStoreName(), "tempMobile");
-
     }
 
     @Override

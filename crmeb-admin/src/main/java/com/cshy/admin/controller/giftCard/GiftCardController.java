@@ -1,9 +1,6 @@
 package com.cshy.admin.controller.giftCard;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.EasyExcelFactory;
-import com.alibaba.excel.ExcelWriter;
-import com.alibaba.excel.write.metadata.WriteSheet;
+import cn.hutool.core.lang.Assert;
 import com.cshy.common.exception.ExceptionCodeEnum;
 import com.cshy.common.model.Type;
 import com.cshy.common.model.dto.giftCard.GiftCardDto;
@@ -13,12 +10,10 @@ import com.cshy.common.model.query.giftCard.GiftCardQuery;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.vo.giftCard.GiftCardVo;
 import com.cshy.service.service.giftCard.GiftCardService;
-import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -101,5 +95,14 @@ public class GiftCardController {
         BeanUtils.copyProperties(giftCard, giftCardDto);
         giftCardService.update(giftCardDto);
         return CommonResult.success();
+    }
+
+    @ApiOperation("批量修改礼品卡类型")
+    @PostMapping("/update/batch")
+    public CommonResult<GiftCardVo> updateBatch(@RequestBody Map<String, Object> params) {
+        Assert.isTrue(params.containsKey("serialNoList"), "序列号不能为空");
+        Assert.isTrue(params.containsKey("giftCardTypeId"), "礼品卡类型id不能为空");
+
+        return CommonResult.success(giftCardService.updateBatch(params));
     }
 }

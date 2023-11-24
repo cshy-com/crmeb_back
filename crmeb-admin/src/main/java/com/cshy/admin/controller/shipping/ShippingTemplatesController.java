@@ -5,7 +5,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.shipping.ShippingTemplatesRequest;
 import com.cshy.common.model.request.shipping.ShippingTemplatesSearchRequest;
-import com.cshy.service.service.ShippingTemplatesService;
+import com.cshy.service.service.shipping.ShippingTemplatesService;
 import io.swagger.annotations.ApiImplicitParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

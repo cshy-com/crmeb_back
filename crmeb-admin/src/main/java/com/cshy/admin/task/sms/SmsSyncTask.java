@@ -1,9 +1,8 @@
 package com.cshy.admin.task.sms;
 
 import com.cshy.common.utils.DateUtil;
-import com.cshy.service.service.SmsSignService;
-import com.cshy.service.service.SmsTemplateService;
-import com.cshy.service.service.giftCard.GiftCardService;
+import com.cshy.service.service.sms.SmsSignService;
+import com.cshy.service.service.sms.SmsTemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

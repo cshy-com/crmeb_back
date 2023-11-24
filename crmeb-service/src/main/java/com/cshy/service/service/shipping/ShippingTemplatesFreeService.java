@@ -1,4 +1,4 @@
-package com.cshy.service.service;
+package com.cshy.service.service.shipping;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.entity.express.ShippingTemplatesFree;

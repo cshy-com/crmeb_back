@@ -2,7 +2,7 @@ package com.cshy.admin.controller.shipping;
 
 import com.cshy.common.model.request.shipping.ShippingTemplatesRegionRequest;
 import com.cshy.common.model.response.CommonResult;
-import com.cshy.service.service.ShippingTemplatesRegionService;
+import com.cshy.service.service.shipping.ShippingTemplatesRegionService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
