@@ -2,10 +2,8 @@ package com.cshy.service.service.impl.giftCard;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.img.ImgUtil;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
-import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cshy.common.constants.Constants;
@@ -18,14 +16,12 @@ import com.cshy.common.model.entity.giftCard.GiftCardOrder;
 import com.cshy.common.model.entity.giftCard.GiftCardProduct;
 import com.cshy.common.model.entity.giftCard.GiftCardType;
 import com.cshy.common.model.entity.product.StoreProduct;
-import com.cshy.common.model.entity.product.StoreProductAttr;
 import com.cshy.common.model.entity.product.StoreProductAttrValue;
 import com.cshy.common.model.entity.user.UserAddress;
 import com.cshy.common.model.query.giftCard.GiftCardQuery;
 import com.cshy.common.model.vo.giftCard.GiftCardVo;
 import com.cshy.common.utils.*;
 import com.cshy.service.dao.giftCard.GiftCardDao;
-import com.cshy.service.service.StoreProductAttrService;
 import com.cshy.service.service.StoreProductAttrValueService;
 import com.cshy.service.service.StoreProductService;
 import com.cshy.service.service.UserAddressService;
@@ -34,7 +30,6 @@ import com.cshy.service.service.giftCard.GiftCardProductService;
 import com.cshy.service.service.giftCard.GiftCardService;
 import com.cshy.service.service.giftCard.GiftCardTypeService;
 import com.google.common.collect.Lists;
-import io.swagger.annotations.ApiModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -44,7 +39,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -270,6 +264,28 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
     public GiftCard getById(String id, Boolean isDel) {
         GiftCard giftCard = giftCardDao.getById(id, isDel);
         return giftCard;
+    }
+
+    @Override
+    public String updateBatch(Map<String, Object> params) {
+        String giftCardTypeId = (String) params.get("giftCardTypeId");
+        String serialNoListStr = (String) params.get("serialNoList");
+        serialNoListStr = serialNoListStr.trim();
+        String[] snArr = serialNoListStr.split("\n");
+        List<String> errorSn = Lists.newArrayList();
+        Arrays.asList(snArr).forEach(sn -> {
+            GiftCard giftCard = this.getOne(new LambdaQueryWrapper<GiftCard>().eq(GiftCard::getSerialNo, sn));
+            if (Objects.nonNull(giftCard)){
+                giftCard.setGiftCardTypeId(giftCardTypeId);
+                this.updateById(giftCard);
+            }else {
+                errorSn.add(sn);
+            }
+        });
+        if (CollUtil.isNotEmpty(errorSn))
+            return "执行失败序列号：" + String.join(",", errorSn);
+        else
+            return "";
     }
 
     @Override
