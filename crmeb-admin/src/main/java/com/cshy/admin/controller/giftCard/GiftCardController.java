@@ -9,6 +9,7 @@ import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.query.giftCard.GiftCardQuery;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.vo.giftCard.GiftCardVo;
+import com.cshy.common.utils.StringUtils;
 import com.cshy.service.service.giftCard.GiftCardService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -102,7 +103,10 @@ public class GiftCardController {
     public CommonResult<GiftCardVo> updateBatch(@RequestBody Map<String, Object> params) {
         Assert.isTrue(params.containsKey("serialNoList"), "序列号不能为空");
         Assert.isTrue(params.containsKey("giftCardTypeId"), "礼品卡类型id不能为空");
-
-        return CommonResult.success(giftCardService.updateBatch(params));
+        String res = giftCardService.updateBatch(params);
+        if (StringUtils.isNotBlank(res))
+            return CommonResult.failed(res);
+        else
+            return CommonResult.success();
     }
 }

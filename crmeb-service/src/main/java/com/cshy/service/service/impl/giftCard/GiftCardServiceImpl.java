@@ -270,18 +270,21 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
     public String updateBatch(Map<String, Object> params) {
         String giftCardTypeId = (String) params.get("giftCardTypeId");
         String serialNoListStr = (String) params.get("serialNoList");
+        serialNoListStr = serialNoListStr.trim();
         String[] snArr = serialNoListStr.split("\n");
         List<String> errorSn = Lists.newArrayList();
         Arrays.asList(snArr).forEach(sn -> {
             GiftCard giftCard = this.getOne(new LambdaQueryWrapper<GiftCard>().eq(GiftCard::getSerialNo, sn));
             if (Objects.nonNull(giftCard)){
-                giftCard.setGiftCardTypeId(giftCardTypeId);
-                this.save(giftCard);
+                this.updateById(giftCard);
             }else {
                 errorSn.add(sn);
             }
         });
-        return "执行失败序列号：" + String.join(",", errorSn);
+        if (CollUtil.isNotEmpty(errorSn))
+            return "执行失败序列号：" + String.join(",", errorSn);
+        else
+            return "";
     }
 
     @Override
