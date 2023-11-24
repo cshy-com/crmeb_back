@@ -11,11 +11,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.model.entity.express.ExpressDetail;
 import com.cshy.common.model.entity.giftCard.GiftCardOrder;
+import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.constants.OnePassConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.utils.StringUtils;
 import com.cshy.service.service.giftCard.GiftCardOrderService;
+import com.cshy.service.service.store.StoreOrderService;
 import com.cshy.service.util.OnePassUtil;
 import com.github.pagehelper.PageHelper;
 import com.cshy.common.utils.RedisUtil;
@@ -65,6 +67,9 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
 
     @Autowired
     private GiftCardOrderService giftCardOrderService;
+
+    @Autowired
+    private StoreOrderService storeOrderService;
 
     @Value("${express.host}")
     private String host;
@@ -235,14 +240,20 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
                     throw new CrmebException((String) jsonObject.get("msg"));
                 ExpressDetail expressDetail = JSONObject.parseObject(result.toJSONString(), ExpressDetail.class);
                 if (type == 0) {
-                    //TODO 查询商城订单
+                    List<StoreOrder> storeOrderList = this.storeOrderService.list(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getTrackingNo, trackingNo));
+                    if (CollUtil.isNotEmpty(storeOrderList)) {
+                        storeOrderList.forEach(storeOrder -> {
+                            storeOrder.setStatus(transferOrderStatus(expressDetail.getDeliveryStatus()));
+                            this.storeOrderService.updateById(storeOrder);
+                        });
+                    }
                 } else if (type == 1) {
                     //查询礼品卡订单
-                    List<GiftCardOrder> giftCardOrderList = giftCardOrderService.list(new LambdaQueryWrapper<GiftCardOrder>().eq(GiftCardOrder::getTrackingNo, trackingNo));
+                    List<GiftCardOrder> giftCardOrderList = this.giftCardOrderService.list(new LambdaQueryWrapper<GiftCardOrder>().eq(GiftCardOrder::getTrackingNo, trackingNo));
                     if (CollUtil.isNotEmpty(giftCardOrderList)) {
                         giftCardOrderList.forEach(giftCardOrder -> {
                             giftCardOrder.setOrderStatus(transferOrderStatus(expressDetail.getDeliveryStatus()));
-                            giftCardOrderService.updateById(giftCardOrder);
+                            this.giftCardOrderService.updateById(giftCardOrder);
                         });
                     }
                 }
@@ -282,7 +293,17 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
 
     @Override
     public void syncExpressStatus() {
-        //TODO 查询商城订单并更新物流状态
+        //查询商城订单并更新物流状态
+        List<StoreOrder> storeOrderList = this.storeOrderService.list(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getStatus, Constants.ORDER_STATUS_H5_SPIKE));
+        logger.info("正在同步礼品卡订单数据， 共{}条", storeOrderList.size());
+        storeOrderList.stream().filter(giftCardOrder -> StringUtils.isNotBlank(giftCardOrder.getTrackingNo())).forEach(storeOrder -> {
+            try {
+                this.findExpressDetail(storeOrder.getTrackingNo(), 0);
+            } catch (Exception e) {
+                if (!e.getMessage().equals("没有信息"))
+                    throw new RuntimeException(e);
+            }
+        });
         //查询礼品卡订单并更新状态
         List<GiftCardOrder> giftCardOrderList = this.giftCardOrderService.list(new LambdaQueryWrapper<GiftCardOrder>()
                 .in(GiftCardOrder::getOrderStatus, Lists.newArrayList(1, 2)));

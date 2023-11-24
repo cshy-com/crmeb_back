@@ -329,7 +329,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (execute)
             // 发送用户退款管理员提醒短信
-            smsService.sendCode(request.getMobile(), SmsTriggerEnum.RETURN_REQUEST_SUBMITTED.getCode(), null, existStoreOrder.getOrderId(), request.getRefundType() == 0 ? "退款" : "退货退款");
+            smsService.sendCode(null, SmsTriggerEnum.RETURN_REQUEST_SUBMITTED.getCode(), null, existStoreOrder.getOrderId(), request.getRefundType() == 0 ? "退款" : "退货退款");
         if (!execute) throw new CrmebException("申请退款失败");
         return execute;
     }

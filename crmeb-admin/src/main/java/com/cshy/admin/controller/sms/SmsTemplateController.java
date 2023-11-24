@@ -70,11 +70,4 @@ public class SmsTemplateController {
     public CommonResult<SmsTemplate> get(@PathVariable String id) {
         return CommonResult.success(smsTemplateService.getById(id));
     }
-
-    @ApiOperation(value = "查看详情")
-    @RequestMapping(value = "/test/{id}", method = RequestMethod.GET)
-    public CommonResult<SmsTemplate> get(@PathVariable Integer id) {
-        smsService.sendCode("15285143252", id, null, "测试发送");
-        return CommonResult.success();
-    }
 }

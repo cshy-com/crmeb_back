@@ -107,7 +107,6 @@ public class SmsServiceImpl implements SmsService {
             String smsKey = systemConfigService.getValueByKey(Constants.SMS_KEY);
             String smsSecret = systemConfigService.getValueByKey(Constants.SMS_SECRET);
 
-            //查询对应的消息模板
             List<String> phoneList = Lists.newArrayList();
             if (smsTemplate.getIsInternal() == 1) {
                 //查询员工短信开关
@@ -133,13 +132,9 @@ public class SmsServiceImpl implements SmsService {
                         try {
                             sendSmsResponse = doSend(client, sendSmsRequest.get());
                         } catch (Exception e) {
-                            throw new RuntimeException(e);
+                            logger.error("发送短信失败");
                         }
                         addRecord(phone, request, smsTemplate, sendSmsResponse, params);
-
-                        if (Objects.nonNull(sendSmsResponse) && !sendSmsResponse.getBody().getCode().equals("OK")) {
-                            throw new CrmebException(sendSmsResponse.getBody().getMessage());
-                        }
                     });
                 } else {
                     sendSmsRequest.set(this.sendCommonCode(phoneNumber, smsTemplate, params));
@@ -151,11 +146,11 @@ public class SmsServiceImpl implements SmsService {
                     }
                 }
             }
-
-
         } catch (Exception e) {
-            if (Objects.isNull(smsTemplate))
+            SendSmsResponse sendSmsResponse = new SendSmsResponse();
+            if (Objects.isNull(smsTemplate)){
                 logger.error("向手机号（{}）发送短信失败， 找不到对应模板：{}", phoneNumber, e.getMessage());
+            }
             else
                 logger.error("向手机号（{}）发送短信失败， 错误：{}", phoneNumber, e.getMessage());
             addRecord(phoneNumber, null, smsTemplate, null, params);
@@ -183,7 +178,7 @@ public class SmsServiceImpl implements SmsService {
             smsRecord.setMemo(JSON.toJSONString(sendSmsResponse.getBody()));
             smsRecord.setResultCode(sendSmsResponse.getBody().getCode());
         } else {
-            smsRecord.setResultCode("ERROR");
+            smsRecord.setResultCode("错误，短信未发送");
         }
 
         if (Objects.nonNull(params))

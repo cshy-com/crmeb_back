@@ -29,6 +29,7 @@ import com.cshy.service.service.giftCard.GiftCardOrderService;
 import com.cshy.service.service.giftCard.GiftCardProductService;
 import com.cshy.service.service.giftCard.GiftCardService;
 import com.cshy.service.service.giftCard.GiftCardTypeService;
+import com.cshy.service.service.order.ShortUrlService;
 import com.cshy.service.service.sms.SmsService;
 import com.cshy.service.service.store.StoreProductAttrValueService;
 import com.cshy.service.service.store.StoreProductService;
@@ -87,7 +88,7 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
     private FrontTokenComponent tokenComponent;
 
     @Autowired
-    private SystemConfigService systemConfigService;
+    private ShortUrlService shortUrlService;
 
     @Value("${domainUrl}")
     private String domainUrl;
@@ -237,19 +238,18 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
         dto.setUserId(userId);
         String id = this.add(dto);
 
-        String phone = systemConfigService.getValueByKey(Constants.SMS_EMPLOYEE_NUMBER);
-
         //查询商品名称
         StoreProduct storeProduct = storeProductService.getOne(new LambdaQueryWrapper<StoreProduct>().eq(StoreProduct::getId, dto.getProductId()));
         Assert.notNull(storeProduct, "未查询到商品");
 
-        //短信通知
-        //TODO 员工短信配置
-        smsService.sendCode(phone, SmsTriggerEnum.ORDER_PLACED_TO_EMPLOYEE.getCode(), request, storeProduct.getStoreName());
+        //短信通知员工
+        smsService.sendCode(null, SmsTriggerEnum.ORDER_PLACED_TO_EMPLOYEE.getCode(), request, "礼品卡");
 
-        User info = userService.getInfo();
-
-        smsService.sendCode(info.getPhone(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), request, storeProduct.getStoreName());
+        //通知客户
+        UserAddress userAddress = userAddressService.getById(dto.getAddressId(), true);
+        //生成短链
+        String shortenURL = shortUrlService.shortenURL("/front/index.html#/pages/gift/index?pickupCode=" + dto.getPickupCode(), 1);
+        smsService.sendCode(userAddress.getPhone(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), request, "兑换", shortenURL.replace(domainUrl, "/"));
         return id;
     }
 
