@@ -233,7 +233,7 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
         Date effectiveDate = DateUtil.strToDate(effectiveTime, Constants.DATE_FORMAT_START);
         Date nowDate = DateUtil.strToDate(now, Constants.DATE_FORMAT_START);
         if (effectiveDate.after(nowDate))
-            throw new CrmebException("该礼品卡未到可使用时间，生效时间为：" + effectiveDate);
+            throw new CrmebException("该礼品卡未到可使用时间，生效时间为：" + effectiveTime);
         String encryptPassword = CrmebUtil.encryptPassword(secret, this.pickupSecretKey);
         if (encryptPassword.equals(giftCard.getPickupSecret()))
             return true;
