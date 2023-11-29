@@ -9,7 +9,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cshy.common.constants.*;
 import com.cshy.common.enums.SmsTriggerEnum;
+import com.cshy.common.model.entity.giftCard.GiftCard;
 import com.cshy.common.model.entity.giftCard.GiftCardOrder;
+import com.cshy.common.model.entity.order.ShortUrl;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.order.OrderComputedPriceRequest;
 import com.cshy.common.model.request.order.OrderRefundApplyRequest;
@@ -47,6 +49,7 @@ import com.cshy.common.utils.*;
 import com.cshy.service.delete.OrderUtils;
 import com.cshy.service.service.*;
 import com.cshy.service.service.giftCard.GiftCardOrderService;
+import com.cshy.service.service.giftCard.GiftCardService;
 import com.cshy.service.service.order.OrderService;
 import com.cshy.service.service.order.ShortUrlService;
 import com.cshy.service.service.shipping.ShippingTemplatesFreeService;
@@ -192,6 +195,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private GiftCardOrderService giftCardOrderService;
+
+    @Autowired
+    private GiftCardService giftCardService;
 
     /**
      * 删除已完成订单
@@ -1177,15 +1183,6 @@ public class OrderServiceImpl implements OrderService {
                 storeCartService.deleteCartByIds(orderInfoVo.getCartIdList());
             }
 
-            //生成短连接
-            String param = "/pages/users/user_return_list/detail?order_id=" + storeOrder.getOrderId();
-            String shortenURL = shortUrlService.shortenURL(param, 0);
-
-            //短信通知员工
-            smsService.sendCode(null, SmsTriggerEnum.ORDER_PLACED_TO_EMPLOYEE.getCode(), null, "普通");
-            //短信通知客户
-            smsService.sendCode(request.getPhone(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), null, "购买", shortenURL.substring(shortenURL.lastIndexOf("/")));
-
             return Boolean.TRUE;
         });
         if (!execute) {
@@ -1245,9 +1242,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = RuntimeException.class)
     public void ship(String orderId, String trackingNo, Integer type, HttpServletRequest request) {
-        StoreProductInfoResponse productServiceInfo;
         String userMobile;
-        String nameStr;
+        String param = "";
 
         if (type == 0) {
             //更新状态和物流单号
@@ -1262,10 +1258,9 @@ public class OrderServiceImpl implements OrderService {
 
             this.storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_EXPRESS, Constants.ORDER_STATUS_STR_SHIPPING);
 
-            //查询同一订单商品
-            List<StoreOrderInfo> storeOrderInfoList = this.storeOrderInfoService.getListByOrderNo(storeOrder.getOrderId());
-            List<String> nameList = storeOrderInfoList.stream().map(StoreOrderInfo::getProductName).collect(Collectors.toList());
-            nameStr = StringUtils.join("，", nameList);
+            //短连接
+            ShortUrl shortUrl = shortUrlService.getOne(new LambdaQueryWrapper<ShortUrl>().eq(ShortUrl::getLocation, 0).like(ShortUrl::getParam, storeOrder.getOrderId()));
+            param = shortUrl.getCode();
 
             //电话
             userMobile = storeOrder.getUserMobile();
@@ -1276,15 +1271,16 @@ public class OrderServiceImpl implements OrderService {
             cardOrder.setTrackingNo(trackingNo);
             giftCardOrderService.updateById(cardOrder);
 
-            //查询商品
-            productServiceInfo = this.storeProductService.getInfo(cardOrder.getProductId());
-            nameStr = productServiceInfo.getStoreName();
+            //短连接
+            GiftCard giftCard = giftCardService.getById(cardOrder.getGiftCardId());
+            ShortUrl shortUrl = shortUrlService.getOne(new LambdaQueryWrapper<ShortUrl>().eq(ShortUrl::getLocation, 1).like(ShortUrl::getParam, giftCard.getPickupCode()));
+            param = shortUrl.getCode();
 
             //电话
             UserAddress userAddress = userAddressService.getById(cardOrder.getAddressId(), true);
             userMobile = userAddress.getPhone();
         }
-        smsService.sendCode(userMobile, SmsTriggerEnum.ITEMS_SHIPPED.getCode(), request, nameStr);
+        smsService.sendCode(userMobile, SmsTriggerEnum.ITEMS_SHIPPED.getCode(), request, "/" + param);
     }
 
     @Override

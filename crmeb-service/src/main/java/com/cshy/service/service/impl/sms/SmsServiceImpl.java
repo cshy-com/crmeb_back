@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.aliyun.dysmsapi20170525.Client;
 import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
+import com.aliyun.dysmsapi20170525.models.SendSmsResponseBody;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cshy.common.constants.OnePassConstants;
 import com.cshy.common.constants.SmsConstants;
@@ -150,10 +151,13 @@ public class SmsServiceImpl implements SmsService {
             SendSmsResponse sendSmsResponse = new SendSmsResponse();
             if (Objects.isNull(smsTemplate)){
                 logger.error("向手机号（{}）发送短信失败， 找不到对应模板：{}", phoneNumber, e.getMessage());
+                sendSmsResponse.setBody(new SendSmsResponseBody().setMessage("找不到对应模板").setCode("500"));
             }
-            else
+            else{
                 logger.error("向手机号（{}）发送短信失败， 错误：{}", phoneNumber, e.getMessage());
-            addRecord(phoneNumber, null, smsTemplate, null, params);
+                sendSmsResponse.setBody(new SendSmsResponseBody().setMessage(e.getMessage()).setCode("500"));
+            }
+            addRecord(phoneNumber, null, smsTemplate, sendSmsResponse, params);
         }
     }
 

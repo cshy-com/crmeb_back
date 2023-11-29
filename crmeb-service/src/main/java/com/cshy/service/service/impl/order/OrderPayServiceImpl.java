@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.cshy.common.constants.*;
+import com.cshy.common.enums.SmsTriggerEnum;
 import com.cshy.common.model.entity.user.*;
 import com.cshy.common.model.vo.*;
 import com.cshy.common.exception.CrmebException;
@@ -28,6 +29,7 @@ import com.cshy.common.utils.WxPayUtil;
 import com.cshy.service.delete.OrderUtils;
 import com.cshy.service.service.*;
 import com.cshy.service.service.order.OrderPayService;
+import com.cshy.service.service.order.ShortUrlService;
 import com.cshy.service.service.sms.SmsService;
 import com.cshy.service.service.sms.SmsTemplateService;
 import com.cshy.service.service.store.*;
@@ -158,6 +160,9 @@ public class OrderPayServiceImpl implements OrderPayService {
     @Autowired
     private SmsTemplateService smsTemplateService;
 
+    @Autowired
+    private ShortUrlService shortUrlService;
+
     /**
      * 支付成功处理
      * @param storeOrder 订单
@@ -276,34 +281,42 @@ public class OrderPayServiceImpl implements OrderPayService {
 
         if (execute) {
             try {
-                SystemNotification payNotification = systemNotificationService.getByMark(NotifyConstants.PAY_SUCCESS_MARK);
-                // 发送短信
-                if (StrUtil.isNotBlank(user.getPhone()) && payNotification.getIsSms().equals(1)) {
-                    SmsTemplate smsTemplate = smsTemplateService.getDetail(payNotification.getSmsId());
+                //生成短连接
+                String param = "/pages/users/user_return_list/detail?order_id=" + storeOrder.getOrderId();
+                String shortenURL = shortUrlService.shortenURL(param, 0);
 
-                    //TODO 修改短信通知
-                    smsService.sendPaySuccess(user.getPhone(), storeOrder.getOrderId(), storeOrder.getPayPrice(), 0);
-                }
-
-                // 发送用户支付成功管理员提醒短信
-                SystemNotification payAdminNotification = systemNotificationService.getByMark(NotifyConstants.PAY_SUCCESS_ADMIN_MARK);
-                if (payAdminNotification.getIsSms().equals(1)) {
-                    // 查询可已发送短信的管理员
-                    List<SystemAdmin> systemAdminList = systemAdminService.findIsSmsList();
-                    if (CollUtil.isNotEmpty(systemAdminList)) {
-                        SmsTemplate smsTemplate = smsTemplateService.getDetail(payAdminNotification.getSmsId());
-                        // 发送短信
-                        systemAdminList.forEach(admin -> {
-                            //TODO 修改短信通知
-                            smsService.sendOrderPaySuccessNotice(admin.getPhone(), storeOrder.getOrderId(), admin.getRealName(), 0);
-                        });
-                    }
-                }
-
-                if (payNotification.getIsWechat().equals(1) || payNotification.getIsRoutine().equals(1)) {
-                    //下发模板通知
-                    pushMessageOrder(storeOrder, user, payNotification);
-                }
+                //短信通知员工
+                smsService.sendCode(null, SmsTriggerEnum.ORDER_PLACED_TO_EMPLOYEE.getCode(), null, "普通");
+                //短信通知客户
+                smsService.sendCode(storeOrder.getUserMobile(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), null, "购买", shortenURL.substring(shortenURL.lastIndexOf("/")));
+//                SystemNotification payNotification = systemNotificationService.getByMark(NotifyConstants.PAY_SUCCESS_MARK);
+//                // 发送短信
+//                if (StrUtil.isNotBlank(user.getPhone()) && payNotification.getIsSms().equals(1)) {
+//                    SmsTemplate smsTemplate = smsTemplateService.getDetail(payNotification.getSmsId());
+//
+//                    //TODO 修改短信通知
+//                    smsService.sendPaySuccess(user.getPhone(), storeOrder.getOrderId(), storeOrder.getPayPrice(), 0);
+//                }
+//
+//                // 发送用户支付成功管理员提醒短信
+//                SystemNotification payAdminNotification = systemNotificationService.getByMark(NotifyConstants.PAY_SUCCESS_ADMIN_MARK);
+//                if (payAdminNotification.getIsSms().equals(1)) {
+//                    // 查询可已发送短信的管理员
+//                    List<SystemAdmin> systemAdminList = systemAdminService.findIsSmsList();
+//                    if (CollUtil.isNotEmpty(systemAdminList)) {
+//                        SmsTemplate smsTemplate = smsTemplateService.getDetail(payAdminNotification.getSmsId());
+//                        // 发送短信
+//                        systemAdminList.forEach(admin -> {
+//                            //TODO 修改短信通知
+//                            smsService.sendOrderPaySuccessNotice(admin.getPhone(), storeOrder.getOrderId(), admin.getRealName(), 0);
+//                        });
+//                    }
+//                }
+//
+//                if (payNotification.getIsWechat().equals(1) || payNotification.getIsRoutine().equals(1)) {
+//                    //下发模板通知
+//                    pushMessageOrder(storeOrder, user, payNotification);
+//                }
 
                 // 购买成功后根据配置送优惠券
                 autoSendCoupons(storeOrder);

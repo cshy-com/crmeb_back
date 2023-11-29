@@ -83,16 +83,4 @@ public class GiftCardOrderController {
     public CommonResult<Map<String, Object>> getOrderStatusNum() {
         return CommonResult.success(giftCardOrderService.getOrderStatusNum());
     }
-
-    @ApiOperation(value = "发货")
-    @RequestMapping(value = "/ship", method = RequestMethod.GET)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "0 普通订单 1 礼品卡订单"),
-            @ApiImplicitParam(name = "orderId", value = "订单号"),
-            @ApiImplicitParam(name = "trackingNo", value = "物流单号")
-    })
-    public CommonResult<String> ship(@RequestParam String orderId, @RequestParam String trackingNo, @RequestParam Integer type, HttpServletRequest request) {
-        orderService.ship(orderId, trackingNo, type, request);
-        return CommonResult.success();
-    }
 }
