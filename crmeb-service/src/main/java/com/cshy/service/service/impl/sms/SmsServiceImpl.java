@@ -121,9 +121,13 @@ public class SmsServiceImpl implements SmsService {
             Client client = this.createClient(smsKey, smsSecret);
 
             AtomicReference<SendSmsRequest> sendSmsRequest = new AtomicReference<>();
-            if (0 == smsTemplate.getTriggerPosition())
+            if (0 == smsTemplate.getTriggerPosition()){
                 //验证码
-                sendSmsRequest.set(this.sendVerificationCode(phoneNumber, smsTemplate));
+                SendSmsRequest sr = this.sendVerificationCode(phoneNumber, smsTemplate);
+                sendSmsRequest.set(sr);
+                SendSmsResponse sendSmsResponse = doSend(client, sendSmsRequest.get());
+                addRecord(phoneNumber, request, smsTemplate, sendSmsResponse, params);
+            }
             else {
                 //其他模板
                 if (CollUtil.isNotEmpty(phoneList)) {
@@ -140,11 +144,11 @@ public class SmsServiceImpl implements SmsService {
                 } else {
                     sendSmsRequest.set(this.sendCommonCode(phoneNumber, smsTemplate, params));
                     SendSmsResponse sendSmsResponse = doSend(client, sendSmsRequest.get());
-                    addRecord(phoneNumber, request, smsTemplate, sendSmsResponse, params);
 
-                    if (!sendSmsResponse.getBody().getCode().equals("OK")) {
-                        throw new CrmebException(sendSmsResponse.getBody().getMessage());
-                    }
+                    if (!sendSmsResponse.getBody().getCode().equals("OK"))
+                        logger.error("向手机号（{}）发送短信失败， 错误：{}", phoneNumber, sendSmsResponse.getBody().getCode());
+
+                    addRecord(phoneNumber, request, smsTemplate, sendSmsResponse, params);
                 }
             }
         } catch (Exception e) {
