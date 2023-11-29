@@ -1277,8 +1277,8 @@ public class OrderServiceImpl implements OrderService {
             param = shortUrl.getCode();
 
             //电话
-            UserAddress userAddress = userAddressService.getById(cardOrder.getAddressId(), true);
-            userMobile = userAddress.getPhone();
+            User user = userService.getById(cardOrder.getUserId());
+            userMobile = user.getPhone();
         }
         smsService.sendCode(userMobile, SmsTriggerEnum.ITEMS_SHIPPED.getCode(), request, "/" + param);
     }

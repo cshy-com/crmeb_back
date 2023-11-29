@@ -19,7 +19,6 @@ import com.cshy.common.model.entity.product.StoreProductAttrValue;
 import com.cshy.common.model.entity.user.User;
 import com.cshy.common.model.entity.user.UserAddress;
 import com.cshy.common.model.query.giftCard.GiftCardOrderQuery;
-import com.cshy.common.model.response.StoreProductInfoResponse;
 import com.cshy.common.model.vo.dateLimitUtilVo;
 import com.cshy.common.model.vo.giftCard.GiftCardOrderVo;
 import com.cshy.common.token.FrontTokenComponent;
@@ -33,7 +32,6 @@ import com.cshy.service.service.order.ShortUrlService;
 import com.cshy.service.service.sms.SmsService;
 import com.cshy.service.service.store.StoreProductAttrValueService;
 import com.cshy.service.service.store.StoreProductService;
-import com.cshy.service.service.system.SystemConfigService;
 import com.cshy.service.service.user.UserAddressService;
 import com.cshy.service.service.user.UserService;
 import com.cshy.service.util.IdWorkerUtils;
@@ -246,10 +244,10 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
         smsService.sendCode(null, SmsTriggerEnum.ORDER_PLACED_TO_EMPLOYEE.getCode(), request, "礼品卡");
 
         //通知客户
-        UserAddress userAddress = userAddressService.getById(dto.getAddressId(), true);
+        User user = userService.getById(dto.getUserId());
         //生成短链
         String shortenURL = shortUrlService.shortenURL("/front/index.html#/pages/gift/index?pickupCode=" + dto.getPickupCode(), 1);
-        smsService.sendCode(userAddress.getPhone(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), request, "兑换", shortenURL.replace(domainUrl, "/"));
+        smsService.sendCode(user.getPhone(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), request, "兑换", shortenURL.replace(domainUrl, "/"));
         return id;
     }
 
