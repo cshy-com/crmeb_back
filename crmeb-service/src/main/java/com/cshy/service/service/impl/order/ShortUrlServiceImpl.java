@@ -8,7 +8,6 @@ import com.cshy.common.model.entity.order.ShortUrl;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.query.order.ShortUrlQuery;
 import com.cshy.common.model.vo.order.ShortUrlVo;
-import com.cshy.common.utils.StringUtils;
 import com.cshy.service.dao.store.ShortUrlDao;
 import com.cshy.service.service.order.ShortUrlService;
 import com.cshy.service.service.store.StoreOrderService;
@@ -42,7 +41,7 @@ public class ShortUrlServiceImpl extends BaseServiceImpl<ShortUrl, ShortUrlDto,
     }
 
     @Override
-    public String expandUrl(String shortUrl, Integer location) {
+    public String expandUrl(String shortUrl) {
         String shortCode = shortUrl.replace(domainUrl, "");
         //校验
         String regex = "^[A-Z]+$";
@@ -52,9 +51,9 @@ public class ShortUrlServiceImpl extends BaseServiceImpl<ShortUrl, ShortUrlDto,
             throw new CrmebException("短连接不匹配");
 
         //查询
-        String param = this.expandURL(shortCode, location);
+        String param = this.expandURL(shortCode);
 
-        String finalUrl = domainUrl + hashTag + param;
+        String finalUrl = domainUrl + param;
         return finalUrl;
     }
 
@@ -124,14 +123,14 @@ public class ShortUrlServiceImpl extends BaseServiceImpl<ShortUrl, ShortUrlDto,
     }
 
     // 根据短URL还原为长URL
-    public String expandURL(String shortCode, Integer location) {
+    public String expandURL(String shortCode) {
         String expand;
         //查询数据库
-        ShortUrl shortURL = this.getOne(new LambdaQueryWrapper<ShortUrl>().eq(ShortUrl::getCode, shortCode).eq(ShortUrl::getLocation, location));
+        ShortUrl shortURL = this.getOne(new LambdaQueryWrapper<ShortUrl>().eq(ShortUrl::getCode, shortCode));
         if (Objects.nonNull(shortURL)) {
             expand = shortURL.getParam();
             //普通订单需要额外拼接数据
-            if (location == 0) {
+            if (shortURL.getLocation() == 0) {
                 StoreOrder storeOrder = this.storeOrderService.getByOrderId(expand.substring(expand.lastIndexOf("=") + 1));
                 String status = getH5OrderStatus(storeOrder);
                 expand += "&status=" + status;

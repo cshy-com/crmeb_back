@@ -282,7 +282,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         if (execute) {
             try {
                 //生成短连接
-                String param = "/pages/users/user_return_list/detail?order_id=" + storeOrder.getOrderId();
+                String param = "front/#/pages/order_details/index?order_id=" + storeOrder.getOrderId();
                 String shortenURL = shortUrlService.shortenURL(param, 0);
 
                 //短信通知员工

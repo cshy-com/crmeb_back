@@ -27,14 +27,13 @@ public class ShortUrlController {
     @RequestMapping(value = "/expand", method = RequestMethod.GET)
     @ApiImplicitParams({
             @ApiImplicitParam(name="url", value="长连接"),
-            @ApiImplicitParam(name="location", value="0 普通订单 1 礼品卡订单"),
     })
-    public CommonResult<String> expand(@RequestParam String url, @RequestParam Integer location) {
-        String expandUrl = shortUrlService.expandUrl(url, location);
+    public CommonResult<String> expand(@RequestParam String url) {
+        String expandUrl = shortUrlService.expandUrl(url);
         return CommonResult.success(expandUrl);
     }
 
-    @ApiOperation(value = "短连接转换成长连接")
+    @ApiOperation(value = "长连接转换成短连接")
     @RequestMapping(value = "/shorten", method = RequestMethod.GET)
     @ApiImplicitParams({
             @ApiImplicitParam(name="param", value="需要转换的数据"),

@@ -7,7 +7,7 @@ import com.cshy.common.model.query.order.ShortUrlQuery;
 import com.cshy.common.model.vo.order.ShortUrlVo;
 
 public interface ShortUrlService extends BaseService<ShortUrl, ShortUrlDto, ShortUrlQuery, ShortUrlVo> {
-    String expandUrl(String shortUrl, Integer location);
+    String expandUrl(String shortUrl);
 
     String shortenURL(String param, Integer location);
 }

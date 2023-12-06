@@ -246,7 +246,7 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
         //通知客户
         User user = userService.getById(dto.getUserId());
         //生成短链
-        String shortenURL = shortUrlService.shortenURL("/front/index.html#/pages/gift/index?pickupCode=" + dto.getPickupCode(), 1);
+        String shortenURL = shortUrlService.shortenURL("front/#/pages/gift/index?pickupCode=" + dto.getPickupCode(), 1);
         smsService.sendCode(user.getPhone(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), request, "兑换", shortenURL.replace(domainUrl, "/"));
         return id;
     }

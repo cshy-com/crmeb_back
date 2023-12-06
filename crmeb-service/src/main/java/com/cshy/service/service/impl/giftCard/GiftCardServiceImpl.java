@@ -276,6 +276,7 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
         Arrays.asList(snArr).forEach(sn -> {
             GiftCard giftCard = this.getOne(new LambdaQueryWrapper<GiftCard>().eq(GiftCard::getSerialNo, sn));
             if (Objects.nonNull(giftCard)){
+                giftCard.setGiftCardTypeId(giftCardTypeId);
                 this.updateById(giftCard);
             }else {
                 errorSn.add(sn);
