@@ -97,14 +97,6 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
 
     private static final Logger logger = LoggerFactory.getLogger(StoreBargainServiceImpl.class);
 
-    /**
-    * 列表
-    * @param request 请求参数
-    * @param pageParamRequest 分页类参数
-    * @author HZW
-    * @since 2020-11-06
-    * @return List<StoreBargain>
-    */
     @Override
     public PageInfo<StoreBargainResponse> getList(StoreBargainSearchRequest request, PageParamRequest pageParamRequest) {
         Page<StoreBargain> storeBargainPage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());

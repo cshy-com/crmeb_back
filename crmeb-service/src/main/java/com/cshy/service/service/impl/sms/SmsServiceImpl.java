@@ -112,7 +112,7 @@ public class SmsServiceImpl implements SmsService {
             if (smsTemplate.getIsInternal() == 1) {
                 //查询员工短信开关
                 List<SystemAdmin> systemAdminList = systemAdminService.list(new LambdaQueryWrapper<SystemAdmin>().eq(SystemAdmin::getIsSms, 1));
-                phoneList = systemAdminList.stream().map(SystemAdmin::getPhone).collect(Collectors.toList());
+                phoneList = systemAdminList.stream().filter(sa -> !sa.getPhone().contains("-")).map(SystemAdmin::getPhone).collect(Collectors.toList());
                 String phoneStr = StringUtils.join(phoneList, ",");
                 logger.info("向内部手机号 {} 发送短信，短信模板编码为：{}, 名称为：{}", phoneStr, smsTemplate.getTempCode(), smsTemplate.getTempName());
             } else {
@@ -174,8 +174,9 @@ public class SmsServiceImpl implements SmsService {
     private void addRecord(String phoneNumber, HttpServletRequest request, SmsTemplate smsTemplate, SendSmsResponse sendSmsResponse, String[] params) {
         //添加发送短信记录
         SmsRecord smsRecord = new SmsRecord()
-                .setTemplate(smsTemplate.getTempCode())
                 .setPhone(phoneNumber);
+        if (Objects.nonNull(smsTemplate))
+            smsRecord.setTemplate(smsTemplate.getTempCode());
 
         if (Objects.nonNull(smsTemplate))
             smsRecord.setTemplateName(smsTemplate.getTempName());
@@ -538,14 +539,6 @@ public class SmsServiceImpl implements SmsService {
         return checkResult(result);
     }
 
-    /**
-     * 检测结构请求返回的数据
-     *
-     * @param result 接口返回的结果
-     * @return JSONObject
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     private JSONObject checkResult(String result) {
         if (StrUtil.isBlank(result)) {
             throw new CrmebException("短信平台接口异常，没任何数据返回！");

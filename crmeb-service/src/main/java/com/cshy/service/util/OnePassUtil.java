@@ -133,14 +133,6 @@ public class OnePassUtil {
         return checkResult(result);
     }
 
-    /**
-     * 检测结构请求返回的数据
-     *
-     * @param result 接口返回的结果
-     * @return JSONObject
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     private JSONObject checkResult(String result) {
         if (StringUtils.isBlank(result)) {
             throw new CrmebException("一号通平台接口异常，没任何数据返回！");

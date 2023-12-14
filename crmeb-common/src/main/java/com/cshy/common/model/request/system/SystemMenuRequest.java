@@ -13,14 +13,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
-/**
- * <p>
- * 系统菜单请求对象
- * </p>
- *
- * @author HZW
- * @since 2021-11-17
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)

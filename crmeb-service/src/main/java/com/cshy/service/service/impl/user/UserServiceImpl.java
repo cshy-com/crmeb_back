@@ -368,13 +368,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return updateBatchById(list);
     }
 
-    /**
-     * 用户id in list
-     *
-     * @param uidList List<Integer> id
-     * @author Mr.Zhang
-     * @since 2020-04-28
-     */
     private List<User> getListInUid(List<Integer> uidList) {
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.in(User::getUid, uidList);
@@ -401,13 +394,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return update(user, lambdaQueryWrapper);
     }
 
-    /**
-     * 获取个人资料
-     *
-     * @return User
-     * @author Mr.Zhang
-     * @since 2020-04-28
-     */
     @Override
     public User getInfo() {
         if (getUserId() == 0) {
@@ -416,13 +402,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return getById(getUserId());
     }
 
-    /**
-     * 获取个人资料
-     *
-     * @return User
-     * @author Mr.Zhang
-     * @since 2020-04-28
-     */
     @Override
     public User getInfoException() {
         User user = getInfo();
@@ -450,13 +429,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return id;
     }
 
-    /**
-     * 获取当前用户id
-     *
-     * @return Integer
-     * @author Mr.Zhang
-     * @since 2020-04-28
-     */
     @Override
     public Integer getUserId() {
         Integer id = tokenComponet.getUserId();
@@ -596,13 +568,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return getMapByList(userList);
     }
 
-    /**
-     * 根据用户id获取用户列表 map模式
-     *
-     * @return HashMap<Integer, User>
-     * @author Mr.Zhang
-     * @since 2020-04-28
-     */
     private HashMap<Integer, User> getMapByList(List<User> list) {
         HashMap<Integer, User> map = new HashMap<>();
         if (null == list || list.size() < 1) {
@@ -616,13 +581,6 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         return map;
     }
 
-    /**
-     * 重置连续签到天数
-     *
-     * @param userId Integer 用户id
-     * @author Mr.Zhang
-     * @since 2020-04-28
-     */
     @Override
     public void repeatSignNum(Integer userId) {
         User user = new User();

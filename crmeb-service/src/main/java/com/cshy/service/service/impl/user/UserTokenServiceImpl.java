@@ -32,13 +32,6 @@ public class UserTokenServiceImpl extends ServiceImpl<UserTokenDao, UserToken> i
         return dao.selectOne(lambdaQueryWrapper);
     }
 
-    /**
-     * 绑定token关系
-     * @param token String token
-     * @param type int 类型
-     * @author Mr.Zhang
-     * @since 2020-05-25
-     */
     @Override
     public void bind(String token, int type, Integer userId) {
         UserToken userToken = new UserToken();

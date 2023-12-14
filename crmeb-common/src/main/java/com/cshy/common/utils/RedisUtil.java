@@ -179,13 +179,6 @@ public class RedisUtil {
         return redisTemplate.opsForHash().size(key);
     }
 
-    /**
-     * 列表添加左边添加
-     * @param k string key
-     * @param v Object v
-     * @author Mr.Zhang
-     * @since 2020-04-13
-     */
     public void lPush(String k, Object v) {
         ListOperations<String, Object> list = redisTemplate.opsForList();
         list.leftPush(k, v);

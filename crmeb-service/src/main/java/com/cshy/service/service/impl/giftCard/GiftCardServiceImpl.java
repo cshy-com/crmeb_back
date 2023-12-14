@@ -186,7 +186,7 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
             StoreProduct product = storeProductService.getH5Detail(productId, true);
 
             //商品规格
-            StoreProductAttrValue attrValue = storeProductAttrValueService.getById(giftCardOrder.getAttrValueId());
+            StoreProductAttrValue attrValue = storeProductAttrValueService.getById(Integer.valueOf(giftCardOrder.getAttrValueId()), true);
             if (Objects.isNull(attrValue))
                 throw new CrmebException("商品规格有误，请联系管理员");
 

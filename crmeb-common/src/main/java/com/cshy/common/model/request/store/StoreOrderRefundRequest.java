@@ -32,4 +32,13 @@ public class StoreOrderRefundRequest {
     private BigDecimal amount;
 
     private Integer orderId;
+
+    @ApiModelProperty(value = "退货收件人")
+    private String returnName;
+
+    @ApiModelProperty(value = "退货收件地址")
+    private String returnAddress;
+
+    @ApiModelProperty(value = "退货收件电话")
+    private String returnMobile;
 }

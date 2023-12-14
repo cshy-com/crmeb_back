@@ -47,4 +47,7 @@ public class OrderInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "规格属性值")
     private String sku;
+
+    @ApiModelProperty(value = "原价")
+    private BigDecimal otPrice;
 }

@@ -208,8 +208,7 @@ public class ProductServiceImpl implements ProductService {
 
 
         // 获取商品规格
-        List<StoreProductAttr> attrList;
-        attrList = attrService.getListByProductIdAndTypeNotDel(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
 
         // 根据制式设置attr属性
         productDetailResponse.setProductAttr(attrList);

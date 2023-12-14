@@ -141,18 +141,18 @@ public class OrderUtils {
                 case Constants.ORDER_STATUS_H5_NOT_SHIPPED: // 待发货
                     queryWrapper.eq(StoreOrder::getPaid, true);
                     queryWrapper.eq(StoreOrder::getStatus, 0);
-                    queryWrapper.eq(StoreOrder::getRefundStatus, 0);
+                    queryWrapper.notIn(StoreOrder::getRefundStatus, 1, 2, 3, 4, 5);
 //                queryWrapper.eq(StoreOrder::getShippingType, 1);
                     break;
                 case Constants.ORDER_STATUS_H5_SPIKE: // 待收货
                     queryWrapper.eq(StoreOrder::getPaid, true);
                     queryWrapper.eq(StoreOrder::getStatus, 1);
-                    queryWrapper.eq(StoreOrder::getRefundStatus, 0);
+                    queryWrapper.notIn(StoreOrder::getRefundStatus, 1, 2, 3, 4, 5);
                     break;
                 case Constants.ORDER_STATUS_H5_JUDGE: //  已支付 已收货 待评价
                     queryWrapper.eq(StoreOrder::getPaid, true);
                     queryWrapper.eq(StoreOrder::getStatus, 2);
-                    queryWrapper.eq(StoreOrder::getRefundStatus, 0);
+                    queryWrapper.notIn(StoreOrder::getRefundStatus, 1, 2, 3, 4, 5);
                     break;
                 case Constants.ORDER_STATUS_H5_COMPLETE: // 已完成
                     queryWrapper.eq(StoreOrder::getPaid, true);
@@ -167,9 +167,9 @@ public class OrderUtils {
                     queryWrapper.eq(StoreOrder::getPaid, true);
                     queryWrapper.eq(StoreOrder::getRefundStatus, 2);
                     break;
-                case Constants.ORDER_STATUS_H5_REFUND: // 包含已退款和退款中
+                case Constants.ORDER_STATUS_H5_REFUND: // 包含已退款和退款中 退货待发货  退货已发货 退货退款被拒绝
                     queryWrapper.eq(StoreOrder::getPaid, true);
-                    queryWrapper.in(StoreOrder::getRefundStatus, 1,2,3);
+                    queryWrapper.in(StoreOrder::getRefundStatus, 1,2,3,4,5,6);
                     break;
             }
         }

@@ -29,11 +29,6 @@ public class WeChatMessageController {
     @Autowired
     private WeChatMessageService weChatMessageService;
 
-    /**
-     * 微信关键字回复
-     * @author Mr.Zhang
-     * @since 2020-04-22
-     */
     @ApiOperation(value = "接受微信推送过来的消息")
     @RequestMapping(value = "/webHook", method = RequestMethod.POST)
     public String webHook(HttpServletRequest request){

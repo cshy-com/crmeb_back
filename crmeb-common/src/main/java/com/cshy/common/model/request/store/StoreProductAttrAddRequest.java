@@ -31,4 +31,7 @@ public class StoreProductAttrAddRequest implements Serializable {
 
     @ApiModelProperty(value = "属性值|逗号分隔", required = true)
     private String attrValues;
+
+    @ApiModelProperty(value = "活动类型 0=商品，1=秒杀，2=砍价，3=拼团")
+    private Integer type;
 }

@@ -46,14 +46,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
     private SystemAttachmentService systemAttachmentService;
 
 
-    /**
-     * 获取分类下子类的数量
-     * @param request 请求参数
-     * @param pageParamRequest 分页参数
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     * @return List<Category>
-     */
     @Override
     public List<Category> getList(CategorySearchRequest request, PageParamRequest pageParamRequest) {
         PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
@@ -74,13 +66,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         return dao.selectList(lambdaQueryWrapper);
     }
 
-    /**
-     * 通过id集合获取列表
-     * @param idList List<Integer> id集合
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     * @return List<Category>
-     */
     @Override
     public List<Category> getByIds(List<Integer> idList) {
         LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -88,13 +73,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         return dao.selectList(lambdaQueryWrapper);
     }
 
-    /**
-     * 通过id集合获取列表 id => name
-     * @param cateIdList List<Integer> id集合
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     * @return HashMap<Integer, String>
-     */
     @Override
     public HashMap<Integer, String> getListInId(List<Integer> cateIdList) {
         HashMap<Integer, String> map = new HashMap<>();
@@ -106,12 +84,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         return map;
     }
 
-    /**
-     * 查询id和url是否存在
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     * @return Boolean
-     */
     @Override
     public Boolean checkAuth(List<Integer> pathIdList, String uri) {
         LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -124,14 +96,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         return true;
     }
 
-    /**
-     * 修改
-     * @param request CategoryRequest
-     * @param id Integer
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     * @return bool
-     */
     @Override
     public boolean update(CategoryRequest request, Integer id) {
         try{
@@ -158,12 +122,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         }
     }
 
-    /**
-     * 开启父级状态
-     * @param id Integer
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     private void updatePidStatusById(Integer id) {
         Category category = getById(id);
         List<Integer> categoryIdList = CrmebUtil.stringToArrayByRegex(category.getPath(), "/");
@@ -181,13 +139,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         updateBatchById(categoryArrayList);
     }
 
-    /**
-     * 获取分类下子类的数量
-     * @param pid Integer
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     * @return bool
-     */
     private int getChildCountByPid(Integer pid) {
         //查看是否有子类
         QueryWrapper<Category> objectQueryWrapper = new QueryWrapper<>();
@@ -195,13 +146,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         return dao.selectCount(objectQueryWrapper);
     }
 
-    /**
-     * 修改分类以及子类的状态
-     * @param pid Integer
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     * @return bool
-     */
     private int updateStatusByPid(Integer pid, boolean status) {
         //查看是否有子类
         Category category = new Category();
@@ -220,11 +164,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         return null;
     }
 
-    /**
-     * 带结构的无线级分类
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     @Override
     public List<CategoryTreeVo> getListTree(Integer type, Integer status, String name) {
         return getTree(type, status,name,null);
@@ -239,11 +178,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         return getTree(type, status,null,categoryIdList);
     }
 
-    /**
-     * 带结构的无线级分类
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     private List<CategoryTreeVo> getTree(Integer type, Integer status,String name, List<Integer> categoryIdList) {
         //循环数据，把数据对象变成带list结构的vo
         List<CategoryTreeVo> treeList = new ArrayList<>();
@@ -311,13 +245,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         return list;
     }
 
-    /**
-     * 删除分类表
-     * @param id Integer
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     * @return bool
-     */
     @Override
     public int delete(Integer id) {
         //查看是否有子类, 物理删除
@@ -328,13 +255,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         return dao.deleteById(id);
     }
 
-    /**
-     * 获取分类下子类
-     * @param pid Integer
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     * @return List<Category>
-     */
     @Override
     public List<Category> getChildVoListByPid(Integer pid) {
         //查看是否有子类
@@ -344,14 +264,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         return dao.selectList(objectQueryWrapper);
     }
 
-    /**
-     * 检测分类名称是否存在
-     * @param name String 分类名
-     * @param type int 类型
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     * @return int
-     */
     private int checkName(String name, Integer type) {
         LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(Category::getName, name);
@@ -361,13 +273,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         return dao.selectCount(lambdaQueryWrapper);
     }
 
-    /**
-     * 检测url是否存在
-     * @param uri String url
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     * @return int
-     */
     @Override
     public boolean checkUrl(String uri) {
         LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();

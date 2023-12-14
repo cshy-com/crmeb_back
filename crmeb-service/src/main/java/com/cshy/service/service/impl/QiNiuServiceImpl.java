@@ -29,12 +29,6 @@ public class QiNiuServiceImpl implements QiNiuService {
     @Autowired
     private SystemAttachmentService systemAttachmentService;
 
-    /**
-     * 同步到七牛云
-     * @param cloudVo CloudVo
-     * @author Mr.Zhang
-     * @since 2020-05-06
-     */
     @Async
     @Override
     public void upload(UploadManager uploadManager, CloudVo cloudVo, String upToken, String webPth, String localFile, Integer id) {

@@ -12,14 +12,6 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * <p>
- * 微信回调表
- * </p>
- *
- * @author HZW
- * @since 2021-05-19
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)

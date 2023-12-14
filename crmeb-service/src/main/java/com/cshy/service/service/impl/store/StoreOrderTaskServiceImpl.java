@@ -124,11 +124,6 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
     @Autowired
     private SmsTemplateService smsTemplateService;
 
-    /**
-     * 用户取消订单
-     * @author Mr.Zhang
-     * @since 2020-07-09
-     */
     @Override
     @Transactional(rollbackFor = {RuntimeException.class, Error.class, CrmebException.class})
     public Boolean cancelByUser(StoreOrder storeOrder) {
@@ -142,7 +137,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
             * */
 
             //写订单日志
-            storeOrderStatusService.createLog(storeOrder.getId(), "cancel_order", "取消订单");
+            storeOrderStatusService.createLog(storeOrder.getId(), "cancel_order", "取消订单", 0);
             // 退优惠券
             if (storeOrder.getCouponId() > 0 ) {
                 StoreCouponUser couponUser = couponUserService.getById(storeOrder.getCouponId());
@@ -155,11 +150,6 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
         }
     }
 
-    /**
-     * 完成订单
-     * @author Mr.Zhang
-     * @since 2020-07-09
-     */
     @Override
     @Transactional(rollbackFor = {RuntimeException.class, Error.class, CrmebException.class})
     public Boolean complete(StoreOrder storeOrder) {
@@ -168,7 +158,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
          * 2、写订单日志
          * */
         try{
-            storeOrderStatusService.createLog(storeOrder.getId(), "check_order_over", "用户评价");
+            storeOrderStatusService.createLog(storeOrder.getId(), "check_order_over", "用户评价", 0);
             return true;
         }catch (Exception e){
             return false;
@@ -398,7 +388,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
         Boolean execute = transactionTemplate.execute(e -> {
             storeOrderService.updateById(storeOrder);
             //写订单日志
-            storeOrderStatusService.createLog(storeOrder.getId(), "cancel", "到期未支付系统自动取消");
+            storeOrderStatusService.createLog(storeOrder.getId(), "cancel", "到期未支付系统自动取消", 0);
             // 退优惠券
             if (storeOrder.getCouponId() > 0 ) {
                 StoreCouponUser couponUser = couponUserService.getById(storeOrder.getCouponId());
@@ -468,7 +458,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
 
         Boolean execute = transactionTemplate.execute(e -> {
             // 日志
-            storeOrderStatusService.createLog(storeOrder.getId(), "user_take_delivery", Constants.ORDER_STATUS_STR_TAKE);
+            storeOrderStatusService.createLog(storeOrder.getId(), "user_take_delivery", Constants.ORDER_STATUS_STR_TAKE, 0);
             // 分佣-佣金进入冻结期
             if (CollUtil.isNotEmpty(recordList)) {
                 userBrokerageRecordService.updateBatchById(recordList);

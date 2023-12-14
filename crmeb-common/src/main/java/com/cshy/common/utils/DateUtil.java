@@ -432,13 +432,6 @@ public final class DateUtil {
         return endSdf.format(c.getTime());
     }
 
-    /**
-     * 计算时间范围
-     * @param data string 类型
-     * @author Mr.Zhang
-     * @since 2020-05-06
-     * @return dateLimitUtilVo
-     */
     public static dateLimitUtilVo getDateLimit(String data){
         //时间计算
         String startTime = null;
@@ -509,13 +502,6 @@ public final class DateUtil {
         return new dateLimitUtilVo(startTime, endTime);
     }
 
-    /**
-     * 获取某一时间段内的时间集合
-     * @param data string 类型
-     * @author Mr.Zhang
-     * @since 2020-05-06
-     * @return List<Date>
-     */
     public static List<String> getListDate(String data) {
 
         //获取30天的开始结束日期

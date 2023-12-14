@@ -25,12 +25,6 @@ public class ImageMergeUtil {
     public static String model = "merge";
     public static String ext = "jpg";
 
-    /**
-     * 合并生成新的图片文件
-     * @param list List<ImageMergeUtilVo> 图片集合
-     * @author Mr.Zhang
-     * @since 2020-05-06
-     */
     public static String drawWordFile(List<ImageMergeUtilVo> list){
         buildImage(list);
         if(bufferedImage == null){
@@ -82,12 +76,6 @@ public class ImageMergeUtil {
         }
     }
 
-    /**
-     * 合并生成新的图片流
-     * @param list List<ImageMergeUtilVo> 图片集合
-     * @author Mr.Zhang
-     * @since 2020-05-06
-     */
     private static void buildImage(List<ImageMergeUtilVo> list){
         if(list.size() < 2){
             throw new CrmebException("至少需要2张图片才可以做合并");
@@ -100,12 +88,6 @@ public class ImageMergeUtil {
 
 
 
-    /**
-     * 根据图片路径输出File流
-     * @param url String 文件地址
-     * @author Mr.Zhang
-     * @since 2020-05-06
-     */
     private static String getFileSource(String url){
         if(!url.contains("http")){
             return url;

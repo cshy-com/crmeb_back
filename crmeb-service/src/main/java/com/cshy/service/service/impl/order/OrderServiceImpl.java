@@ -2,6 +2,7 @@ package com.cshy.service.service.impl.order;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
@@ -231,7 +232,7 @@ public class OrderServiceImpl implements OrderService {
         Boolean execute = transactionTemplate.execute(e -> {
             storeOrderService.updateById(storeOrder);
             //日志
-            storeOrderStatusService.createLog(storeOrder.getId(), "remove_order", "删除订单");
+            storeOrderStatusService.createLog(storeOrder.getId(), "remove_order", "删除订单", 0);
             return Boolean.TRUE;
         });
         return execute;
@@ -297,6 +298,8 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public Boolean refundApply(OrderRefundApplyRequest request) {
+        Assert.isFalse(request.getRefundType().equals(1) && request.getRefundReceivingStatus().equals(0), "未收货不能选择退货退款");
+
         ValidateFormUtil.isPhone(request.getMobile(), "手机号码错误");
 
         StoreOrder storeOrderPram = new StoreOrder();
@@ -324,12 +327,12 @@ public class OrderServiceImpl implements OrderService {
         existStoreOrder.setRefundReasonWap(request.getText());
         existStoreOrder.setRefundReasonWapExplain(request.getExplain());
         existStoreOrder.setRefundReasonWapImg(systemAttachmentService.clearPrefix(request.getReasonImage()));
-        existStoreOrder.setRefundPrice(BigDecimal.ZERO);
+        existStoreOrder.setRefundPrice(request.getRefundPrice());
         existStoreOrder.setRefundMobile(request.getMobile());
 
         Boolean execute = transactionTemplate.execute(e -> {
             storeOrderService.updateById(existStoreOrder);
-            storeOrderStatusService.createLog(existStoreOrder.getId(), Constants.ORDER_LOG_REFUND_APPLY, request.getText());
+            storeOrderStatusService.createLog(existStoreOrder.getId(), Constants.ORDER_LOG_REFUND_APPLY, request.getText(), 0);
             return Boolean.TRUE;
         });
 
@@ -401,22 +404,22 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 订单列表
      *
-     * @param status      类型
+     * @param params      类型
      * @param pageRequest 分页
      * @return CommonPage<OrderDetailResponse>
      */
     @Override
-    public CommonPage<OrderDetailResponse> list(Integer status, PageParamRequest pageRequest) {
+    public CommonPage<OrderDetailResponse> list(Map<String, Object> params, PageParamRequest pageRequest) {
         Integer userId = userService.getUserIdException();
 
-        List<StoreOrder> orderList = storeOrderService.getUserOrderList(userId, status, pageRequest);
+        List<StoreOrder> orderList = storeOrderService.getUserOrderList(userId, params, pageRequest);
         CommonPage<StoreOrder> storeOrderCommonPage = CommonPage.restPage(orderList);
         List<OrderDetailResponse> responseList = CollUtil.newArrayList();
         for (StoreOrder storeOrder : orderList) {
             OrderDetailResponse infoResponse = new OrderDetailResponse();
             BeanUtils.copyProperties(storeOrder, infoResponse);
             // 订单状态
-            infoResponse.setOrderStatus(getH5OrderStatus(storeOrder));
+            infoResponse.setOrderStatus(getH5OrderStatus(storeOrder, Objects.nonNull(params.get("type")) ? Integer.valueOf((String) params.get("type")) : null));
             // 活动类型
             infoResponse.setActivityType(getOrderActivityType(storeOrder));
             // 订单详情对象列表
@@ -430,6 +433,9 @@ public class OrderServiceImpl implements OrderService {
                 orderInfoResponse.setPrice(ObjectUtil.isNotNull(e.getVipPrice()) ? e.getVipPrice() : e.getPrice());
                 orderInfoResponse.setProductId(e.getProductId());
                 orderInfoResponse.setSku(e.getSku());
+                //查询原价
+                StoreProductAttrValue attrValueServiceById = attrValueService.getById(e.getAttrValueId());
+                orderInfoResponse.setOtPrice(attrValueServiceById.getOtPrice());
                 infoResponseList.add(orderInfoResponse);
             });
             infoResponse.setOrderInfoList(infoResponseList);
@@ -470,32 +476,62 @@ public class OrderServiceImpl implements OrderService {
      *
      * @param storeOrder 订单对象
      */
-    private String getH5OrderStatus(StoreOrder storeOrder) {
+    private String getH5OrderStatus(StoreOrder storeOrder, Integer type) {
+        String status = "";
         if (!storeOrder.getPaid()) {
-            return "待支付";
+            status = "待支付";
         }
-        if (storeOrder.getRefundStatus().equals(1)) {
-            return "申请退款中";
-        }
-        if (storeOrder.getRefundStatus().equals(2)) {
-            return "已退款";
-        }
-        if (storeOrder.getRefundStatus().equals(3)) {
-            return "退款中";
-        }
+
         if (storeOrder.getStatus().equals(0)) {
-            return "待发货";
+            status = "待发货";
         }
         if (storeOrder.getStatus().equals(1)) {
-            return "待收货";
+            status = "待收货";
         }
         if (storeOrder.getStatus().equals(2)) {
-            return "待评价";
+            status = "待评价";
         }
         if (storeOrder.getStatus().equals(3)) {
-            return "已完成";
+            status = "已完成";
         }
-        return "";
+        if (!storeOrder.getRefundStatus().equals(0)){
+            if (storeOrder.getRefundStatus().equals(1)) {
+                status = "申请退款中";
+            }
+            if (storeOrder.getRefundStatus().equals(2)) {
+                status = "已退款";
+            }
+            if (storeOrder.getRefundStatus().equals(4)) {
+                status = "退货待发货";
+            }
+            if (storeOrder.getRefundStatus().equals(5)) {
+                status = "退货中";
+            }
+        }
+        if (Objects.nonNull(type) && type == -3){
+            if (storeOrder.getRefundStatus().equals(1)) {
+                status = "申请退款中";
+            }
+            if (storeOrder.getRefundStatus().equals(2)) {
+                status = "已退款";
+            }
+            if (storeOrder.getRefundStatus().equals(3)) {
+                status = "退款中";
+            }
+            if (storeOrder.getRefundStatus().equals(4)) {
+                status = "退货待发货";
+            }
+            if (storeOrder.getRefundStatus().equals(5)) {
+                status = "退货中";
+            }
+            if (storeOrder.getRefundStatus().equals(6)) {
+                status = "退货退款被拒绝";
+            }
+            if (storeOrder.getRefundStatus().equals(7)) {
+                status = "退款被拒绝";
+            }
+        }
+        return status;
     }
 
     /**
@@ -532,6 +568,9 @@ public class OrderServiceImpl implements OrderService {
             orderInfoResponse.setIsReply(e.getIsReply() ? 1 : 0);
             orderInfoResponse.setAttrId(e.getAttrValueId());
             orderInfoResponse.setSku(e.getSku());
+            //查询原价
+            StoreProductAttrValue productAttrValue = attrValueService.getById(e.getAttrValueId());
+            orderInfoResponse.setOtPrice(productAttrValue.getOtPrice());
             infoResponseList.add(orderInfoResponse);
         });
         storeOrderDetailResponse.setOrderInfoList(infoResponseList);
@@ -814,6 +853,7 @@ public class OrderServiceImpl implements OrderService {
             throw new CrmebException("预下单订单详情列表不能为空");
         }
         User user = userService.getInfoException();
+
         // 校验预下单商品信息
         OrderInfoVo orderInfoVo = validatePreOrderRequest(request, user);
         // 商品总计金额
@@ -1176,7 +1216,7 @@ public class OrderServiceImpl implements OrderService {
             // 保存购物车商品详情
             storeOrderInfoService.saveOrderInfos(storeOrderInfos);
             // 生成订单日志
-            storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_STATUS_CACHE_CREATE_ORDER, "订单生成");
+            storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_STATUS_CACHE_CREATE_ORDER, "订单生成", 0);
 
             // 清除购物车数据
             if (CollUtil.isNotEmpty(orderInfoVo.getCartIdList())) {
@@ -1256,7 +1296,7 @@ public class OrderServiceImpl implements OrderService {
             storeOrder.setDeliveryType(Constants.ORDER_LOG_EXPRESS);
             this.storeOrderService.updateById(storeOrder);
 
-            this.storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_EXPRESS, Constants.ORDER_STATUS_STR_SHIPPING);
+            this.storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_EXPRESS, Constants.ORDER_STATUS_STR_SHIPPING, 1);
 
             //短连接
             ShortUrl shortUrl = shortUrlService.getOne(new LambdaQueryWrapper<ShortUrl>().eq(ShortUrl::getLocation, 0).like(ShortUrl::getParam, storeOrder.getOrderId()));
@@ -1284,27 +1324,93 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Map<String, Object>> refundList(Integer id) {
+    public List<Map<String, Object>> operationList(Integer id) {
+        User user = userService.getInfo();
         List<Map<String, Object>> resList = Lists.newArrayList();
         StoreOrder storeOrder = this.storeOrderService.getById(id);
         if (Objects.nonNull(storeOrder)) {
+            //需要排除的操作类型
             List<String> constantList = Lists.newArrayList(Constants.ORDER_LOG_EXPRESS, Constants.ORDER_LOG_PAY_SUCCESS
                     , Constants.ORDER_LOG_DELIVERY_VI, Constants.ORDER_LOG_EDIT, Constants.ORDER_STATUS_CACHE_CREATE_ORDER);
+            //查询
             List<StoreOrderStatus> orderStatusList = this.storeOrderStatusService.list(new LambdaQueryWrapper<StoreOrderStatus>()
                     .eq(StoreOrderStatus::getOid, storeOrder.getId())
                     .notIn(StoreOrderStatus::getChangeType, constantList)
                     .orderByDesc(StoreOrderStatus::getCreateTime));
+            //数据处理
             orderStatusList.forEach(orderStatus -> {
-                Map<String, Object> map = CommonUtil.objToMap(orderStatus, StoreOrderStatus.class);
+                Map<String, Object> map = new HashMap<>();
+                map = CommonUtil.objToMap(orderStatus, StoreOrderStatus.class);
+
+                //特殊处理
                 if (orderStatus.getChangeType().equals(Constants.ORDER_LOG_REFUND_APPLY)) {
-                    map.put("reason", storeOrder.getRefundReason());
                     map.put("mobile", storeOrder.getRefundMobile());
                     map.put("desc", storeOrder.getRefundReasonWapExplain());
+                    map.put("refundPrice", storeOrder.getRefundPrice());
                 }
+
+                //转译
+                String changeType;
+                switch (orderStatus.getChangeType()){
+                    case Constants.ORDER_LOG_REFUND_REFUSE:
+                        if (storeOrder.getRefundType().equals(0))
+                            changeType = "退款被拒绝";
+                        else
+                            changeType = "退货退款被拒绝";
+                        break;
+                    case Constants.ORDER_LOG_REFUND_PRICE:
+                        changeType = "已退款";
+                        break;
+                    case Constants.ORDER_LOG_RETURN_GOODS:
+                        changeType = "退货中";
+                        break;
+                    case Constants.ORDER_LOG_REFUND_APPLY:
+                        if (storeOrder.getRefundType().equals(0))
+                            changeType = "用户申请退款";
+                        else
+                            changeType = "用户申请退货退款";
+                        break;
+                    case Constants.ORDER_LOG_AGREE_RETURN:
+                        changeType = "平台同意退货退款";
+                        break;
+                    case Constants.ORDER_LOG_AGREE_REFUND:
+                        changeType = "平台同意退款";
+                        break;
+                    case Constants.ORDER_LOG_REFUND_REVOKE:
+                        changeType = "用户撤销售后";
+                        break;
+                    default:
+                        changeType = "系统操作";
+                }
+                map.put("changeType", changeType);
+
+                //头像
+                if (0 == orderStatus.getIsSysUser())
+                    map.put("avatar", user.getAvatar());
+                else
+                    map.put("avatar", null);
                 resList.add(map);
             });
         }
         return resList;
+    }
+
+    @Override
+    public Boolean returnShip(String orderId, String trackingNo, String remark, String img) {
+        storeOrderService.returnShip(orderId, trackingNo, remark, img);
+        return true;
+    }
+
+    @Override
+    public void refundRevoke(String orderId) {
+        StoreOrder storeOrder = this.getByOrderIdException(orderId);
+        //检查状态
+        Assert.isTrue(storeOrder.getRefundStatus().equals(1) || storeOrder.getRefundStatus().equals(4), "无法撤回订单");
+        storeOrder.setRefundStatus(0);
+
+        storeOrderService.updateById(storeOrder);
+
+        storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_REFUND_REVOKE, Constants.ORDER_STATUS_STR_REFUND_REVOKE , 0);
     }
 
     /**

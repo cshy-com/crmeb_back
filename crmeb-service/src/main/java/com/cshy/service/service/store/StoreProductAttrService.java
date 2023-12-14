@@ -48,4 +48,5 @@ public interface StoreProductAttrService extends IService<StoreProductAttr> {
      * @return List
      */
     List<StoreProductAttr> getListByProductIdAndType(Integer productId, Integer type);
+
 }

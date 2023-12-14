@@ -40,13 +40,6 @@ public class CategoryController {
     @Autowired
     private SystemAttachmentService systemAttachmentService;
 
-    /**
-     * 分页显示分类表
-     * @param request 搜索条件
-     * @param pageParamRequest 分页参数
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     @PreAuthorize("hasAuthority('admin:category:list')")
     @ApiOperation(value = "分页分类列表")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
@@ -70,12 +63,6 @@ public class CategoryController {
         }
     }
 
-    /**
-     * 删除分类表
-     * @param id Integer
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     @PreAuthorize("hasAuthority('admin:category:delete')")
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
@@ -88,13 +75,6 @@ public class CategoryController {
         }
     }
 
-    /**
-     * 修改分类表
-     * @param id integer id
-     * @param categoryRequest 修改参数
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     @PreAuthorize("hasAuthority('admin:category:update')")
     @ApiOperation(value = "修改")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
@@ -109,12 +89,6 @@ public class CategoryController {
         }
     }
 
-    /**
-     * 查询分类表信息
-     * @param id Integer
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     @PreAuthorize("hasAuthority('admin:category:info')")
     @ApiOperation(value = "分类详情")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
@@ -125,11 +99,6 @@ public class CategoryController {
     }
 
 
-    /**
-     * 查询分类表信息
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     @PreAuthorize("hasAuthority('admin:category:list:tree')")
     @ApiOperation(value = "获取tree结构的列表")
     @RequestMapping(value = "/list/tree", method = RequestMethod.GET)

@@ -54,13 +54,6 @@ public class SystemCityServiceImpl extends ServiceImpl<SystemCityDao, SystemCity
         return list;
     }
 
-    /**
-     * 根据父级id获取数据
-     * @param parentId integer parentId
-     * @author Mr.Zhang
-     * @since 2020-04-17
-     * @return Object
-     */
     private Object getList(Integer parentId) {
         LambdaQueryWrapper<SystemCity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(SystemCity::getParentId, parentId);
@@ -147,21 +140,10 @@ public class SystemCityServiceImpl extends ServiceImpl<SystemCityDao, SystemCity
     }
 
 
-    /**
-     * 数据整体刷入redis
-     * @author Mr.Zhang
-     * @since 2020-05-18
-     */
     public void asyncRedis(Integer pid) {
         systemCityAsyncService.async(pid);
     }
 
-    /**
-     * 根据城市名称获取城市详细数据
-     * @author 大粽子
-     * @param cityName 城市名称
-     * @return 城市数据
-     */
     @Override
     public SystemCity getCityByCityName(String cityName) {
         LambdaQueryWrapper<SystemCity> systemCityLambdaQueryWrapper = Wrappers.lambdaQuery();

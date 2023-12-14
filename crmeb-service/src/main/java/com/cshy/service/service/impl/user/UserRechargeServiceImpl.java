@@ -130,12 +130,6 @@ public class UserRechargeServiceImpl extends ServiceImpl<UserRechargeDao, UserRe
         return map;
     }
 
-    /**
-     * 根据对象查询订单
-     * @author Mr.Zhang
-     * @since 2020-05-11
-     * @return UserRecharge
-     */
     @Override
     public UserRecharge getInfoByEntity(UserRecharge userRecharge) {
         LambdaQueryWrapper<UserRecharge> lambdaQueryWrapper = new LambdaQueryWrapper<>();

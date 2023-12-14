@@ -152,12 +152,6 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
 
     }
 
-    /**
-     * deleteStatusByGroupId
-     * @param formId Integer formId
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     private void deleteStatusByFormId(Integer formId) {
         LambdaQueryWrapper<SystemConfig> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         //删除已经隐藏的数据
@@ -285,12 +279,6 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
     }
 
 
-    /**
-     * 把数据同步到redis
-     * @param name name
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     private void asyncRedis(String name) {
         LambdaQueryWrapper<SystemConfig> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(SystemConfig::getName, name);
@@ -318,12 +306,6 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
         }
     }
 
-    /**
-     * 把数据同步到redis
-     * @param name String
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     private void deleteRedis(String name) {
         if (!crmebConfig.isAsyncConfig()) {
             //如果配置没有开启

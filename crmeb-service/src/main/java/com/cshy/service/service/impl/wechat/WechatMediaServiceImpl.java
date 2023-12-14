@@ -89,10 +89,6 @@ public class WechatMediaServiceImpl implements WechatMediaService {
         }
     }
 
-    /**
-     * 参数配置
-     * @author Mr.Zhang
-     */
     private JSONObject getConfig() {
         String data = "{" +
                 "image:{size:\""+maxSizeImage+"\", suffix: \""+suffixNameImage+"\"}, " +

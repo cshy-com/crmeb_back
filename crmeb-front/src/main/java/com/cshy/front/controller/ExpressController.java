@@ -31,8 +31,8 @@ public class ExpressController {
     @ApiOperation(value = "查询快递信息")
     @RequestMapping(value = "/findExpressDetail", method = RequestMethod.GET)
     @ApiImplicitParam(name="no", value="快递单号（包括前缀）")
-    public CommonResult<ExpressDetail> findExpressDetail(@RequestParam(value = "trackingNo") String trackingNo, @RequestParam(value = "type") Integer type) {
-        return CommonResult.success(expressService.findExpressDetail(trackingNo, type));
+    public CommonResult<ExpressDetail> findExpressDetail(@RequestParam(value = "trackingNo") String trackingNo, @RequestParam(value = "type") Integer type, @RequestParam String userMobile) {
+        return CommonResult.success(expressService.findExpressDetail(trackingNo, type, userMobile));
     }
 
 //    /**

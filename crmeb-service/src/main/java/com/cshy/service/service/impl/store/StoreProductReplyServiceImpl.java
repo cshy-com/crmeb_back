@@ -425,12 +425,6 @@ public class StoreProductReplyServiceImpl extends ServiceImpl<StoreProductReplyD
         return dao.selectCount(lqw);
     }
 
-    /**
-     * 如果所有的都已评价，那么订单完成
-     * @author Mr.Zhang
-     * @since 2020-06-03
-     * @return Integer
-     */
     private void completeOrder(StoreProductReply storeProductReply, Integer count, StoreOrder storeOrder) {
         Integer replyCount = getReplyCountByEntity(storeProductReply, true);
 
@@ -442,12 +436,6 @@ public class StoreProductReplyServiceImpl extends ServiceImpl<StoreProductReplyD
         }
     }
 
-    /**
-     * 检测当前商品是否可以评论
-     * @author Mr.Zhang
-     * @since 2020-06-03
-     * @return Integer
-     */
     private Integer checkIsReply(StoreProductReply storeProductReply) {
 
         //查看商品信息
@@ -483,12 +471,6 @@ public class StoreProductReplyServiceImpl extends ServiceImpl<StoreProductReplyD
         return orderInfoVoList.size();
     }
 
-    /**
-     * 根据商品id  订单id  用户id 获取评论信息
-     * @author Mr.Zhang
-     * @since 2020-06-03
-     * @return Integer
-     */
     private Integer getReplyCountByEntity(StoreProductReply request, boolean isAll) {
         LambdaQueryWrapper<StoreProductReply> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(StoreProductReply::getOid, request.getOid());

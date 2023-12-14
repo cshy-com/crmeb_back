@@ -99,4 +99,10 @@ public class OrderDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "退款金额")
     private BigDecimal refundPrice;
+
+    @ApiModelProperty(value = "用户电话")
+    private String userMobile;
+
+    @ApiModelProperty(value = "物流单号")
+    private String trackingNo;
 }

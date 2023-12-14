@@ -21,11 +21,11 @@ public interface OrderService {
 
     /**
      * 订单列表
-     * @param type 类型
+     * @param params 查询参数
      * @param pageRequest 分页
      * @return 订单集合
      */
-    CommonPage<OrderDetailResponse> list(Integer type, PageParamRequest pageRequest);
+    CommonPage<OrderDetailResponse> list(Map<String, Object> params, PageParamRequest pageRequest);
 
     /**
      * 订单详情
@@ -144,5 +144,9 @@ public interface OrderService {
 
     void ship(String orderId, String trackingNo, Integer type, HttpServletRequest request);
 
-    List<Map<String, Object>> refundList(Integer id);
+    List<Map<String, Object>> operationList(Integer id);
+
+    Boolean returnShip(String orderId, String trackingNo, String remark, String img);
+
+    void refundRevoke(String orderId);
 }

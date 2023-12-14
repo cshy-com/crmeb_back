@@ -74,7 +74,7 @@ public interface ExpressService extends IService<Express> {
     /**
      * 查询快递信息
      */
-    ExpressDetail findExpressDetail(String trackingNo, Integer type);
+    ExpressDetail findExpressDetail(String trackingNo, Integer type, String mobile);
 
     void syncExpressStatus();
 }

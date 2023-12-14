@@ -478,8 +478,8 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         addRequestList.forEach(e -> {
             StoreProductAttr attr = new StoreProductAttr();
             BeanUtils.copyProperties(e, attr);
+            attr.setProductId(storeProduct.getId());
             if (ObjectUtil.isNull(attr.getId())) {
-                attr.setProductId(storeProduct.getId());
                 attr.setType(Constants.PRODUCT_TYPE_NORMAL);
                 attrAddList.add(attr);
             } else {
@@ -496,9 +496,9 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
             BeanUtils.copyProperties(e, attrValue);
             attrValue.setSuk(getSku(e.getAttrValue()));
             attrValue.setImage(systemAttachmentService.clearPrefix(e.getImage()));
+            attrValue.setProductId(storeProduct.getId());
             if (ObjectUtil.isNull(attrValue.getId()) || attrValue.getId().equals(0)) {
                 attrValue.setId(null);
-                attrValue.setProductId(storeProduct.getId());
                 attrValue.setQuota(0);
                 attrValue.setQuotaShow(0);
                 attrValue.setType(Constants.PRODUCT_TYPE_NORMAL);

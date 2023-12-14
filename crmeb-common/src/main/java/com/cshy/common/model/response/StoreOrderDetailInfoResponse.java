@@ -182,4 +182,18 @@ public class StoreOrderDetailInfoResponse implements Serializable {
     @ApiModelProperty(value = "订单详情")
     private List<OrderInfoResponse> orderInfoList;
 
+    @ApiModelProperty(value = "退货收件人")
+    private String returnName;
+
+    @ApiModelProperty(value = "退货收件地址")
+    private String returnAddress;
+
+    @ApiModelProperty(value = "退货收件电话")
+    private String returnMobile;
+
+    @ApiModelProperty(value = "退货图片")
+    private String returnImg;
+
+    @ApiModelProperty(value = "退货备注")
+    private String returnRemark;
 }

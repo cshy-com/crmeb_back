@@ -12,6 +12,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 /**
  * 添加购物车参数Request对象
@@ -54,4 +55,8 @@ public class OrderRefundApplyRequest {
     @ApiModelProperty(value = "退款联系电话")
     @NotNull(message = "退款联系电话不能为空")
     private String mobile;
+
+    @ApiModelProperty(value = "退款金额")
+    @NotNull(message = "退款金额不能为空")
+    private BigDecimal refundPrice;
 }

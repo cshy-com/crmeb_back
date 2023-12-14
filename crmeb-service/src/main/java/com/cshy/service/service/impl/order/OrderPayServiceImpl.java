@@ -247,7 +247,7 @@ public class OrderPayServiceImpl implements OrderPayService {
 
         Boolean execute = transactionTemplate.execute(e -> {
             //订单日志
-            storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_PAY_SUCCESS, Constants.ORDER_LOG_MESSAGE_PAY_SUCCESS);
+            storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_PAY_SUCCESS, Constants.ORDER_LOG_MESSAGE_PAY_SUCCESS, 0);
 
             // 用户信息变更
             userService.updateById(user);

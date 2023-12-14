@@ -1,6 +1,7 @@
 package com.cshy.service.service.impl.store;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -8,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.model.entity.order.StoreOrderInfo;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.store.*;
 import com.cshy.common.model.request.system.SystemWriteOffOrderSearchRequest;
@@ -17,10 +19,7 @@ import com.cshy.service.service.*;
 import com.cshy.service.service.sms.SmsService;
 import com.cshy.service.service.sms.SmsTemplateService;
 import com.cshy.service.service.store.*;
-import com.cshy.service.service.system.SystemAdminService;
-import com.cshy.service.service.system.SystemConfigService;
-import com.cshy.service.service.system.SystemNotificationService;
-import com.cshy.service.service.system.SystemStoreService;
+import com.cshy.service.service.system.*;
 import com.cshy.service.service.user.*;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -45,6 +44,7 @@ import com.cshy.common.utils.RedisUtil;
 import com.cshy.common.utils.ValidateFormUtil;
 import com.cshy.service.dao.store.StoreOrderDao;
 import com.cshy.service.delete.OrderUtils;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,7 +132,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
     private SmsTemplateService smsTemplateService;
 
     @Autowired
-    private UserIntegralRecordService userIntegralRecordService;
+    private SystemAttachmentService systemAttachmentService;
 
     /**
      * 列表
@@ -147,9 +147,9 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         QueryWrapper<StoreOrder> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id", "order_id", "uid", "real_name", "pay_price", "pay_type", "create_time", "status", "refund_status"
                 , "refund_reason_wap_img", "refund_reason_wap_explain", "refund_reason_wap", "refund_reason", "refund_reason_time"
-                , "is_del", "combination_id", "pink_id", "seckill_id", "bargain_id", "verify_code", "remark", "paid", "is_system_del", "shipping_type", "type", "is_alter_price");
+                , "is_del", "combination_id", "pink_id", "seckill_id", "bargain_id", "verify_code", "remark", "paid", "is_system_del", "shipping_type", "type", "is_alter_price", "refund_type");
         if (StrUtil.isNotBlank(request.getOrderNo())) {
-            queryWrapper.eq("order_id", request.getOrderNo());
+            queryWrapper.like("order_id", request.getOrderNo());
         }
         getRequestTimeWhere(queryWrapper, request);
         getStatusWhere(queryWrapper, request.getStatus());
@@ -170,19 +170,34 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
      * H5订单列表
      *
      * @param uid              用户uid
-     * @param status           评价等级|0=未支付,1=待发货,2=待收货,3=待评价,4=已完成,-3=售后/退款
+     * @param params           type 评价等级|0=未支付,1=待发货,2=待收货,3=待评价,4=已完成,-3=售后/退款
      * @param pageParamRequest 分页参数
      * @return 订单结果列表
      */
     @Override
-    public List<StoreOrder> getUserOrderList(Integer uid, Integer status, PageParamRequest pageParamRequest) {
+    public List<StoreOrder> getUserOrderList(Integer uid, Map<String, Object> params, PageParamRequest pageParamRequest) {
+        Integer status = Objects.nonNull(params.get("type")) ? Integer.valueOf((String) params.get("type")) : null;
+        String condition = (String) params.get("condition");
+        String startDate = (String) params.get("startDate");
+        String endDate = (String) params.get("endDate");
+
         PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         LambdaQueryWrapper<StoreOrder> lqw = new LambdaQueryWrapper<>();
-        orderUtils.statusApiByWhere(lqw, status);
-        lqw.eq(StoreOrder::getUid, uid);
+        //查询商品名称
+        lqw.and(StringUtils.isNotBlank(condition), wrapper -> {
+            wrapper.apply("s_order.id in (select order_id from s_order_info where product_name like '%" + condition + "%')");
+            wrapper.or().like(StoreOrder::getOrderId, condition);
+        });
+
+        //查询日期
+        lqw.between(StringUtils.isNotBlank(startDate)&&StringUtils.isNotBlank(endDate),StoreOrder::getCreateTime,startDate,endDate);
+
+        orderUtils.statusApiByWhere(lqw,status);
+
+        lqw.eq(StoreOrder::getUid,uid);
         lqw.orderByDesc(StoreOrder::getId);
         return dao.selectList(lqw);
-    }
+}
 
     /**
      * 创建订单
@@ -350,14 +365,6 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         return orderType;
     }
 
-    /**
-     * 格式化订单信息，对外输出一致
-     *
-     * @param storeOrderList List<StoreOrder> 订单列表
-     * @return List<StoreOrderItemResponse>
-     * @author Mr.Zhang
-     * @since 2020-05-28
-     */
     private List<StoreOrderItemResponse> formatOrder(List<StoreOrder> storeOrderList) {
         List<StoreOrderItemResponse> storeOrderItemResponseArrayList = new ArrayList<>();
         if (null == storeOrderList || storeOrderList.size() < 1) {
@@ -468,14 +475,6 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         return storeOrderItemResponseArrayList;
     }
 
-    /**
-     * 累计消费
-     *
-     * @param userId Integer 用户id
-     * @return UserBalanceResponse
-     * @author Mr.Zhang
-     * @since 2020-06-10
-     */
     @Override
     public BigDecimal getSumBigDecimal(Integer userId, String date) {
         QueryWrapper<StoreOrder> queryWrapper = new QueryWrapper<>();
@@ -496,15 +495,6 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         return storeOrder.getPayPrice();
     }
 
-    /**
-     * 按开始结束时间分组订单
-     *
-     * @param date    String 时间范围
-     * @param lefTime int 截取创建时间长度
-     * @return HashMap<String, Object>
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     */
     public List<StoreOrder> getOrderGroupByDate(String date, int lefTime) {
         QueryWrapper<StoreOrder> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("sum(pay_price) as pay_price", "left(create_time, " + lefTime + ") as orderId", "count(id) as id");
@@ -559,6 +549,8 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
 
         Boolean execute = transactionTemplate.execute(e -> {
             updateById(storeOrder);
+            storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_AGREE_REFUND, Constants.ORDER_STATUS_STR_AGREE_REFUND, 1);
+
             if (storeOrder.getPayType().equals(Constants.PAY_TYPE_INTEGRAL)) {
                 //新增日志
                 request.setOrderId(storeOrder.getId());
@@ -668,36 +660,27 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         }
         StoreOrder storeOrder = getInfoException(orderNo);
         storeOrder.setRefundReason(reason);
-        storeOrder.setRefundStatus(0);
-
-        User user = userService.getById(storeOrder.getUid());
+        storeOrder.setRefundStatus(6);
 
         Boolean execute = transactionTemplate.execute(e -> {
             updateById(storeOrder);
-            storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_REFUND_REFUSE, Constants.ORDER_LOG_MESSAGE_REFUND_REFUSE.replace("{reason}", reason));
+            storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_REFUND_REFUSE, Constants.ORDER_LOG_MESSAGE_REFUND_REFUSE.replace("{reason}", reason), 1);
             return Boolean.TRUE;
         });
-        if (execute) {
-            // 如果是拼团订单要将拼团状态改回去
-            if (ObjectUtil.isNotNull(storeOrder) && storeOrder.getPinkId() > 0) {
-                StorePink storePink = storePinkService.getById(storeOrder.getPinkId());
-                if (storePink.getStatus().equals(3)) {
-                    storePink.setStatus(1);
-                    storePinkService.updateById(storePink);
-                }
-            }
-        }
+        //TODO
+//        if (execute) {
+//            // 如果是拼团订单要将拼团状态改回去
+//            if (ObjectUtil.isNotNull(storeOrder) && storeOrder.getPinkId() > 0) {
+//                StorePink storePink = storePinkService.getById(storeOrder.getPinkId());
+//                if (storePink.getStatus().equals(3)) {
+//                    storePink.setStatus(1);
+//                    storePinkService.updateById(storePink);
+//                }
+//            }
+//        }
         return execute;
     }
 
-    /**
-     * 查询单条
-     *
-     * @param storeOrder StoreOrder 订单参数
-     * @return StoreOrder
-     * @author Mr.Zhang
-     * @since 2020-05-28
-     */
     @Override
     public StoreOrder getInfoByEntity(StoreOrder storeOrder) {
         LambdaQueryWrapper<StoreOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -992,7 +975,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
             // 订单修改状态操作
             storeOrderStatusService.createLog(existOrder.getId(), Constants.ORDER_LOG_EDIT,
                     Constants.RESULT_ORDER_EDIT_PRICE_LOGS.replace("${orderPrice}", oldPrice)
-                            .replace("${price}", request.getPayPrice() + ""));
+                            .replace("${price}", request.getPayPrice() + ""), 1);
             return Boolean.TRUE;
         });
         if (!execute) {
@@ -1138,6 +1121,8 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         response.setRefunded(getCount(dateLimit, Constants.ORDER_STATUS_REFUNDED, type));
         // 已删除订单
         response.setDeleted(getCount(dateLimit, Constants.ORDER_STATUS_DELETED, type));
+        // 退货退款
+        response.setRefundNReturn(getCount(dateLimit, Constants.ORDER_STATUS_APPLY_REFUNDING_RETURN, type));
         return response;
     }
 
@@ -1462,7 +1447,84 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         return dao.getBrokerageData(uid, spreadId);
     }
 
+    @Override
+    public Boolean refundNReturn(StoreOrderRefundRequest request) {
+        Assert.notNull(request.getReturnName(), "退货收件人不能为空");
+        Assert.notNull(request.getReturnAddress(), "退货收件地址不能为空");
+        Assert.notNull(request.getReturnMobile(), "退货收件电话不能为空");
+
+        StoreOrder storeOrder = getInfoException(request.getOrderNo());
+        if (!storeOrder.getPaid()) {
+            throw new CrmebException("未支付无法退款");
+        }
+
+        if (storeOrder.getRefundPrice().add(request.getAmount()).compareTo(storeOrder.getPayPrice()) > 0) {
+            throw new CrmebException("退款金额大于支付金额，请修改退款金额");
+        }
+
+        request.setOrderId(storeOrder.getId());
+        //修改订单退款状态
+        storeOrder.setRefundStatus(4);
+        storeOrder.setRefundPrice(request.getAmount());
+        storeOrder.setReturnAddress(request.getReturnAddress());
+        storeOrder.setReturnMobile(request.getReturnMobile());
+        storeOrder.setReturnName(request.getReturnName());
+        Boolean execute = transactionTemplate.execute(e -> {
+            updateById(storeOrder);
+            return Boolean.TRUE;
+        });
+        if (!execute) {
+            storeOrderStatusService.saveRefund(storeOrder.getId(), request.getAmount(), "失败");
+            throw new CrmebException("订单更新失败");
+        } else {
+            storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_AGREE_RETURN, Constants.ORDER_STATUS_STR_AGREE_RETURN, 1);
+        }
+        return execute;
+    }
+
+    @Override
+    public Boolean returnShip(String orderId, String trackingNo, String remark, String img) {
+        StoreOrder storeOrder = this.getByOrderIdException(orderId);
+        if (storeOrder.getRefundStatus() == 2) {
+            throw new CrmebException("订单已退款");
+        }
+        storeOrder.setRefundTrackingNo(trackingNo);
+        storeOrder.setReturnRemark(remark);
+        storeOrder.setReturnImg(systemAttachmentService.clearPrefix(img));
+        storeOrder.setRefundStatus(5);
+        //创建日志
+        storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_RETURN_GOODS, "物流单号：" + trackingNo, 0);
+        boolean b = this.updateById(storeOrder);
+        if (!b)
+            throw new CrmebException("更新订单失败，请稍后重试");
+        return true;
+    }
+
+    @Override
+    public Boolean returnArrived(String orderId) {
+        StoreOrder storeOrder = this.getByOrderIdException(orderId);
+
+        StoreOrderRefundRequest storeOrderRefundRequest = new StoreOrderRefundRequest();
+        storeOrderRefundRequest.setOrderId(storeOrder.getId());
+        storeOrderRefundRequest.setAmount(storeOrder.getRefundPrice());
+        storeOrderRefundRequest.setOrderNo(orderId);
+        boolean refund = this.refund(storeOrderRefundRequest);
+        return refund;
+    }
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////// 以下为自定义方法
+
+    private StoreOrder getByOrderIdException(String orderId) {
+        StoreOrder storeOrder = getByOrderId(orderId);
+        if (ObjectUtil.isNull(storeOrder)) {
+            throw new CrmebException("订单不存在");
+        }
+        if (storeOrder.getIsDel() || storeOrder.getIsSystemDel()) {
+            throw new CrmebException("订单不存在");
+        }
+        return storeOrder;
+    }
 
     /**
      * 根据时间参数获取有效订单
@@ -1515,7 +1577,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         Boolean execute = transactionTemplate.execute(i -> {
             updateById(storeOrder);
             //订单记录增加
-            storeOrderStatusService.createLog(request.getId(), Constants.ORDER_LOG_EXPRESS, message);
+            storeOrderStatusService.createLog(request.getId(), Constants.ORDER_LOG_EXPRESS, message, 1);
             return Boolean.TRUE;
         });
 
@@ -1680,14 +1742,6 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         if (StrUtil.isBlank(request.getToAddr())) throw new CrmebException("请填写寄件人地址");
     }
 
-    /**
-     * 送货上门
-     *
-     * @param request    StoreOrderSendRequest 发货参数
-     * @param storeOrder StoreOrder 订单信息
-     * @author Mr.Zhang
-     * @since 2020-06-10
-     */
     private void delivery(StoreOrderSendRequest request, StoreOrder storeOrder) {
         if (StrUtil.isBlank(request.getDeliveryName())) throw new CrmebException("请输入送货人姓名");
         if (StrUtil.isBlank(request.getDeliveryTel())) throw new CrmebException("请输入送货人电话号码");
@@ -1717,7 +1771,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
             // 更新订单
             updateById(storeOrder);
             // 订单记录增加
-            storeOrderStatusService.createLog(request.getId(), Constants.ORDER_LOG_EXPRESS, message);
+            storeOrderStatusService.createLog(request.getId(), Constants.ORDER_LOG_EXPRESS, message, 1);
             return Boolean.TRUE;
         });
         if (!execute) throw new CrmebException("订单更新送货失败");
@@ -1785,14 +1839,6 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         }
     }
 
-    /**
-     * 虚拟
-     *
-     * @param request    StoreOrderSendRequest 发货参数
-     * @param storeOrder StoreOrder 订单信息
-     * @author Mr.Zhang
-     * @since 2020-06-10
-     */
     private void virtual(StoreOrderSendRequest request, StoreOrder storeOrder) {
         //快递信息
         storeOrder.setDeliveryType("fictitious");
@@ -1801,7 +1847,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         Boolean execute = transactionTemplate.execute(i -> {
             updateById(storeOrder);
             //订单记录增加
-            storeOrderStatusService.createLog(request.getId(), Constants.ORDER_LOG_DELIVERY_VI, "虚拟物品发货");
+            storeOrderStatusService.createLog(request.getId(), Constants.ORDER_LOG_DELIVERY_VI, "虚拟物品发货", 1);
             return Boolean.TRUE;
         });
         if (!execute) throw new CrmebException("虚拟物品发货失败");
@@ -1948,6 +1994,10 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
             case Constants.ORDER_STATUS_DELETED: //已删除
                 queryWrapper.eq("is_del", 1);
                 break;
+            case Constants.ORDER_STATUS_APPLY_REFUNDING_RETURN: //申请退货退款
+                queryWrapper.in("refund_status", Lists.newArrayList(1, 4, 5));
+                queryWrapper.eq("refund_type", 1);
+                break;
             default:
                 queryWrapper.eq("paid", 1);
                 queryWrapper.ne("refund_status", 2);
@@ -2017,6 +2067,10 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
             case Constants.ORDER_STATUS_DELETED: //已删除
                 queryWrapper.eq("is_del", 1);
                 break;
+            case Constants.ORDER_STATUS_APPLY_REFUNDING_RETURN: //申请退货退款
+                queryWrapper.in("refund_status", Lists.newArrayList(1, 4, 5));
+                queryWrapper.eq("refund_type", 1);
+                break;
             default:
                 queryWrapper.eq("paid", 1);
                 queryWrapper.ne("refund_status", 2);
@@ -2025,13 +2079,6 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         queryWrapper.eq("is_system_del", 0);
     }
 
-    /**
-     * 获取订单状态
-     *
-     * @param storeOrder StoreOrder 订单信息
-     * @author Mr.Zhang
-     * @since 2020-06-12
-     */
     private Map<String, String> getStatus(StoreOrder storeOrder) {
         Map<String, String> map = new HashMap<>();
         map.put("key", "");
@@ -2051,8 +2098,12 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         }
         // 未发货
         if (storeOrder.getPaid()
-                && storeOrder.getStatus() == 0
-                && storeOrder.getRefundStatus() == 0
+                && ((storeOrder.getStatus() == 0 || storeOrder.getRefundStatus() == 6 || storeOrder.getRefundStatus() == 7)
+                && storeOrder.getRefundStatus() != 1
+                && storeOrder.getRefundStatus() != 2
+                && storeOrder.getRefundStatus() != 3
+                && storeOrder.getRefundStatus() != 4
+                && storeOrder.getRefundStatus() != 5)
                 && storeOrder.getShippingType() == 1
                 && !storeOrder.getIsDel()
                 && !storeOrder.getIsSystemDel()) {
@@ -2062,8 +2113,12 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         }
         // 待收货
         if (storeOrder.getPaid()
-                && storeOrder.getStatus() == 1
-                && storeOrder.getRefundStatus() == 0
+                && ((storeOrder.getStatus() == 1 || storeOrder.getRefundStatus() == 6 || storeOrder.getRefundStatus() == 7)
+                && storeOrder.getRefundStatus() != 1
+                && storeOrder.getRefundStatus() != 2
+                && storeOrder.getRefundStatus() != 3
+                && storeOrder.getRefundStatus() != 4
+                && storeOrder.getRefundStatus() != 5)
                 && storeOrder.getShippingType() == 1
                 && !storeOrder.getIsDel()
                 && !storeOrder.getIsSystemDel()) {
@@ -2073,8 +2128,12 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         }
         // 待评价
         if (storeOrder.getPaid()
-                && storeOrder.getStatus() == 2
-                && storeOrder.getRefundStatus() == 0
+                && ((storeOrder.getStatus() == 2 || storeOrder.getRefundStatus() == 6 || storeOrder.getRefundStatus() == 7)
+                && storeOrder.getRefundStatus() != 1
+                && storeOrder.getRefundStatus() != 2
+                && storeOrder.getRefundStatus() != 3
+                && storeOrder.getRefundStatus() != 4
+                && storeOrder.getRefundStatus() != 5)
                 && !storeOrder.getIsDel()
                 && !storeOrder.getIsSystemDel()) {
             map.put("key", Constants.ORDER_STATUS_BARGAIN);
@@ -2083,7 +2142,12 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         }
         // 交易完成
         if (storeOrder.getPaid()
-                && storeOrder.getStatus() == 3
+                && ((storeOrder.getStatus() == 3 || storeOrder.getRefundStatus() == 6 || storeOrder.getRefundStatus() == 7)
+                && storeOrder.getRefundStatus() != 1
+                && storeOrder.getRefundStatus() != 2
+                && storeOrder.getRefundStatus() != 3
+                && storeOrder.getRefundStatus() != 4
+                && storeOrder.getRefundStatus() != 5)
                 && storeOrder.getRefundStatus() == 0
                 && !storeOrder.getIsDel()
                 && !storeOrder.getIsSystemDel()) {
@@ -2107,9 +2171,15 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         if (storeOrder.getPaid()
                 && storeOrder.getRefundStatus() == 1
                 && !storeOrder.getIsDel()
-                && !storeOrder.getIsSystemDel()) {
-            map.put("key", Constants.ORDER_STATUS_APPLY_REFUNDING);
-            map.put("value", Constants.ORDER_STATUS_STR_APPLY_REFUNDING);
+                && !storeOrder.getIsSystemDel()
+                && Objects.nonNull(storeOrder.getRefundType())) {
+            if (storeOrder.getRefundType().equals(0)) {
+                map.put("key", Constants.ORDER_STATUS_APPLY_REFUNDING);
+                map.put("value", Constants.ORDER_STATUS_STR_APPLY_REFUNDING);
+            } else {
+                map.put("key", Constants.ORDER_STATUS_APPLY_REFUNDING_RETURN);
+                map.put("value", Constants.ORDER_STATUS_STR_APPLY_REFUNDING_RETURN);
+            }
             return map;
         }
 
@@ -2136,6 +2206,24 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         if (storeOrder.getIsDel() || storeOrder.getIsSystemDel()) {
             map.put("key", Constants.ORDER_STATUS_DELETED);
             map.put("value", Constants.ORDER_STATUS_STR_DELETED);
+        }
+
+        //退货待发货
+        if (storeOrder.getPaid()
+                && storeOrder.getRefundStatus() == 4
+                && !storeOrder.getIsDel()
+                && !storeOrder.getIsSystemDel()) {
+            map.put("key", Constants.ORDER_STATUS_APPLY_WAIT_FOR_SHIP);
+            map.put("value", Constants.ORDER_STATUS_STR_APPLY_WAIT_FOR_SHIP);
+        }
+
+        //退货已发货
+        if (storeOrder.getPaid()
+                && storeOrder.getRefundStatus() == 5
+                && !storeOrder.getIsDel()
+                && !storeOrder.getIsSystemDel()) {
+            map.put("key", Constants.ORDER_STATUS_APPLY_SHIPPING);
+            map.put("value", Constants.ORDER_STATUS_STR_APPLY_SHIPPING);
         }
 
         return map;

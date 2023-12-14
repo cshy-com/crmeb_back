@@ -29,21 +29,11 @@ public class HomeServiceImpl implements HomeService {
     @Autowired
     private UserVisitRecordService userVisitRecordService;
 
-    /**
-     * 用户曲线图
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     */
     @Override
     public Map<Object, Object> chartUser() {
         return dataFormat(userService.getAddUserCountGroupDate(Constants.SEARCH_DATE_LATELY_30), Constants.SEARCH_DATE_LATELY_30);
     }
 
-    /**
-     * 订单量趋势
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     */
     @Override
     public Map<String, Object> chartOrder() {
         Map<String, Object> map = new HashMap<>();
@@ -59,13 +49,6 @@ public class HomeServiceImpl implements HomeService {
         return map;
     }
 
-    /**
-     * 按开始结束时间查询每日新增订单数量
-     * @param list List<StoreOrder> 时间范围
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return HashMap<String, Object>
-     */
     private Map<Object, Object> getOrderCountGroupByDate(List<StoreOrder> list) {
         Map<Object, Object> map = new HashMap<>();
 
@@ -80,13 +63,6 @@ public class HomeServiceImpl implements HomeService {
         return map;
     }
 
-    /**
-     * 按开始结束时间查询每日新增订单销售额
-     * @param list List<StoreOrder> 时间范围
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return HashMap<String, Object>
-     */
     private Map<Object, Object> getOrderPriceGroupByDate(List<StoreOrder> list) {
         Map<Object, Object> map = new HashMap<>();
 
@@ -101,12 +77,6 @@ public class HomeServiceImpl implements HomeService {
         return map;
     }
 
-    /**
-     * 日期和数量格式化
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return Map<String, Integer>
-     */
     private Map<Object, Object> dataFormat(Map<Object, Object> countGroupDate, String dateLimit) {
         Map<Object, Object> map = new LinkedHashMap<>();
         List<String> listDate = DateUtil.getListDate(dateLimit);
@@ -143,12 +113,6 @@ public class HomeServiceImpl implements HomeService {
         return map;
     }
 
-    /**
-     * 日期和数量格式化
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return Map<String, Integer>
-     */
     private Map<Object, Object> dataFormatYear(Map<Object, Object> countGroupDate, String dateLimit) {
         Map<Object, Object> map = new LinkedHashMap<>();
         List<Object> listDate = new ArrayList<>();
@@ -185,11 +149,6 @@ public class HomeServiceImpl implements HomeService {
         return map;
     }
 
-    /**
-     * 用户购买统计
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     */
     @Override
     public Map<String, Integer> chartUserBuy() {
         Map<String, Integer> map = new HashMap<>();
@@ -208,12 +167,6 @@ public class HomeServiceImpl implements HomeService {
         return map;
     }
 
-    /**
-     * 周订单量趋势
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return Map<String, Object>
-     */
     @Override
     public Map<String, Object> chartOrderInWeek() {
         return returnOrderDate(Constants.SEARCH_DATE_WEEK, Constants.SEARCH_DATE_PRE_WEEK, Constants.NUM_TEN);
@@ -221,23 +174,11 @@ public class HomeServiceImpl implements HomeService {
 
     }
 
-    /**
-     * 月订单量趋势
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return Map<String, Object>
-     */
     @Override
     public Map<String, Object> chartOrderInMonth() {
         return returnOrderDate(Constants.SEARCH_DATE_MONTH, Constants.SEARCH_DATE_PRE_MONTH, Constants.NUM_TEN);
     }
 
-    /**
-     * 年订单量趋势
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return Map<String, Object>
-     */
     @Override
     public Map<String, Object> chartOrderInYear() {
         Map<String, Object> map = new HashMap<>();
@@ -290,12 +231,6 @@ public class HomeServiceImpl implements HomeService {
         return response;
     }
 
-    /**
-     * 组装订单统计返回数据
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return Map<String, Object>
-     */
     private Map<String, Object> returnOrderDate(String dateLimit, String preDateLimit, int leftTime) {
         Map<String, Object> map = new HashMap<>();
 

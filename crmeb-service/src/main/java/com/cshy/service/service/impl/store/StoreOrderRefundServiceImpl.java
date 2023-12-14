@@ -32,11 +32,6 @@ public class StoreOrderRefundServiceImpl extends ServiceImpl<StoreOrderDao, Stor
     @Autowired
     private WechatNewService wechatNewService;
 
-    /**
-     * 退款 需要优化
-     * @author Mr.Zhang
-     * @since 2020-06-03
-     */
     @Override
     public void refund(StoreOrderRefundRequest request, StoreOrder storeOrder) {
         refundWx(request, storeOrder);

@@ -141,13 +141,6 @@ public class SystemGroupDataServiceImpl extends ServiceImpl<SystemGroupDataDao, 
         return arrayList;
     }
 
-    /**
-      * 通过gid获取列表
-      * @param gid Integer group id
-      * @author Mr.Zhang
-      * @since 2020-05-15
-      * @return List<HashMap<String, Object>>
-      */
     @Override
     public List<HashMap<String, Object>> getListMapByGid(Integer gid) {
         SystemGroupDataSearchRequest systemGroupDataSearchRequest = new SystemGroupDataSearchRequest();

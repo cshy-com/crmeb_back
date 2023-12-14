@@ -74,14 +74,6 @@ public class UserExtractServiceImpl extends ServiceImpl<UserExtractDao, UserExtr
     private UserBrokerageRecordService userBrokerageRecordService;
 
 
-    /**
-    * 列表
-    * @param request 请求参数
-    * @param pageParamRequest 分页类参数
-    * @author Mr.Zhang
-    * @since 2020-05-11
-    * @return List<UserExtract>
-    */
     @Override
     public List<UserExtract> getList(UserExtractSearchRequest request, PageParamRequest pageParamRequest) {
         PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
@@ -165,23 +157,11 @@ public class UserExtractServiceImpl extends ServiceImpl<UserExtractDao, UserExtr
     }
 
 
-    /**
-     * 提现总金额
-     * @author Mr.Zhang
-     * @since 2020-05-11
-     * @return BalanceResponse
-     */
     @Override
     public BigDecimal getWithdrawn(String startTime, String endTime) {
         return getSum(null, 1, startTime, endTime);
     }
 
-    /**
-     * 审核中总金额
-     * @author Mr.Zhang
-     * @since 2020-05-11
-     * @return BalanceResponse
-     */
     private BigDecimal getWithdrawning(String startTime, String endTime) {
         return getSum(null, 0, startTime, endTime);
     }

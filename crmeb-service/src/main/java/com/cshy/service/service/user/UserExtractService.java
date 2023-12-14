@@ -26,12 +26,6 @@ public interface UserExtractService extends IService<UserExtract> {
      */
     BalanceResponse getBalance(String dateLimit);
 
-    /**
-     * 提现总金额
-     * @author Mr.Zhang
-     * @since 2020-05-11
-     * @return BalanceResponse
-     */
     BigDecimal getWithdrawn(String startTime,String endTime);
 
     UserExtractResponse getUserExtractByUserId(Integer userId);

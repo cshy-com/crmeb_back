@@ -142,4 +142,16 @@ public class StoreOrderInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "退款收货状态 0 未收货 1 已收货")
     private Integer refundReceivingStatus;
+
+    @ApiModelProperty(value = "退货留言")
+    private String returnRemark;
+
+    @ApiModelProperty(value = "退货图片")
+    private String returnImg;
+
+    @ApiModelProperty(value = "退货单号")
+    private String refundTrackingNo;
+
+    @ApiModelProperty(value = "退货收件电话")
+    private String returnMobile;
 }

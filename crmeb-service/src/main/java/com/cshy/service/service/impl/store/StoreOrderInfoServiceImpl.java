@@ -35,13 +35,6 @@ public class StoreOrderInfoServiceImpl extends ServiceImpl<StoreOrderInfoDao, St
     @Autowired
     private StoreProductReplyService storeProductReplyService;
 
-    /**
-     * 根据id集合查询数据，返回 map
-     * @param orderList List<Integer> id集合
-     * @author Mr.Zhang
-     * @since 2020-04-17
-     * @return HashMap<Integer, StoreCart>
-     */
     @Override
     public HashMap<Integer, List<StoreOrderInfoOldVo>> getMapInId(List<Integer> orderList){
         HashMap<Integer, List<StoreOrderInfoOldVo>> map = new HashMap<>();
@@ -70,13 +63,6 @@ public class StoreOrderInfoServiceImpl extends ServiceImpl<StoreOrderInfoDao, St
         return map;
     }
 
-    /**
-     * 根据id集合查询数据，返回 map
-     * @param orderId Integer id
-     * @author Mr.Zhang
-     * @since 2020-04-17
-     * @return HashMap<Integer, StoreCart>
-     */
     @Override
     public List<StoreOrderInfoOldVo> getOrderListByOrderId(Integer orderId){
         LambdaQueryWrapper<StoreOrderInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();

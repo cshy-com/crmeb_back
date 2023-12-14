@@ -6,7 +6,6 @@ import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.store.StoreOrderRefundRequest;
 import com.cshy.common.model.request.store.StoreOrderSearchRequest;
-import com.cshy.common.model.request.store.StoreOrderSendRequest;
 import com.cshy.common.model.request.store.StoreOrderUpdatePriceRequest;
 import com.cshy.common.model.request.system.SystemWriteOffOrderSearchRequest;
 import com.cshy.common.model.response.*;
@@ -39,23 +38,16 @@ public interface StoreOrderService extends IService<StoreOrder> {
      */
     SystemWriteOffOrderResponse getWriteOffList(SystemWriteOffOrderSearchRequest request, PageParamRequest pageParamRequest);
 
-    /**
-     * 累计消费
-     * @param userId Integer 用户id
-     * @author Mr.Zhang
-     * @since 2020-06-10
-     * @return UserBalanceResponse
-     */
     BigDecimal getSumBigDecimal(Integer userId, String date);
 
     /**
      * H5订单列表
      * @param uid 用户uid
-     * @param status 评价等级|0=未支付,1=待发货,2=待收货,3=待评价,4=已完成,-3=售后/退款
+     * @param params 查询参数
      * @param pageParamRequest 分页参数
      * @return 订单结果列表
      */
-    List<StoreOrder> getUserOrderList(Integer uid, Integer status, PageParamRequest pageParamRequest);
+    List<StoreOrder> getUserOrderList(Integer uid, Map<String, Object> params, PageParamRequest pageParamRequest);
     /**
      * 创建订单
      * @param storeOrder 订单参数
@@ -373,4 +365,10 @@ public interface StoreOrderService extends IService<StoreOrder> {
      * @param spreadId 推广人uid
      */
     OrderBrokerageData getBrokerageData(Integer uid, Integer spreadId);
+
+    Boolean refundNReturn(StoreOrderRefundRequest request);
+
+    Boolean returnShip(String orderId, String trackingNo, String remark, String img);
+
+    Boolean returnArrived(String orderId);
 }

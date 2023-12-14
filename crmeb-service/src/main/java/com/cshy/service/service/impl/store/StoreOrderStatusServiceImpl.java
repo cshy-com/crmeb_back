@@ -52,7 +52,56 @@ public class StoreOrderStatusServiceImpl extends ServiceImpl<StoreOrderStatusDao
         LambdaQueryWrapper<StoreOrderStatus> lqw = new LambdaQueryWrapper<>();
         lqw.eq(StoreOrderStatus::getOid, storeOrder.getId());
         lqw.orderByDesc(StoreOrderStatus::getCreateTime);
-        return dao.selectList(lqw);
+        List<StoreOrderStatus> storeOrderStatuses = dao.selectList(lqw);
+        storeOrderStatuses.forEach(storeOrderStatus -> {
+            String type;
+            switch (storeOrderStatus.getChangeType()){
+                case Constants.ORDER_LOG_REFUND_REFUSE:
+                    if (storeOrder.getRefundType().equals(0))
+                        type = "退款被拒绝";
+                    else
+                        type = "退货退款被拒绝";
+                    break;
+                case Constants.ORDER_LOG_PAY_SUCCESS:
+                    type = "支付成功";
+                    break;
+                case Constants.ORDER_LOG_EXPRESS:
+                    type = "已发货";
+                    break;
+                case Constants.ORDER_LOG_EDIT:
+                    type = "编辑订单";
+                    break;
+                case Constants.ORDER_LOG_REFUND_PRICE:
+                    type = "退款";
+                    break;
+                case Constants.ORDER_STATUS_CACHE_CREATE_ORDER:
+                    type = "订单生成";
+                    break;
+                case Constants.ORDER_LOG_RETURN_GOODS:
+                    type = "退货中";
+                    break;
+                case Constants.ORDER_LOG_REFUND_APPLY:
+                    if (storeOrder.getRefundType().equals(0))
+                        type = "申请退款";
+                    else
+                        type = "申请退货退款";
+                    storeOrderStatus.setChangeMessage(storeOrderStatus.getChangeMessage() + "，原因：" + storeOrder.getRefundReasonWapExplain());
+                    break;
+                case Constants.ORDER_LOG_AGREE_RETURN:
+                    type = "平台同意退货退款";
+                    break;
+                case Constants.ORDER_LOG_AGREE_REFUND:
+                    type = "平台同意退款";
+                    break;
+                case Constants.ORDER_LOG_REFUND_REVOKE:
+                    type = "用户撤销售后";
+                    break;
+                default:
+                    type = "系统操作";
+            }
+            storeOrderStatus.setChangeType(type);
+        });
+        return storeOrderStatuses;
     }
 
     /**
@@ -73,6 +122,7 @@ public class StoreOrderStatusServiceImpl extends ServiceImpl<StoreOrderStatusDao
         storeOrderStatus.setOid(orderId);
         storeOrderStatus.setChangeType(Constants.ORDER_LOG_REFUND_PRICE);
         storeOrderStatus.setChangeMessage(changeMessage);
+        storeOrderStatus.setIsSysUser(1);
         return save(storeOrderStatus);
     }
 
@@ -84,12 +134,13 @@ public class StoreOrderStatusServiceImpl extends ServiceImpl<StoreOrderStatusDao
      * @return Boolean
      */
     @Override
-    public Boolean createLog(Integer orderId, String type, String message) {
+    public Boolean createLog(Integer orderId, String type, String message, Integer isSysUser) {
         StoreOrderStatus storeOrderStatus = new StoreOrderStatus();
         storeOrderStatus.setOid(orderId);
         storeOrderStatus.setChangeType(type);
         storeOrderStatus.setChangeMessage(message);
         storeOrderStatus.setCreateTime(DateUtil.nowDateTime());
+        storeOrderStatus.setIsSysUser(isSysUser);
         return save(storeOrderStatus);
     }
 

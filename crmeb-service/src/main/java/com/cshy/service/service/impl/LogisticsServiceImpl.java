@@ -51,14 +51,6 @@ public class LogisticsServiceImpl implements LogisticService {
     private String expressNo;
 
 
-    /** 快递
-     * @param expressNo String 物流单号
-     * @param type String 快递公司字母简写：不知道可不填 95%能自动识别，填写查询速度会更快 https://market.aliyun.com/products/56928004/cmapi021863.html#sku=yuncode15863000015
-     * @param com 快递公司编号
-     * @author Mr.Zhang
-     * @since 2020-06-10
-     * @return Express
-     */
     @Override
     public LogisticsResultVo info(String expressNo, String type, String com, String phone) {
         LogisticsResultVo resultVo = new LogisticsResultVo();
@@ -126,11 +118,6 @@ public class LogisticsServiceImpl implements LogisticService {
         return resultVo;
     }
 
-    /** 获取快递缓存
-     * @author Mr.Zhang
-     * @since 2020-07-06
-     * @return JSONObject
-     */
     private JSONObject getCache() {
         Object data = redisUtil.get(getRedisKey() + getExpressNo());
         if(null != data){
@@ -139,20 +126,10 @@ public class LogisticsServiceImpl implements LogisticService {
         return null;
     }
 
-    /** 获取快递缓存
-     * @param data JSONObject 需要保存的数据
-     * @author Mr.Zhang
-     * @since 2020-07-06
-     */
     private void saveCache(JSONObject data) {
         redisUtil.set(getRedisKey() + getExpressNo(), data.toJSONString(), getRedisCacheSeconds(), TimeUnit.SECONDS);
     }
 
-    /** 获取快递缓存
-     * @param data JSONObject 检测返回的结果
-     * @author Mr.Zhang
-     * @since 2020-07-06
-     */
     private void checkResult(JSONObject data) {
         if (!"0".equals(data.getString("status"))){
             throw new CrmebException(data.getString("msg"));

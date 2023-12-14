@@ -307,27 +307,11 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
         return userSignInfoResponse;
     }
 
-    /**
-     * 检测今天是否签到
-     *
-     * @param userId Integer 用户id
-     * @return UserSignInfoResponse
-     * @author Mr.Zhang
-     * @since 2020-05-29
-     */
     private Boolean checkDaySign(Integer userId) {
         List<UserSign> userSignList = getInfoByDay(userId, DateUtil.nowDate(Constants.DATE_FORMAT_DATE));
         return userSignList.size() != 0;
     }
 
-    /**
-     * 检测昨天天是否签到
-     *
-     * @param userId Integer 用户id
-     * @return UserSignInfoResponse
-     * @author Mr.Zhang
-     * @since 2020-05-29
-     */
     private Boolean checkYesterdaySign(Integer userId) {
         String day = DateUtil.nowDate(Constants.DATE_FORMAT_DATE);
         String yesterday = DateUtil.addDay(day, -1, Constants.DATE_FORMAT_DATE);
@@ -335,29 +319,12 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
         return userSignList.size() != 0;
     }
 
-    /**
-     * 根据日期查询数据
-     *
-     * @param userId Integer 用户id
-     * @param date   Date 日期
-     * @return UserSignInfoResponse
-     * @author Mr.Zhang
-     * @since 2020-05-29
-     */
     private List<UserSign> getInfoByDay(Integer userId, String date) {
         LambdaQueryWrapper<UserSign> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(UserSign::getUid, userId).eq(UserSign::getType, 1).eq(UserSign::getCreateDay, date);
         return dao.selectList(lambdaQueryWrapper);
     }
 
-    /**
-     * 累计签到次数
-     *
-     * @param userId Integer 用户id
-     * @return UserSignInfoResponse
-     * @author Mr.Zhang
-     * @since 2020-05-29
-     */
     private Integer getCount(Integer userId) {
         LambdaQueryWrapper<UserSign> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(UserSign::getUid, userId).eq(UserSign::getType, 1);
@@ -378,14 +345,6 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
         return dao.selectOne(lqw);
     }
 
-    /**
-     * 累计签到天数
-     *
-     * @param userId Integer 用户id
-     * @return Integer
-     * @author Mr.Zhang
-     * @since 2020-04-30
-     */
     private Integer signCount(Integer userId) {
         LambdaQueryWrapper<UserSign> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(UserSign::getUid, userId);

@@ -92,12 +92,6 @@ public class StoreCouponServiceImpl extends ServiceImpl<StoreCouponDao, StoreCou
         return dao.selectList(lambdaQueryWrapper);
     }
 
-    /**
-     * 保存优惠券表
-     * @param request StoreCouponRequest 新增参数
-     * @author Mr.Zhang
-     * @since 2020-05-18
-     */
     @Override
     public boolean create(StoreCouponRequest request) {
         StoreCoupon storeCoupon = new StoreCoupon();
@@ -149,12 +143,6 @@ public class StoreCouponServiceImpl extends ServiceImpl<StoreCouponDao, StoreCou
         return storeCoupon;
     }
 
-    /**
-     * 检测当前优惠券是否正常
-     * @param storeCoupon StoreCoupon 优惠券对象`
-     * @author Mr.Zhang
-     * @since 2020-05-18
-     */
     private void checkException(StoreCoupon storeCoupon) {
         if (storeCoupon == null || storeCoupon.getIsDel() || !storeCoupon.getStatus()) {
             throw new CrmebException("优惠券信息不存在或者已失效！");

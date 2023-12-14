@@ -270,12 +270,6 @@ public class UploadServiceImpl implements UploadService {
     }
 
 
-    public static final String upload(String baseDir, MultipartFile file, String[] allowedExtension) throws IOException {
-        String absPath = "https://www.bankservice.shop/home/file/xxxxx.png";
-        file.transferTo(Paths.get(absPath));
-        return "xxxxxx";
-    }
-
     /**
      * 文件长传
      * @param multipartFile 文件

@@ -204,13 +204,6 @@ public class StoreCouponUserServiceImpl extends ServiceImpl<StoreCouponUserDao, 
         }
     }
 
-    /**
-     * 用户已领取的优惠券
-     * @param userId Integer 用户id
-     * @author Mr.Zhang
-     * @since 2020-05-18
-     * @return boolean
-     */
     @Override
     public HashMap<Integer, StoreCouponUser>  getMapByUserId(Integer userId) {
         List<StoreCouponUser> list = findListByUid(userId);

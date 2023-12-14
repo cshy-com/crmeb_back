@@ -171,6 +171,7 @@ public class FrontTokenComponent {
                 "api/front/express/findExpressDetail",
                 "api/front/url/shortener/expand",
                 "api/front/url/shortener/shorten",
+                "api/front/common/contact/phone",
         };
 
         return ArrayUtils.contains(routerList, uri);

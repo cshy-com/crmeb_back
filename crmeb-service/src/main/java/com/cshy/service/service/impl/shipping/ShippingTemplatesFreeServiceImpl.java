@@ -32,14 +32,6 @@ public class ShippingTemplatesFreeServiceImpl extends ServiceImpl<ShippingTempla
 
     private List<Integer> cityIdList;
 
-    /**
-     * 保存配送区域
-     * @param shippingTemplatesFreeRequestList List<ShippingTemplatesFreeRequest> 运费集合
-     * @param type Integer 计费方式
-     * @param tempId Integer 运费模板id
-     * @author Mr.Zhang
-     * @since 2020-05-20
-     */
     @Async
     @Override
     public void saveAll(List<ShippingTemplatesFreeRequest> shippingTemplatesFreeRequestList, Integer type, Integer tempId) {
@@ -76,12 +68,6 @@ public class ShippingTemplatesFreeServiceImpl extends ServiceImpl<ShippingTempla
         delete(tempId);
     }
 
-    /**
-     * 获取所有城市cityId
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     * @return List<Integer>
-     */
     private List<Integer> getCityIdList() {
         if(this.cityIdList == null || this.cityIdList.size() < 1){
             this.cityIdList = systemCityService.getCityIdList();
@@ -89,12 +75,6 @@ public class ShippingTemplatesFreeServiceImpl extends ServiceImpl<ShippingTempla
         return this.cityIdList;
     }
 
-    /**
-     * 把模板下的所有数据标记为无效
-     * @param tempId Integer 运费模板id
-     * @author Mr.Zhang
-     * @since 2020-05-20
-     */
     private void updateStatus(Integer tempId) {
         LambdaQueryWrapper<ShippingTemplatesFree> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(ShippingTemplatesFree::getTempId, tempId);

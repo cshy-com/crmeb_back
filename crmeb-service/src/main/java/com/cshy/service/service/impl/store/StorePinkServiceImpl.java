@@ -79,14 +79,6 @@ public class StorePinkServiceImpl extends ServiceImpl<StorePinkDao, StorePink> i
     private SystemNotificationService systemNotificationService;
 
 
-    /**
-    * 列表
-    * @param request 请求参数
-    * @param pageParamRequest 分页类参数
-    * @author HZW
-    * @since 2020-11-13
-    * @return List<StorePink>
-    */
     @Override
     public PageInfo<StorePinkAdminListResponse> getList(StorePinkSearchRequest request, PageParamRequest pageParamRequest) {
         Page<StorePink> pinkPage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());

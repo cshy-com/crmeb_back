@@ -43,14 +43,6 @@ public class ShippingTemplatesServiceImpl extends ServiceImpl<ShippingTemplatesD
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    /**
-    * 列表
-    * @param request 请求参数
-    * @param pageParamRequest 分页类参数
-    * @author Mr.Zhang
-    * @since 2020-04-17
-    * @return List<ShippingTemplates>
-    */
     @Override
     public List<ShippingTemplates> getList(ShippingTemplatesSearchRequest request, PageParamRequest pageParamRequest) {
         PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
@@ -62,13 +54,6 @@ public class ShippingTemplatesServiceImpl extends ServiceImpl<ShippingTemplatesD
         return dao.selectList(lambdaQueryWrapper);
     }
 
-    /**
-     * 新增
-     * @param request 新增参数
-     * @author Mr.Zhang
-     * @since 2020-04-17
-     * @return bool
-     */
     @Override
     public Boolean create(ShippingTemplatesRequest request) {
         // 判断模板名称是否重复

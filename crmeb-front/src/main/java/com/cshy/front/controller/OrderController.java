@@ -1,5 +1,6 @@
 package com.cshy.front.controller;
 
+import cn.hutool.core.lang.Assert;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.order.OrderComputedPriceRequest;
@@ -71,18 +72,22 @@ public class OrderController {
     /**
      * 订单列表
      *
-     * @param type        类型
-     * @param pageRequest 分页
+     * @param params    type : 评价等级|0=未支付,1=待发货,2=待收货,3=待评价,4=已完成,-3=售后/退款\n" +
+     *                     "condition: 查询条件 orderId/商品名称\n startDate、endDate: 查询时间区间
      * @return 订单列表
      */
     @ApiOperation(value = "订单列表")
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "评价等级|0=未支付,1=待发货,2=待收货,3=待评价,4=已完成,-3=售后/退款", required = true)
+            @ApiImplicitParam(name = "params", value = "type : 评价等级|0=未支付,1=待发货,2=待收货,3=待评价,4=已完成,-3=售后/退款\n" +
+                    "condition: 查询条件 orderId/商品名称\n startDate、endDate: 查询时间区间", required = true)
     })
-    public CommonResult<CommonPage<OrderDetailResponse>> orderList(@RequestParam(name = "type") Integer type,
-                                                                   @ModelAttribute PageParamRequest pageRequest) {
-        return CommonResult.success(orderService.list(type, pageRequest));
+    public CommonResult<CommonPage<OrderDetailResponse>> orderList(@RequestBody Map<String, Object> params) {
+        PageParamRequest pageRequest = new PageParamRequest();
+        pageRequest.setLimit((Integer) params.get("limit"));
+        pageRequest.setPage((Integer) params.get("page"));
+
+        return CommonResult.success(orderService.list(params, pageRequest));
     }
 
     /**
@@ -245,9 +250,27 @@ public class OrderController {
         return CommonResult.success(orderService.getPayConfig());
     }
 
-    @ApiOperation(value = "查询申请退款列表")
-    @RequestMapping(value = "/refund/list", method = RequestMethod.GET)
+    @ApiOperation(value = "查询订单操作记录")
+    @RequestMapping(value = "/operation/list", method = RequestMethod.GET)
     public CommonResult<List<Map<String, Object>>> refundList(@RequestParam Integer id) {
-        return CommonResult.success(orderService.refundList(id));
+        return CommonResult.success(orderService.operationList(id));
     }
+
+
+    @ApiOperation(value = "退货发货")
+    @RequestMapping(value = "/refund/ship", method = RequestMethod.POST)
+    public CommonResult<Boolean> returnShip(@RequestBody Map<String, Object> params) {
+        Assert.notNull(params.get("orderId"), "订单编号不能为空");
+        Assert.notNull(params.get("trackingNo"), "快递单号不能为空");
+
+        return CommonResult.success(orderService.returnShip((String) params.get("orderId"), (String) params.get("trackingNo"), (String) params.get("remark"), (String) params.get("img")));
+    }
+
+    @ApiOperation(value = "撤销售后")
+    @RequestMapping(value = "/refund/revoke", method = RequestMethod.GET)
+    public CommonResult<String> refundRevoke(@RequestParam String orderId) {
+        orderService.refundRevoke(orderId);
+        return CommonResult.success();
+    }
+
 }

@@ -62,11 +62,6 @@ public class OrderTaskServiceImpl implements OrderTaskService {
     @Autowired
     private OrderPayService orderPayService;
 
-    /**
-     * 用户取消订单
-     * @author Mr.Zhang
-     * @since 2020-07-09
-     */
     @Override
     public void cancelByUser() {
         String redisKey = Constants.ORDER_TASK_REDIS_KEY_AFTER_CANCEL_BY_USER;
@@ -98,11 +93,6 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         return JSONObject.toJavaObject(JSONObject.parseObject(data.toString()), StoreOrder.class);
     }
 
-    /**
-     * 执行 用户退款申请
-     * @author Mr.Zhang
-     * @since 2020-07-09
-     */
     @Override
     public void refundApply() {
         String redisKey = Constants.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER;
@@ -133,11 +123,6 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         }
     }
 
-    /**
-     * 完成订单
-     * @author Mr.Zhang
-     * @since 2020-07-09
-     */
     @Override
     public void complete() {
         String redisKey = Constants.ORDER_TASK_REDIS_KEY_AFTER_COMPLETE_BY_USER;

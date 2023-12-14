@@ -128,14 +128,6 @@ public class SystemFormTempServiceImpl extends ServiceImpl<SystemFormTempDao, Sy
         return updateById(systemFormTemp);
     }
 
-    /**
-     * 验证item规则
-     * @param regList List<SystemConfigFormItemConfigRegListVo 正则表达式列表
-     * @param value String 验证的值
-     * @param name String 提示语字段名称
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     private void checkRule(List<SystemConfigFormItemConfigRegListVo> regList, String value, String name) {
         if(regList.size() > 0) {
             for (SystemConfigFormItemConfigRegListVo systemConfigFormItemConfigRegListVo : regList) {

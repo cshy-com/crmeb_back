@@ -23,14 +23,6 @@ public class WechatUserServiceImpl implements WechatUserService {
     private UserTokenService userTokenService;
 
 
-//    /**
-//     * 消息推送
-//     * @param userId 用户id
-//     * @param newsId 图文消息id
-//     * @author Mr.Zhang
-//     * @since 2020-04-11
-//     * @return Boolean
-//     */
 //    @Override
 //    public void push(String userId, Integer newsId) {
 //        //检查文章是否存在

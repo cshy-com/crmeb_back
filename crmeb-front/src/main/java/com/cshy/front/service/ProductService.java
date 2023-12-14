@@ -36,8 +36,6 @@ public interface ProductService {
      *
      * @param id         商品编号
      * @param type       normal-正常，void-视频
-     * @param isGiftCard
-     * @param isOrder
      * @return 商品详情信息
      */
     ProductDetailResponse getDetail(Integer id, String type, Integer isGiftCard);

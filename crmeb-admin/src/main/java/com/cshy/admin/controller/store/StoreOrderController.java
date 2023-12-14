@@ -133,9 +133,9 @@ public class StoreOrderController {
      * 退款
      */
     @PreAuthorize("hasAuthority('admin:order:refund')")
-    @ApiOperation(value = "退款")
+    @ApiOperation(value = "同意退款")
     @RequestMapping(value = "/refund", method = RequestMethod.GET)
-    public CommonResult<Boolean> send(@Validated StoreOrderRefundRequest request) {
+    public CommonResult<Boolean> refund(@Validated StoreOrderRefundRequest request) {
         return CommonResult.success(storeOrderService.refund(request));
     }
 
@@ -162,12 +162,6 @@ public class StoreOrderController {
         return CommonResult.success(storeOrderService.getLogisticsInfo(orderNo));
     }
 
-    /**
-     * 核销订单头部数据
-     *
-     * @author stivepeim
-     * @since 2020-08-29
-     */
     @PreAuthorize("hasAuthority('admin:order:statistics')")
     @ApiOperation(value = "核销订单头部数据")
     @RequestMapping(value = "/statistics", method = RequestMethod.GET)
@@ -175,12 +169,6 @@ public class StoreOrderController {
         return CommonResult.success(storeOrderVerification.getOrderVerificationData());
     }
 
-    /**
-     * 核销订单 月列表数据
-     *
-     * @author stivepeim
-     * @since 2020-08-29
-     */
     @PreAuthorize("hasAuthority('admin:order:statistics:data')")
     @ApiOperation(value = "核销订单 月列表数据")
     @RequestMapping(value = "/statisticsData", method = RequestMethod.GET)
@@ -189,12 +177,6 @@ public class StoreOrderController {
     }
 
 
-    /**
-     * 核销码核销订单
-     *
-     * @author stivepeim
-     * @since 2020-09-01
-     */
     @PreAuthorize("hasAuthority('admin:order:write:update')")
     @ApiOperation(value = "核销码核销订单")
     @RequestMapping(value = "/writeUpdate/{vCode}", method = RequestMethod.GET)
@@ -202,12 +184,6 @@ public class StoreOrderController {
         return CommonResult.success(storeOrderVerification.verificationOrderByCode(vCode));
     }
 
-    /**
-     * 核销码查询待核销订单
-     *
-     * @author stivepeim
-     * @since 2020-09-01
-     */
     @PreAuthorize("hasAuthority('admin:order:write:confirm')")
     @ApiOperation(value = "核销码查询待核销订单")
     @RequestMapping(value = "/writeConfirm/{vCode}", method = RequestMethod.GET)
@@ -216,12 +192,6 @@ public class StoreOrderController {
         return CommonResult.success(storeOrderVerification.getVerificationOrderByCode(vCode));
     }
 
-    /**
-     * 订单统计详情
-     *
-     * @author stivepeim
-     * @since 2020-09-01
-     */
     @PreAuthorize("hasAuthority('admin:order:time')")
     @ApiOperation(value = "订单统计详情")
     @RequestMapping(value = "/time", method = RequestMethod.GET)
@@ -257,6 +227,18 @@ public class StoreOrderController {
         return CommonResult.success();
     }
 
+    @ApiOperation(value = "同意退货退款")
+    @RequestMapping(value = "/refund/return", method = RequestMethod.GET)
+    public CommonResult<Boolean> refundNReturn(@Validated StoreOrderRefundRequest request) {
+        return CommonResult.success(storeOrderService.refundNReturn(request));
+    }
+
+    @PreAuthorize("hasAuthority('admin:order:refund')")
+    @ApiOperation(value = "退货平台收货后退款")
+    @RequestMapping(value = "/refund/arrived", method = RequestMethod.GET)
+    public CommonResult<Boolean> returnArrived(@RequestParam String orderId) {
+        return CommonResult.success(storeOrderService.returnArrived(orderId));
+    }
 }
 
 

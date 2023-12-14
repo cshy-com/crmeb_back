@@ -25,7 +25,7 @@ public class ResponseRouter {
             data = SpringUtil.getBean(SystemAttachmentService.class).prefixImage(data);
         }
 
-        if (data.contains("file/") && !data.contains("https://www.bankservice.shop/file/")) {
+        if (data.contains("file/") && !data.contains("https://cshy.store/file/")) {
             data = SpringUtil.getBean(SystemAttachmentService.class).prefixFile(data);
         }
 

@@ -527,14 +527,6 @@ public class OnePassServiceImpl implements OnePassService {
         return list.contains(type);
     }
 
-    /**
-     * 更新sms配置信息
-     *
-     * @param account  账号
-     * @param password 密码
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     private void setConfigSmsInfo(String account, String password) {
         boolean accountResult = systemConfigService.updateOrSaveValueByName("sms_account", account);
         boolean tokenResult = systemConfigService.updateOrSaveValueByName("sms_token", password);

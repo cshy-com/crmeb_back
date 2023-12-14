@@ -36,9 +36,10 @@ public interface StoreOrderStatusService extends IService<StoreOrderStatus> {
      * @param orderId 订单id
      * @param type 类型
      * @param message 备注
+     * @param isSysUser 是否后管操作 0 否 1 是
      * @return Boolean
      */
-    Boolean createLog(Integer orderId, String type, String message);
+    Boolean createLog(Integer orderId, String type, String message, Integer isSysUser);
 
     /**
      * 根据实体参数获取
