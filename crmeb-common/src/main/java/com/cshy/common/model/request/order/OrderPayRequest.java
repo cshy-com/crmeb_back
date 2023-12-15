@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * 支付订单参数
@@ -25,7 +24,7 @@ public class OrderPayRequest {
 
     @ApiModelProperty(value = "订单编号")
     @NotNull(message = "订单编号不能为空")
-    private List<String> orderNoList;
+    private String orderNo;
 
     @ApiModelProperty(value = "支付类型：weixin-微信支付，yue-余额支付，offline-线下支付，alipay-支付包支付")
     @NotNull(message = "支付类型不能为空")
