@@ -39,20 +39,20 @@ public class SysFaqServiceImpl extends BaseServiceImpl<SysFaq, SysFaqDto, SysFaq
         super.onAfterPage(page);
     }
 
-    private void queryChildren(SysFaqVo sysFaqVo){
-        List<SysFaq> list = this.list(new LambdaQueryWrapper<SysFaq>().eq(SysFaq::getParentId, sysFaqVo.getId()));
-        while (CollUtil.isNotEmpty(list)) {
-            List<SysFaqVo> voList = Lists.newArrayList();
-            list.forEach(faq -> {
-                SysFaqVo childSysFaqVo = new SysFaqVo();
-                BeanUtils.copyProperties(faq, childSysFaqVo);
-                queryChildren(childSysFaqVo);
-                voList.add(childSysFaqVo);
-            });
-            sysFaqVo.setChildSysFaqVo(voList);
-            break;
-        }
-    }
+//    private void queryChildren(SysFaqVo sysFaqVo){
+//        List<SysFaq> list = this.list(new LambdaQueryWrapper<SysFaq>().eq(SysFaq::getParentId, sysFaqVo.getId()));
+//        while (CollUtil.isNotEmpty(list)) {
+//            List<SysFaqVo> voList = Lists.newArrayList();
+//            list.forEach(faq -> {
+//                SysFaqVo childSysFaqVo = new SysFaqVo();
+//                BeanUtils.copyProperties(faq, childSysFaqVo);
+//                queryChildren(childSysFaqVo);
+//                voList.add(childSysFaqVo);
+//            });
+//            sysFaqVo.setChildSysFaqVo(voList);
+//            break;
+//        }
+//    }
 
     @Override
     public CommonPage<String> categoryPage(BasePage basePage) {
