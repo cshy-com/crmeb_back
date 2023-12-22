@@ -241,13 +241,13 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
         Assert.notNull(storeProduct, "未查询到商品");
 
         //短信通知员工
-        smsService.sendCode(null, SmsTriggerEnum.ORDER_PLACED_TO_EMPLOYEE.getCode(), request, "礼品卡");
+        smsService.sendSMS(null, SmsTriggerEnum.ORDER_PLACED_TO_EMPLOYEE.getCode(), request, "礼品卡");
 
         //通知客户
         User user = userService.getById(dto.getUserId());
         //生成短链
         String shortenURL = shortUrlService.shortenURL("front/#/pages/gift/index?pickupCode=" + dto.getPickupCode(), 1);
-        smsService.sendCode(user.getPhone(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), request, "兑换", shortenURL.replace(domainUrl, "/"));
+        smsService.sendSMS(user.getPhone(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), request, "兑换", shortenURL.replace(domainUrl, "/"));
         return id;
     }
 

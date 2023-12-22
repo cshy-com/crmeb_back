@@ -1,6 +1,6 @@
 package com.cshy.common.model.response;
 
-import com.cshy.common.model.vo.StoreOrderInfoOldVo;
+import com.cshy.common.model.vo.order.StoreOrderInfoOldVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

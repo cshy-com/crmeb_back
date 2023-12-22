@@ -470,22 +470,6 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
             return Boolean.TRUE;
         });
         if (execute) {
-            // 发送用户确认收货管理员提醒短信
-            SystemNotification notification = systemNotificationService.getByMark(NotifyConstants.RECEIPT_GOODS_ADMIN_MARK);
-            if (notification.getIsSms().equals(1)) {
-                // 查询可已发送短信的管理员
-                List<SystemAdmin> systemAdminList = systemAdminService.findIsSmsList();
-                if (CollUtil.isNotEmpty(systemAdminList)) {
-                    SmsTemplate smsTemplate = smsTemplateService.getDetail(notification.getSmsId());
-                    //TODO 修改短信通知
-                    Integer tempId = Integer.valueOf(0);
-                    // 发送短信
-                    systemAdminList.forEach(admin -> {
-                        smsService.sendOrderReceiptNotice(admin.getPhone(), storeOrder.getOrderId(), admin.getRealName(), tempId);
-                    });
-                }
-            }
-
             // 发送消息通知
             pushMessageOrder(storeOrder, user);
         }

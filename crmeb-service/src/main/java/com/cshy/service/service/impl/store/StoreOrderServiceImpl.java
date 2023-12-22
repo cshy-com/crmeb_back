@@ -9,12 +9,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.model.entity.order.StoreOrderInfo;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.store.*;
 import com.cshy.common.model.request.system.SystemWriteOffOrderSearchRequest;
 import com.cshy.common.model.response.*;
 import com.cshy.common.model.vo.*;
+import com.cshy.common.model.vo.order.StoreOrderInfoOldVo;
 import com.cshy.service.service.*;
 import com.cshy.service.service.sms.SmsService;
 import com.cshy.service.service.sms.SmsTemplateService;
@@ -921,7 +921,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         LambdaQueryWrapper<StoreOrder> lqw = new LambdaQueryWrapper<>();
         lqw.select(StoreOrder::getId, StoreOrder::getUid);
         lqw.eq(StoreOrder::getStatus, 2);
-        lqw.eq(StoreOrder::getRefundStatus, 0);
+        lqw.in(StoreOrder::getRefundStatus, Lists.newArrayList(0, 6, 7));
         lqw.eq(StoreOrder::getIsDel, false);
         List<StoreOrder> orderList = dao.selectList(lqw);
         if (CollUtil.isEmpty(orderList)) {

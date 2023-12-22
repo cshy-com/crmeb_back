@@ -327,11 +327,11 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
             case "0":
             case "1":
             case "2":
-                return 1;
+                return Constants.ORDER_STATUS_INT_SPIKE;
             case "3":
-                return 2;
+                return Constants.ORDER_STATUS_INT_BARGAIN;
         }
-        return 0;
+        return Constants.ORDER_STATUS_INT_PAID;
     }
 
     /**

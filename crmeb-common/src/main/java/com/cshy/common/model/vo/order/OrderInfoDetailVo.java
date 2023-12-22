@@ -1,4 +1,4 @@
-package com.cshy.common.model.vo;
+package com.cshy.common.model.vo.order;
 
 import lombok.Data;
 

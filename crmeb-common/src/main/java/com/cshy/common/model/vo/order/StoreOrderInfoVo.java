@@ -1,6 +1,7 @@
-package com.cshy.common.model.vo;
+package com.cshy.common.model.vo.order;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.cshy.common.model.vo.order.OrderInfoDetailVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

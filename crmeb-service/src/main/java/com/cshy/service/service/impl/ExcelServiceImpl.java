@@ -26,7 +26,7 @@ import com.cshy.common.model.response.StoreBargainResponse;
 import com.cshy.common.model.response.StoreCombinationResponse;
 import com.cshy.common.model.vo.BargainProductExcelVo;
 import com.cshy.common.model.vo.CombinationProductExcelVo;
-import com.cshy.common.model.vo.OrderExcelVo;
+import com.cshy.common.model.vo.order.OrderExcelVo;
 import com.cshy.common.model.vo.ProductExcelVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;

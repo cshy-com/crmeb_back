@@ -99,7 +99,7 @@ public class SmsServiceImpl implements SmsService {
     }
 
     @Override
-    public void sendCode(String phoneNumber, Integer triggerPosition, HttpServletRequest request, String... params) {
+    public void sendSMS(String phoneNumber, Integer triggerPosition, HttpServletRequest request, String... params) {
         if (StringUtils.isNotBlank(phoneNumber))
             ValidateFormUtil.isPhone(phoneNumber, "手机号码错误");
         SmsTemplate smsTemplate = smsTemplateService.getOne(new LambdaQueryWrapper<SmsTemplate>().eq(SmsTemplate::getTriggerPosition, triggerPosition));

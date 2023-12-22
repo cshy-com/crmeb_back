@@ -2,8 +2,8 @@ package com.cshy.service.service.store;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.entity.order.StoreOrderInfo;
-import com.cshy.common.model.vo.StoreOrderInfoOldVo;
-import com.cshy.common.model.vo.StoreOrderInfoVo;
+import com.cshy.common.model.vo.order.StoreOrderInfoOldVo;
+import com.cshy.common.model.vo.order.StoreOrderInfoVo;
 
 import java.math.BigDecimal;
 import java.util.HashMap;

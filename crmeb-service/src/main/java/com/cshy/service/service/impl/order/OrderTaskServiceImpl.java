@@ -13,7 +13,7 @@ import com.cshy.common.model.entity.product.StoreProductReply;
 import com.cshy.common.model.entity.user.User;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.common.utils.RedisUtil;
-import com.cshy.common.model.vo.StoreOrderInfoOldVo;
+import com.cshy.common.model.vo.order.StoreOrderInfoOldVo;
 import com.cshy.service.service.order.OrderPayService;
 import com.cshy.service.service.order.OrderTaskService;
 import com.cshy.service.service.store.*;

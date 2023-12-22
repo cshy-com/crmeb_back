@@ -1,14 +1,13 @@
 package com.cshy.common.model.response;
 
 import com.cshy.common.model.entity.system.SystemStore;
-import com.cshy.common.model.vo.StoreOrderInfoOldVo;
+import com.cshy.common.model.vo.order.StoreOrderInfoOldVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;

@@ -89,7 +89,7 @@ public class LoginController {
             @ApiImplicitParam(name = "phone", value = "手机号码", required = true)
     })
     public CommonResult<Object> sendCode(@RequestParam String phone, HttpServletRequest request) {
-        smsService.sendCode(phone, SmsTriggerEnum.VERIFICATION_CODE.getCode(), request, null);
+        smsService.sendSMS(phone, SmsTriggerEnum.VERIFICATION_CODE.getCode(), request, null);
         return CommonResult.success("发送成功");
     }
 }

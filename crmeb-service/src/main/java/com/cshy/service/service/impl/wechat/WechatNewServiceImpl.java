@@ -14,6 +14,8 @@ import com.cshy.common.model.entity.wechat.WechatExceptions;
 import com.cshy.common.model.entity.wechat.WechatPayInfo;
 import com.cshy.common.model.vo.*;
 import com.cshy.common.model.response.WeChatJsSdkConfigResponse;
+import com.cshy.common.model.vo.order.CreateOrderRequestVo;
+import com.cshy.common.model.vo.order.CreateOrderResponseVo;
 import com.cshy.common.token.WeChatOauthToken;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.utils.RedisUtil;

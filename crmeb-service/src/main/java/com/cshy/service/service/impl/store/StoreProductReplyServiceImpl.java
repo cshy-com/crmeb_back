@@ -34,7 +34,7 @@ import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.common.utils.RedisUtil;
 import com.cshy.common.model.vo.MyRecord;
-import com.cshy.common.model.vo.StoreOrderInfoOldVo;
+import com.cshy.common.model.vo.order.StoreOrderInfoOldVo;
 import com.cshy.common.model.vo.dateLimitUtilVo;
 import com.cshy.service.dao.store.StoreProductReplyDao;
 import org.apache.commons.lang3.ArrayUtils;

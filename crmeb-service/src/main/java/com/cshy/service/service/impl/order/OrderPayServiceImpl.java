@@ -17,11 +17,10 @@ import com.cshy.common.model.entity.order.StoreOrderInfo;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttrValue;
 import com.cshy.common.model.entity.product.StoreProductCoupon;
-import com.cshy.common.model.entity.sms.SmsTemplate;
-import com.cshy.common.model.entity.system.SystemAdmin;
 import com.cshy.common.model.entity.system.SystemNotification;
 import com.cshy.common.model.request.order.OrderPayRequest;
 import com.cshy.common.model.response.OrderPayResultResponse;
+import com.cshy.common.model.vo.order.*;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.common.utils.RedisUtil;
@@ -39,20 +38,19 @@ import com.cshy.service.service.system.SystemNotificationService;
 import com.cshy.service.service.user.*;
 import com.cshy.service.service.wechat.WeChatPayService;
 import com.cshy.service.service.wechat.WechatNewService;
+import com.google.common.collect.Lists;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -286,38 +284,9 @@ public class OrderPayServiceImpl implements OrderPayService {
                 String shortenURL = shortUrlService.shortenURL(param, 0);
 
                 //短信通知员工
-                smsService.sendCode(null, SmsTriggerEnum.ORDER_PLACED_TO_EMPLOYEE.getCode(), null, "普通");
+                smsService.sendSMS(null, SmsTriggerEnum.ORDER_PLACED_TO_EMPLOYEE.getCode(), null, "普通");
                 //短信通知客户
-                smsService.sendCode(storeOrder.getUserMobile(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), null, "购买", shortenURL.substring(shortenURL.lastIndexOf("/")));
-//                SystemNotification payNotification = systemNotificationService.getByMark(NotifyConstants.PAY_SUCCESS_MARK);
-//                // 发送短信
-//                if (StrUtil.isNotBlank(user.getPhone()) && payNotification.getIsSms().equals(1)) {
-//                    SmsTemplate smsTemplate = smsTemplateService.getDetail(payNotification.getSmsId());
-//
-//                    //TODO 修改短信通知
-//                    smsService.sendPaySuccess(user.getPhone(), storeOrder.getOrderId(), storeOrder.getPayPrice(), 0);
-//                }
-//
-//                // 发送用户支付成功管理员提醒短信
-//                SystemNotification payAdminNotification = systemNotificationService.getByMark(NotifyConstants.PAY_SUCCESS_ADMIN_MARK);
-//                if (payAdminNotification.getIsSms().equals(1)) {
-//                    // 查询可已发送短信的管理员
-//                    List<SystemAdmin> systemAdminList = systemAdminService.findIsSmsList();
-//                    if (CollUtil.isNotEmpty(systemAdminList)) {
-//                        SmsTemplate smsTemplate = smsTemplateService.getDetail(payAdminNotification.getSmsId());
-//                        // 发送短信
-//                        systemAdminList.forEach(admin -> {
-//                            //TODO 修改短信通知
-//                            smsService.sendOrderPaySuccessNotice(admin.getPhone(), storeOrder.getOrderId(), admin.getRealName(), 0);
-//                        });
-//                    }
-//                }
-//
-//                if (payNotification.getIsWechat().equals(1) || payNotification.getIsRoutine().equals(1)) {
-//                    //下发模板通知
-//                    pushMessageOrder(storeOrder, user, payNotification);
-//                }
-
+                smsService.sendSMS(storeOrder.getUserMobile(), SmsTriggerEnum.ORDER_PLACED_TO_CUSTOMER.getCode(), null, "购买", shortenURL.substring(shortenURL.lastIndexOf("/")));
                 // 购买成功后根据配置送优惠券
                 autoSendCoupons(storeOrder);
 
@@ -573,6 +542,7 @@ public class OrderPayServiceImpl implements OrderPayService {
 
     /**
      * 余额支付
+     *
      * @param storeOrder 订单
      * @return Boolean Boolean
      */
@@ -598,8 +568,6 @@ public class OrderPayServiceImpl implements OrderPayService {
             if (storeOrder.getUseIntegral() > 0) {
                 userService.updateIntegral(user, storeOrder.getUseIntegral(), "sub");
             }
-            // 添加支付成功redis队列
-            redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, storeOrder.getOrderId());
 
             //TODO 分离代码
 //            // 处理拼团
@@ -673,94 +641,112 @@ public class OrderPayServiceImpl implements OrderPayService {
      */
     @Override
     public OrderPayResultResponse payment(OrderPayRequest orderPayRequest, String ip) {
-        StoreOrder storeOrder = storeOrderService.getByOrderId(orderPayRequest.getOrderNo());
-        if (ObjectUtil.isNull(storeOrder)) {
-            throw new CrmebException("订单不存在");
-        }
-        if (storeOrder.getIsDel()) {
-            throw new CrmebException("订单已被删除");
-        }
-        if (storeOrder.getPaid()) {
-            throw new CrmebException("订单已支付");
-        }
-        User user = userService.getById(storeOrder.getUid());
-        if (ObjectUtil.isNull(user)) throw new CrmebException("用户不存在");
+        List<OrderPayResultResponse> responseList = Lists.newArrayList();
+        orderPayRequest.getOrderNoList().forEach(orderNo -> {
+            StoreOrder storeOrder = storeOrderService.getByOrderId(orderNo);
+            if (ObjectUtil.isNull(storeOrder)) {
+                throw new CrmebException("订单不存在");
+            }
+            if (storeOrder.getIsDel()) {
+                throw new CrmebException("订单已被删除");
+            }
+            if (storeOrder.getPaid()) {
+                throw new CrmebException("订单已支付");
+            }
+            User user = userService.getById(storeOrder.getUid());
+            if (ObjectUtil.isNull(user)) throw new CrmebException("用户不存在");
 
-        // 判断订单是否还是之前的支付类型
-        if (!storeOrder.getPayType().equals(orderPayRequest.getPayType())) {
-            // 根据支付类型进行校验,更换支付类型
-            storeOrder.setPayType(orderPayRequest.getPayType());
-            // 余额支付
+            // 判断订单是否还是之前的支付类型
+            if (!storeOrder.getPayType().equals(orderPayRequest.getPayType())) {
+                // 根据支付类型进行校验,更换支付类型
+                storeOrder.setPayType(orderPayRequest.getPayType());
+                // 余额支付
 //            if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
 //                if (user.getNowMoney().compareTo(storeOrder.getPayPrice()) < 0) {
 //                    throw new CrmebException("用户余额不足");
 //                }
 //                storeOrder.setPaymentChannel(3);
 //            }
-            if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
-                switch (orderPayRequest.getPayChannel()){
-                    case PayConstants.PAY_CHANNEL_WE_CHAT_H5:// H5
-                        storeOrder.setPaymentChannel(2);
-                        break;
-                    case PayConstants.PAY_CHANNEL_WE_CHAT_PUBLIC:// 公众号
-                        storeOrder.setPaymentChannel(0);
-                        break;
-                    case PayConstants.PAY_CHANNEL_WE_CHAT_PROGRAM:// 小程序
-                        storeOrder.setPaymentChannel(1);
-                        break;
+                if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
+                    switch (orderPayRequest.getPayChannel()){
+                        case PayConstants.PAY_CHANNEL_WE_CHAT_H5:// H5
+                            storeOrder.setPaymentChannel(2);
+                            break;
+                        case PayConstants.PAY_CHANNEL_WE_CHAT_PUBLIC:// 公众号
+                            storeOrder.setPaymentChannel(0);
+                            break;
+                        case PayConstants.PAY_CHANNEL_WE_CHAT_PROGRAM:// 小程序
+                            storeOrder.setPaymentChannel(1);
+                            break;
+                    }
+                }
+
+                boolean changePayType = storeOrderService.updateById(storeOrder);
+                if (!changePayType) {
+                    throw new CrmebException("变更订单支付类型失败!");
                 }
             }
 
-            boolean changePayType = storeOrderService.updateById(storeOrder);
-            if (!changePayType) {
-                throw new CrmebException("变更订单支付类型失败!");
+            if (user.getIntegral() < storeOrder.getUseIntegral()) {
+                throw new CrmebException("用户积分不足");
             }
-        }
 
-        if (user.getIntegral() < storeOrder.getUseIntegral()) {
-            throw new CrmebException("用户积分不足");
-        }
+            OrderPayResultResponse response = new OrderPayResultResponse();
+            response.setOrderNo(storeOrder.getOrderId());
+            response.setPayType(storeOrder.getPayType());
 
-        OrderPayResultResponse response = new OrderPayResultResponse();
-        response.setOrderNo(storeOrder.getOrderId());
-        response.setPayType(storeOrder.getPayType());
-
-        // 微信支付，调用微信预下单，返回拉起微信支付需要的信息
-        if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
-            // 预下单
-            Map<String, String> unifiedorder = unifiedorder(storeOrder, ip);
-            response.setStatus(true);
-            WxPayJsResultVo vo = new WxPayJsResultVo();
-            vo.setAppId(unifiedorder.get("appId"));
-            vo.setNonceStr(unifiedorder.get("nonceStr"));
-            vo.setPackages(unifiedorder.get("package"));
-            vo.setSignType(unifiedorder.get("signType"));
-            vo.setTimeStamp(unifiedorder.get("timeStamp"));
-            vo.setPaySign(unifiedorder.get("paySign"));
-            if (storeOrder.getPaymentChannel() == 2) {
-                vo.setMwebUrl(unifiedorder.get("mweb_url"));
-                response.setPayType(PayConstants.PAY_CHANNEL_WE_CHAT_H5);
+            // 微信支付，调用微信预下单，返回拉起微信支付需要的信息
+            if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
+                // 预下单
+                Map<String, String> unifiedorder = unifiedorder(storeOrder, ip);
+                response.setStatus(true);
+                WxPayJsResultVo vo = new WxPayJsResultVo();
+                vo.setAppId(unifiedorder.get("appId"));
+                vo.setNonceStr(unifiedorder.get("nonceStr"));
+                vo.setPackages(unifiedorder.get("package"));
+                vo.setSignType(unifiedorder.get("signType"));
+                vo.setTimeStamp(unifiedorder.get("timeStamp"));
+                vo.setPaySign(unifiedorder.get("paySign"));
+                if (storeOrder.getPaymentChannel() == 2) {
+                    vo.setMwebUrl(unifiedorder.get("mweb_url"));
+                    response.setPayType(PayConstants.PAY_CHANNEL_WE_CHAT_H5);
+                }
+                if (storeOrder.getPaymentChannel() == 4 || storeOrder.getPaymentChannel() == 5) {
+                    vo.setPartnerid(unifiedorder.get("partnerid"));
+                }
+                // 更新商户订单号
+                storeOrder.setOutTradeNo(unifiedorder.get("outTradeNo"));
+                storeOrderService.updateById(storeOrder);
+                response.setJsConfig(vo);
+                responseList.add(response);
+                return;
             }
-            if (storeOrder.getPaymentChannel() == 4 || storeOrder.getPaymentChannel() == 5) {
-                vo.setPartnerid(unifiedorder.get("partnerid"));
-            }
-            // 更新商户订单号
-            storeOrder.setOutTradeNo(unifiedorder.get("outTradeNo"));
-            storeOrderService.updateById(storeOrder);
-            response.setJsConfig(vo);
-            return response;
-        }
 //         余额支付
-        if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_INTEGRAL)) {
-            Boolean balancePay = balancePay(storeOrder);
-            response.setStatus(balancePay);
-            return response;
-        }
+            if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_INTEGRAL)) {
+                Boolean balancePay = balancePay(storeOrder);
+                response.setStatus(balancePay);
+                responseList.add(response);
+                return;
+            }
 //        if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_OFFLINE)) {
 //            throw new CrmebException("暂时不支持线下支付");
 //        }
-        response.setStatus(false);
-        return response;
+            response.setStatus(false);
+            responseList.add(response);
+
+            // 添加支付成功redis队列
+            redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, orderNo);
+        });
+
+        OrderPayResultResponse orderPayResultResponse = new OrderPayResultResponse();
+        BeanUtils.copyProperties(responseList.get(0), orderPayResultResponse);
+        List<Boolean> booleanList = responseList.stream().map(OrderPayResultResponse::getStatus).collect(Collectors.toList());
+        if (booleanList.contains(Boolean.FALSE))
+            orderPayResultResponse.setStatus(Boolean.FALSE);
+
+        String join = StringUtils.join(responseList.stream().map(OrderPayResultResponse::getOrderNo).collect(Collectors.toList()), ",");
+        orderPayResultResponse.setOrderNo(join);
+        return orderPayResultResponse;
     }
 
     /**

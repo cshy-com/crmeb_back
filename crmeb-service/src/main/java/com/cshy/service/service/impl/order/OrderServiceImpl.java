@@ -46,6 +46,10 @@ import com.cshy.common.model.entity.system.SystemUserLevel;
 import com.cshy.common.model.entity.user.User;
 import com.cshy.common.model.entity.user.UserAddress;
 import com.cshy.common.model.page.CommonPage;
+import com.cshy.common.model.vo.order.OrderInfoDetailVo;
+import com.cshy.common.model.vo.order.OrderInfoVo;
+import com.cshy.common.model.vo.order.StoreOrderInfoOldVo;
+import com.cshy.common.model.vo.order.StoreOrderInfoVo;
 import com.cshy.common.utils.*;
 import com.cshy.service.delete.OrderUtils;
 import com.cshy.service.service.*;
@@ -78,6 +82,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -338,7 +343,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (execute)
             // 发送用户退款管理员提醒短信
-            smsService.sendCode(null, SmsTriggerEnum.RETURN_REQUEST_SUBMITTED.getCode(), null, existStoreOrder.getOrderId(), request.getRefundType() == 0 ? "退款" : "退货退款");
+            smsService.sendSMS(null, SmsTriggerEnum.RETURN_REQUEST_SUBMITTED.getCode(), null, existStoreOrder.getOrderId(), request.getRefundType() == 0 ? "退款" : "退货退款");
         if (!execute) throw new CrmebException("申请退款失败");
         return execute;
     }
@@ -425,16 +430,17 @@ public class OrderServiceImpl implements OrderService {
             // 订单详情对象列表
             List<StoreOrderInfo> orderInfoList = storeOrderInfoService.getListByOrderNo(storeOrder.getOrderId());
             List<OrderInfoResponse> infoResponseList = CollUtil.newArrayList();
-            orderInfoList.forEach(e -> {
+            orderInfoList.forEach(orderInfo -> {
                 OrderInfoResponse orderInfoResponse = new OrderInfoResponse();
-                orderInfoResponse.setStoreName(e.getProductName());
-                orderInfoResponse.setImage(e.getImage());
-                orderInfoResponse.setCartNum(e.getPayNum());
-                orderInfoResponse.setPrice(ObjectUtil.isNotNull(e.getVipPrice()) ? e.getVipPrice() : e.getPrice());
-                orderInfoResponse.setProductId(e.getProductId());
-                orderInfoResponse.setSku(e.getSku());
+                orderInfoResponse.setStoreName(orderInfo.getProductName());
+                orderInfoResponse.setImage(orderInfo.getImage());
+                orderInfoResponse.setCartNum(orderInfo.getPayNum());
+                orderInfoResponse.setPrice(ObjectUtil.isNotNull(orderInfo.getVipPrice()) ? orderInfo.getVipPrice() : orderInfo.getPrice());
+                orderInfoResponse.setProductId(orderInfo.getProductId());
+                orderInfoResponse.setSku(orderInfo.getSku());
+                orderInfoResponse.setAttrId(Integer.valueOf(orderInfo.getUnique()));
                 //查询原价
-                StoreProductAttrValue attrValueServiceById = attrValueService.getById(e.getAttrValueId());
+                StoreProductAttrValue attrValueServiceById = attrValueService.getById(orderInfo.getAttrValueId());
                 orderInfoResponse.setOtPrice(attrValueServiceById.getOtPrice());
                 infoResponseList.add(orderInfoResponse);
             });
@@ -480,54 +486,40 @@ public class OrderServiceImpl implements OrderService {
         String status = "";
         if (!storeOrder.getPaid()) {
             status = "待支付";
-        }
-
-        if (storeOrder.getStatus().equals(0)) {
+        } else if (storeOrder.getStatus().equals(0)) {
             status = "待发货";
-        }
-        if (storeOrder.getStatus().equals(1)) {
+        } else if (storeOrder.getStatus().equals(1)) {
             status = "待收货";
-        }
-        if (storeOrder.getStatus().equals(2)) {
+        } else if (storeOrder.getStatus().equals(2)) {
             status = "待评价";
-        }
-        if (storeOrder.getStatus().equals(3)) {
+        } else if (storeOrder.getStatus().equals(3)) {
             status = "已完成";
         }
-        if (!storeOrder.getRefundStatus().equals(0)){
+        if (!storeOrder.getRefundStatus().equals(0)) {
             if (storeOrder.getRefundStatus().equals(1)) {
                 status = "申请退款中";
-            }
-            if (storeOrder.getRefundStatus().equals(2)) {
+            } else if (storeOrder.getRefundStatus().equals(2)) {
                 status = "已退款";
-            }
-            if (storeOrder.getRefundStatus().equals(4)) {
+            } else if (storeOrder.getRefundStatus().equals(4)) {
                 status = "退货待发货";
-            }
-            if (storeOrder.getRefundStatus().equals(5)) {
+            } else if (storeOrder.getRefundStatus().equals(5)) {
                 status = "退货中";
             }
         }
-        if (Objects.nonNull(type) && type == -3){
+        if (Objects.nonNull(type) && type == -3) {
             if (storeOrder.getRefundStatus().equals(1)) {
                 status = "申请退款中";
-            }
-            if (storeOrder.getRefundStatus().equals(2)) {
+            } else if (storeOrder.getRefundStatus().equals(2)) {
                 status = "已退款";
-            }
-            if (storeOrder.getRefundStatus().equals(3)) {
+            } else if (storeOrder.getRefundStatus().equals(3)) {
                 status = "退款中";
-            }
-            if (storeOrder.getRefundStatus().equals(4)) {
+            } else if (storeOrder.getRefundStatus().equals(4)) {
                 status = "退货待发货";
-            }
-            if (storeOrder.getRefundStatus().equals(5)) {
+            } else if (storeOrder.getRefundStatus().equals(5)) {
                 status = "退货中";
-            }
-            if (storeOrder.getRefundStatus().equals(6)) {
+            } else if (storeOrder.getRefundStatus().equals(6)) {
                 status = "退货退款被拒绝";
-            }
-            if (storeOrder.getRefundStatus().equals(7)) {
+            } else if (storeOrder.getRefundStatus().equals(7)) {
                 status = "退款被拒绝";
             }
         }
@@ -970,6 +962,231 @@ public class OrderServiceImpl implements OrderService {
         String orderVoString = redisUtil.get(key).toString();
         OrderInfoVo orderInfoVo = JSONObject.parseObject(orderVoString, OrderInfoVo.class);
 
+        //拆单 重新走流程
+        List<String> storeOrderIdList = Lists.newArrayList();
+        AtomicInteger i = new AtomicInteger();
+        if (CollUtil.isNotEmpty(orderInfoVo.getCartIdList())) {
+            orderInfoVo.getCartIdList().forEach(cartId -> {
+                //预下单
+                PreOrderRequest preOrderRequest = new PreOrderRequest();
+                PreOrderDetailRequest preOrderDetailRequest = new PreOrderDetailRequest();
+                preOrderDetailRequest.setShoppingCartId(cartId);
+                preOrderRequest.setOrderDetails(Lists.newArrayList(preOrderDetailRequest));
+                preOrderRequest.setPreOrderType("shoppingCart");
+                preOrderRequest.setIsGiftCard(0);
+                MyRecord myRecord = this.preOrder(preOrderRequest);
+                String preOrderNo = (String) myRecord.get("preOrderNo");
+
+//            OrderComputedPriceRequest orderComputedPriceRequest = new OrderComputedPriceRequest();
+//            orderComputedPriceRequest.setPreOrderNo(preOrderNo);
+//            orderComputedPriceRequest.setCouponId(request.getCouponId());
+//            orderComputedPriceRequest.setAddressId(request.getAddressId());
+//            orderComputedPriceRequest.setShippingType(1);
+//            orderComputedPriceRequest.setUseIntegral(request.getUseIntegral());
+//            ComputedOrderPriceResponse computedOrderPriceResponse = this.computedOrderPrice(orderComputedPriceRequest);
+
+                CreateOrderRequest createOrderRequest = new CreateOrderRequest();
+                BeanUtils.copyProperties(request, createOrderRequest);
+                createOrderRequest.setPreOrderNo(preOrderNo);
+
+                OrderInfoVo infoVo = JSONObject.parseObject(redisUtil.get("user_order:" + preOrderNo).toString(), OrderInfoVo.class);
+                OrderInfoDetailVo detailVo = orderInfoVo.getOrderDetailList().get(i.get());
+                BeanUtils.copyProperties(detailVo, infoVo);
+                infoVo.setOrderDetailList(Lists.newArrayList(detailVo));
+                infoVo.setCartIdList(Lists.newArrayList(orderInfoVo.getCartIdList().get(i.get())));
+                infoVo.setOrderProNum(1);
+                handleOrder(infoVo, storeOrderIdList, user, createOrderRequest);
+
+                i.getAndIncrement();
+
+            });
+
+            // 删除缓存订单
+            if (redisUtil.exists("user_order:" + request.getPreOrderNo())) {
+                redisUtil.delete("user_order:" + request.getPreOrderNo());
+            }
+        } else {
+            handleOrder(orderInfoVo, storeOrderIdList, user, request);
+        }
+
+        MyRecord record = new MyRecord();
+        record.set("orderNo", storeOrderIdList);
+        record.set("mainOrderNo", request.getPreOrderNo());
+        return record;
+    }
+
+    /**
+     * 获取支付配置
+     *
+     * @return PreOrderResponse
+     */
+    @Override
+    public PreOrderResponse getPayConfig() {
+        PreOrderResponse preOrderResponse = new PreOrderResponse();
+        String payWeixinOpen = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_PAY_WEIXIN_OPEN);
+//        String yuePayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YUE_PAY_STATUS);// 1开启 2关闭
+//        String storeSelfMention = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_STORE_SELF_MENTION);
+//        String aliPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_ALI_PAY_STATUS);// 1开启
+//        preOrderResponse.setYuePayStatus(yuePayStatus);
+        preOrderResponse.setPayWeixinOpen(payWeixinOpen);
+//        preOrderResponse.setStoreSelfMention(storeSelfMention);
+//        preOrderResponse.setAliPayStatus(aliPayStatus);
+        return preOrderResponse;
+    }
+
+    @Override
+    public void refundTrackingNo(String trackingNo, String uni) {
+        StoreOrder storeOrderPram = new StoreOrder();
+        storeOrderPram.setOrderId(uni);
+        storeOrderPram.setIsDel(false);
+        storeOrderPram.setPaid(true);
+        StoreOrder existStoreOrder = storeOrderService.getByEntityOne(storeOrderPram);
+        if (null == existStoreOrder) throw new CrmebException("支付订单不存在");
+        if (existStoreOrder.getRefundStatus() == 2) {
+            throw new CrmebException("订单已退款");
+        }
+
+        existStoreOrder.setRefundTrackingNo(trackingNo);
+        boolean b = storeOrderService.updateById(existStoreOrder);
+        if (!b)
+            throw new CrmebException("更新订单失败，请稍后重试");
+    }
+
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void ship(String orderId, String trackingNo, Integer type, HttpServletRequest request) {
+        String userMobile;
+        String param = "";
+
+        if (type == 0) {
+            //更新状态和物流单号
+            StoreOrder storeOrder = this.getByOrderIdException(orderId);
+            if (Objects.isNull(storeOrder))
+                throw new CrmebException("订单不存在，请重试");
+
+            storeOrder.setStatus(1);
+            storeOrder.setTrackingNo(trackingNo);
+            storeOrder.setDeliveryType(Constants.ORDER_LOG_EXPRESS);
+            this.storeOrderService.updateById(storeOrder);
+
+            this.storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_EXPRESS, Constants.ORDER_STATUS_STR_SHIPPING, 1);
+
+            //短连接
+            ShortUrl shortUrl = shortUrlService.getOne(new LambdaQueryWrapper<ShortUrl>().eq(ShortUrl::getLocation, 0).like(ShortUrl::getParam, storeOrder.getOrderId()));
+            param = shortUrl.getCode();
+
+            //电话
+            userMobile = storeOrder.getUserMobile();
+        } else {
+            //更新状态和物流单号
+            GiftCardOrder cardOrder = giftCardOrderService.getById(orderId);
+            cardOrder.setOrderStatus(1);
+            cardOrder.setTrackingNo(trackingNo);
+            giftCardOrderService.updateById(cardOrder);
+
+            //短连接
+            GiftCard giftCard = giftCardService.getById(cardOrder.getGiftCardId());
+            ShortUrl shortUrl = shortUrlService.getOne(new LambdaQueryWrapper<ShortUrl>().eq(ShortUrl::getLocation, 1).like(ShortUrl::getParam, giftCard.getPickupCode()));
+            param = shortUrl.getCode();
+
+            //电话
+            User user = userService.getById(cardOrder.getUserId());
+            userMobile = user.getPhone();
+        }
+        smsService.sendSMS(userMobile, SmsTriggerEnum.ITEMS_SHIPPED.getCode(), request, "/" + param);
+    }
+
+    @Override
+    public List<Map<String, Object>> operationList(Integer id) {
+        User user = userService.getInfo();
+        List<Map<String, Object>> resList = Lists.newArrayList();
+        StoreOrder storeOrder = this.storeOrderService.getById(id);
+        if (Objects.nonNull(storeOrder)) {
+            //需要排除的操作类型
+            List<String> constantList = Lists.newArrayList(Constants.ORDER_LOG_EXPRESS, Constants.ORDER_LOG_PAY_SUCCESS
+                    , Constants.ORDER_LOG_DELIVERY_VI, Constants.ORDER_LOG_EDIT, Constants.ORDER_STATUS_CACHE_CREATE_ORDER);
+            //查询
+            List<StoreOrderStatus> orderStatusList = this.storeOrderStatusService.list(new LambdaQueryWrapper<StoreOrderStatus>()
+                    .eq(StoreOrderStatus::getOid, storeOrder.getId())
+                    .notIn(StoreOrderStatus::getChangeType, constantList)
+                    .orderByDesc(StoreOrderStatus::getCreateTime));
+            //数据处理
+            orderStatusList.forEach(orderStatus -> {
+                Map<String, Object> map = new HashMap<>();
+                map = CommonUtil.objToMap(orderStatus, StoreOrderStatus.class);
+
+                //特殊处理
+                if (orderStatus.getChangeType().equals(Constants.ORDER_LOG_REFUND_APPLY)) {
+                    map.put("mobile", storeOrder.getRefundMobile());
+                    map.put("desc", storeOrder.getRefundReasonWapExplain());
+                    map.put("refundPrice", storeOrder.getRefundPrice());
+                }
+
+                //转译
+                String changeType;
+                switch (orderStatus.getChangeType()) {
+                    case Constants.ORDER_LOG_REFUND_REFUSE:
+                        if (storeOrder.getRefundType().equals(0))
+                            changeType = "退款被拒绝";
+                        else
+                            changeType = "退货退款被拒绝";
+                        break;
+                    case Constants.ORDER_LOG_REFUND_PRICE:
+                        changeType = "已退款";
+                        break;
+                    case Constants.ORDER_LOG_RETURN_GOODS:
+                        changeType = "退货中";
+                        break;
+                    case Constants.ORDER_LOG_REFUND_APPLY:
+                        if (storeOrder.getRefundType().equals(0))
+                            changeType = "用户申请退款";
+                        else
+                            changeType = "用户申请退货退款";
+                        break;
+                    case Constants.ORDER_LOG_AGREE_RETURN:
+                        changeType = "平台同意退货退款";
+                        break;
+                    case Constants.ORDER_LOG_AGREE_REFUND:
+                        changeType = "平台同意退款";
+                        break;
+                    case Constants.ORDER_LOG_REFUND_REVOKE:
+                        changeType = "用户撤销售后";
+                        break;
+                    default:
+                        changeType = "系统操作";
+                }
+                map.put("changeType", changeType);
+
+                //头像
+                if (0 == orderStatus.getIsSysUser())
+                    map.put("avatar", user.getAvatar());
+                else
+                    map.put("avatar", null);
+                resList.add(map);
+            });
+        }
+        return resList;
+    }
+
+    @Override
+    public Boolean returnShip(String orderId, String trackingNo, String remark, String img) {
+        storeOrderService.returnShip(orderId, trackingNo, remark, img);
+        return true;
+    }
+
+    @Override
+    public void refundRevoke(String orderId) {
+        StoreOrder storeOrder = this.getByOrderIdException(orderId);
+        //检查状态
+        Assert.isTrue(storeOrder.getRefundStatus().equals(1) || storeOrder.getRefundStatus().equals(4), "无法撤回订单");
+        storeOrder.setRefundStatus(0);
+
+        storeOrderService.updateById(storeOrder);
+
+        storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_REFUND_REVOKE, Constants.ORDER_STATUS_STR_REFUND_REVOKE, 0);
+    }
+
+    private void handleOrder(OrderInfoVo infoVo, List<String> storeOrderIdList, User user, CreateOrderRequest request) {
         // 检测支付方式
         if (!orderUtils.checkPayType(request.getPayType()))
             throw new CrmebException("暂不支持该支付方式，请刷新页面或者联系管理员");
@@ -981,7 +1198,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 校验商品库存
-        List<MyRecord> skuRecordList = validateProductStock(orderInfoVo, user);
+        List<MyRecord> skuRecordList = validateProductStock(infoVo, user);
 
         // 校验收货信息
         String verifyCode = "";
@@ -1017,11 +1234,12 @@ public class OrderServiceImpl implements OrderService {
 //
         // 计算订单各种价格
         OrderComputedPriceRequest orderComputedPriceRequest = new OrderComputedPriceRequest();
+        orderComputedPriceRequest.setPreOrderNo(request.getPreOrderNo());
         orderComputedPriceRequest.setShippingType(request.getShippingType());
         orderComputedPriceRequest.setAddressId(request.getAddressId());
         orderComputedPriceRequest.setCouponId(request.getCouponId());
         orderComputedPriceRequest.setUseIntegral(request.getUseIntegral());
-        ComputedOrderPriceResponse computedOrderPriceResponse = computedPrice(orderComputedPriceRequest, orderInfoVo, user);
+        ComputedOrderPriceResponse computedOrderPriceResponse = computedPrice(orderComputedPriceRequest, infoVo, user);
 
         // 生成订单号
         String orderNo = CrmebUtil.getOrderNo("order");
@@ -1029,7 +1247,7 @@ public class OrderServiceImpl implements OrderService {
         // 购买赠送的积分
 //        int gainIntegral = 0;
         List<StoreOrderInfo> storeOrderInfos = new ArrayList<>();
-        for (OrderInfoDetailVo detailVo : orderInfoVo.getOrderDetailList()) {
+        for (OrderInfoDetailVo detailVo : infoVo.getOrderDetailList()) {
             //TODO 分离代码
 //            // 赠送积分
 //            if (ObjectUtil.isNotNull(detailVo.getGiveIntegral()) && detailVo.getGiveIntegral() > 0) {
@@ -1121,7 +1339,7 @@ public class OrderServiceImpl implements OrderService {
             storeOrder.setVerifyCode(verifyCode);
             storeOrder.setStoreId(request.getStoreId());
         }
-        storeOrder.setTotalNum(orderInfoVo.getOrderProNum());
+        storeOrder.setTotalNum(infoVo.getOrderProNum());
         storeOrder.setCouponId(Optional.ofNullable(request.getCouponId()).orElse(0));
 
         // 订单总价
@@ -1138,18 +1356,18 @@ public class OrderServiceImpl implements OrderService {
         storeOrder.setUseIntegral(computedOrderPriceResponse.getUsedIntegral());
         storeOrder.setGainIntegral(0);
         storeOrder.setMark(StringEscapeUtils.escapeHtml4(request.getMark()));
-        storeOrder.setCombinationId(orderInfoVo.getCombinationId());
-        storeOrder.setPinkId(orderInfoVo.getPinkId());
-        storeOrder.setSeckillId(orderInfoVo.getSeckillId());
-        storeOrder.setBargainId(orderInfoVo.getBargainId());
-        storeOrder.setBargainUserId(orderInfoVo.getBargainUserId());
+        storeOrder.setCombinationId(infoVo.getCombinationId());
+        storeOrder.setPinkId(infoVo.getPinkId());
+        storeOrder.setSeckillId(infoVo.getSeckillId());
+        storeOrder.setBargainId(infoVo.getBargainId());
+        storeOrder.setBargainUserId(infoVo.getBargainUserId());
         storeOrder.setCreateTime(DateUtil.nowDateTime());
         storeOrder.setShippingType(request.getShippingType());
         storeOrder.setPaymentChannel(isChannel);
         storeOrder.setPaid(false);
         storeOrder.setCost(BigDecimal.ZERO);
         storeOrder.setType(0);
-        if (orderInfoVo.getIsVideo()) {
+        if (infoVo.getIsVideo()) {
             storeOrder.setType(1);// 视频号订单
         }
 
@@ -1219,8 +1437,8 @@ public class OrderServiceImpl implements OrderService {
             storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_STATUS_CACHE_CREATE_ORDER, "订单生成", 0);
 
             // 清除购物车数据
-            if (CollUtil.isNotEmpty(orderInfoVo.getCartIdList())) {
-                storeCartService.deleteCartByIds(orderInfoVo.getCartIdList());
+            if (CollUtil.isNotEmpty(infoVo.getCartIdList())) {
+                storeCartService.deleteCartByIds(infoVo.getCartIdList());
             }
 
             return Boolean.TRUE;
@@ -1230,187 +1448,13 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 删除缓存订单
-        if (redisUtil.exists(key)) {
-            redisUtil.delete(key);
+        if (redisUtil.exists("user_order:" + request.getPreOrderNo())) {
+            redisUtil.delete("user_order:" + request.getPreOrderNo());
         }
 
         // 加入自动未支付自动取消队列
         redisUtil.lPush(Constants.ORDER_AUTO_CANCEL_KEY, storeOrder.getOrderId());
-
-        MyRecord record = new MyRecord();
-        record.set("orderNo", storeOrder.getOrderId());
-        return record;
-    }
-
-    /**
-     * 获取支付配置
-     *
-     * @return PreOrderResponse
-     */
-    @Override
-    public PreOrderResponse getPayConfig() {
-        PreOrderResponse preOrderResponse = new PreOrderResponse();
-        String payWeixinOpen = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_PAY_WEIXIN_OPEN);
-//        String yuePayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YUE_PAY_STATUS);// 1开启 2关闭
-//        String storeSelfMention = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_STORE_SELF_MENTION);
-//        String aliPayStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_ALI_PAY_STATUS);// 1开启
-//        preOrderResponse.setYuePayStatus(yuePayStatus);
-        preOrderResponse.setPayWeixinOpen(payWeixinOpen);
-//        preOrderResponse.setStoreSelfMention(storeSelfMention);
-//        preOrderResponse.setAliPayStatus(aliPayStatus);
-        return preOrderResponse;
-    }
-
-    @Override
-    public void refundTrackingNo(String trackingNo, String uni) {
-        StoreOrder storeOrderPram = new StoreOrder();
-        storeOrderPram.setOrderId(uni);
-        storeOrderPram.setIsDel(false);
-        storeOrderPram.setPaid(true);
-        StoreOrder existStoreOrder = storeOrderService.getByEntityOne(storeOrderPram);
-        if (null == existStoreOrder) throw new CrmebException("支付订单不存在");
-        if (existStoreOrder.getRefundStatus() == 2) {
-            throw new CrmebException("订单已退款");
-        }
-
-        existStoreOrder.setRefundTrackingNo(trackingNo);
-        boolean b = storeOrderService.updateById(existStoreOrder);
-        if (!b)
-            throw new CrmebException("更新订单失败，请稍后重试");
-    }
-
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void ship(String orderId, String trackingNo, Integer type, HttpServletRequest request) {
-        String userMobile;
-        String param = "";
-
-        if (type == 0) {
-            //更新状态和物流单号
-            StoreOrder storeOrder = this.getByOrderIdException(orderId);
-            if (Objects.isNull(storeOrder))
-                throw new CrmebException("订单不存在，请重试");
-
-            storeOrder.setStatus(1);
-            storeOrder.setTrackingNo(trackingNo);
-            storeOrder.setDeliveryType(Constants.ORDER_LOG_EXPRESS);
-            this.storeOrderService.updateById(storeOrder);
-
-            this.storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_EXPRESS, Constants.ORDER_STATUS_STR_SHIPPING, 1);
-
-            //短连接
-            ShortUrl shortUrl = shortUrlService.getOne(new LambdaQueryWrapper<ShortUrl>().eq(ShortUrl::getLocation, 0).like(ShortUrl::getParam, storeOrder.getOrderId()));
-            param = shortUrl.getCode();
-
-            //电话
-            userMobile = storeOrder.getUserMobile();
-        } else {
-            //更新状态和物流单号
-            GiftCardOrder cardOrder = giftCardOrderService.getById(orderId);
-            cardOrder.setOrderStatus(1);
-            cardOrder.setTrackingNo(trackingNo);
-            giftCardOrderService.updateById(cardOrder);
-
-            //短连接
-            GiftCard giftCard = giftCardService.getById(cardOrder.getGiftCardId());
-            ShortUrl shortUrl = shortUrlService.getOne(new LambdaQueryWrapper<ShortUrl>().eq(ShortUrl::getLocation, 1).like(ShortUrl::getParam, giftCard.getPickupCode()));
-            param = shortUrl.getCode();
-
-            //电话
-            User user = userService.getById(cardOrder.getUserId());
-            userMobile = user.getPhone();
-        }
-        smsService.sendCode(userMobile, SmsTriggerEnum.ITEMS_SHIPPED.getCode(), request, "/" + param);
-    }
-
-    @Override
-    public List<Map<String, Object>> operationList(Integer id) {
-        User user = userService.getInfo();
-        List<Map<String, Object>> resList = Lists.newArrayList();
-        StoreOrder storeOrder = this.storeOrderService.getById(id);
-        if (Objects.nonNull(storeOrder)) {
-            //需要排除的操作类型
-            List<String> constantList = Lists.newArrayList(Constants.ORDER_LOG_EXPRESS, Constants.ORDER_LOG_PAY_SUCCESS
-                    , Constants.ORDER_LOG_DELIVERY_VI, Constants.ORDER_LOG_EDIT, Constants.ORDER_STATUS_CACHE_CREATE_ORDER);
-            //查询
-            List<StoreOrderStatus> orderStatusList = this.storeOrderStatusService.list(new LambdaQueryWrapper<StoreOrderStatus>()
-                    .eq(StoreOrderStatus::getOid, storeOrder.getId())
-                    .notIn(StoreOrderStatus::getChangeType, constantList)
-                    .orderByDesc(StoreOrderStatus::getCreateTime));
-            //数据处理
-            orderStatusList.forEach(orderStatus -> {
-                Map<String, Object> map = new HashMap<>();
-                map = CommonUtil.objToMap(orderStatus, StoreOrderStatus.class);
-
-                //特殊处理
-                if (orderStatus.getChangeType().equals(Constants.ORDER_LOG_REFUND_APPLY)) {
-                    map.put("mobile", storeOrder.getRefundMobile());
-                    map.put("desc", storeOrder.getRefundReasonWapExplain());
-                    map.put("refundPrice", storeOrder.getRefundPrice());
-                }
-
-                //转译
-                String changeType;
-                switch (orderStatus.getChangeType()){
-                    case Constants.ORDER_LOG_REFUND_REFUSE:
-                        if (storeOrder.getRefundType().equals(0))
-                            changeType = "退款被拒绝";
-                        else
-                            changeType = "退货退款被拒绝";
-                        break;
-                    case Constants.ORDER_LOG_REFUND_PRICE:
-                        changeType = "已退款";
-                        break;
-                    case Constants.ORDER_LOG_RETURN_GOODS:
-                        changeType = "退货中";
-                        break;
-                    case Constants.ORDER_LOG_REFUND_APPLY:
-                        if (storeOrder.getRefundType().equals(0))
-                            changeType = "用户申请退款";
-                        else
-                            changeType = "用户申请退货退款";
-                        break;
-                    case Constants.ORDER_LOG_AGREE_RETURN:
-                        changeType = "平台同意退货退款";
-                        break;
-                    case Constants.ORDER_LOG_AGREE_REFUND:
-                        changeType = "平台同意退款";
-                        break;
-                    case Constants.ORDER_LOG_REFUND_REVOKE:
-                        changeType = "用户撤销售后";
-                        break;
-                    default:
-                        changeType = "系统操作";
-                }
-                map.put("changeType", changeType);
-
-                //头像
-                if (0 == orderStatus.getIsSysUser())
-                    map.put("avatar", user.getAvatar());
-                else
-                    map.put("avatar", null);
-                resList.add(map);
-            });
-        }
-        return resList;
-    }
-
-    @Override
-    public Boolean returnShip(String orderId, String trackingNo, String remark, String img) {
-        storeOrderService.returnShip(orderId, trackingNo, remark, img);
-        return true;
-    }
-
-    @Override
-    public void refundRevoke(String orderId) {
-        StoreOrder storeOrder = this.getByOrderIdException(orderId);
-        //检查状态
-        Assert.isTrue(storeOrder.getRefundStatus().equals(1) || storeOrder.getRefundStatus().equals(4), "无法撤回订单");
-        storeOrder.setRefundStatus(0);
-
-        storeOrderService.updateById(storeOrder);
-
-        storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_REFUND_REVOKE, Constants.ORDER_STATUS_STR_REFUND_REVOKE , 0);
+        storeOrderIdList.add(storeOrder.getOrderId());
     }
 
     /**

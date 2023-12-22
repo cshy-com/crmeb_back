@@ -6,7 +6,7 @@ import com.cshy.common.constants.PayConstants;
 import com.cshy.common.constants.SysConfigConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.order.StoreOrder;
-import com.cshy.common.model.vo.StoreOrderInfoOldVo;
+import com.cshy.common.model.vo.order.StoreOrderInfoOldVo;
 import com.cshy.service.service.store.StoreOrderInfoService;
 import com.cshy.service.service.store.StoreOrderService;
 import com.cshy.service.service.system.SystemConfigService;
