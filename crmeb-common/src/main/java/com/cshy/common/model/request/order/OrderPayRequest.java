@@ -26,7 +26,7 @@ public class OrderPayRequest {
     @NotNull(message = "订单编号不能为空")
     private List<String> orderNoList;
 
-    @ApiModelProperty(value = "支付类型：weixin-微信支付，yue-余额支付，offline-线下支付，alipay-支付包支付")
+    @ApiModelProperty(value = "支付类型：weixin-微信支付，yue-余额支付，offline-线下支付，alipay-支付包支付, integral-积分支付")
     @NotNull(message = "支付类型不能为空")
     private String payType;
 
