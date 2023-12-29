@@ -415,6 +415,7 @@ public class Constants {
     public static final int ORDER_STATUS_H5_REFUNDING = -1; // 退款中
     public static final int ORDER_STATUS_H5_REFUNDED = -2; // 已退款
     public static final int ORDER_STATUS_H5_REFUND = -3; // 退款
+    public static final int ORDER_STATUS_H5_REFUND_PROCESSING = -4; // 待处理
 
     public static final int ORDER_STATUS_INT_PAID = 0; //已支付
     public static final int ORDER_STATUS_INT_SPIKE = 1; //待收货

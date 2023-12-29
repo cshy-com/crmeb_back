@@ -171,6 +171,10 @@ public class OrderUtils {
                     queryWrapper.eq(StoreOrder::getPaid, true);
                     queryWrapper.in(StoreOrder::getRefundStatus, 1,2,3,4,5,6);
                     break;
+                case Constants.ORDER_STATUS_H5_REFUND_PROCESSING: // 包含已退款和退款中 退货待发货  退货已发货 退货退款被拒绝
+                    queryWrapper.eq(StoreOrder::getPaid, true);
+                    queryWrapper.eq(StoreOrder::getRefundStatus, 4);
+                    break;
             }
         }
         queryWrapper.eq(StoreOrder::getIsDel, false);

@@ -2378,9 +2378,7 @@ public class OrderServiceImpl implements OrderService {
         if (request.getUseIntegral()) {
             // 积分兑换金额小于实际支付金额
             if (deductionPrice.compareTo(payPrice) < 0) {
-                payPrice = payPrice.subtract(deductionPrice);
-                priceResponse.setSurplusIntegral(0);
-                priceResponse.setUsedIntegral(user.getIntegral());
+                throw new CrmebException("积分不足，请选择其他支付方式");
             } else {
                 deductionPrice = payPrice;
                 if (payPrice.compareTo(BigDecimal.ZERO) > 0) {

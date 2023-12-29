@@ -547,7 +547,6 @@ public class OrderPayServiceImpl implements OrderPayService {
      * @return Boolean Boolean
      */
     private Boolean balancePay(StoreOrder storeOrder) {
-
         // 用户积分扣除
         User user = userService.getById(storeOrder.getUid());
         if (ObjectUtil.isNull(user)) throw new CrmebException("用户不存在");
@@ -652,6 +651,9 @@ public class OrderPayServiceImpl implements OrderPayService {
             }
             if (storeOrder.getPaid()) {
                 throw new CrmebException("订单已支付");
+            }
+            if (storeOrder.getPayType().equals(Constants.PAY_TYPE_INTEGRAL) && storeOrder.getPayPrice().compareTo(new BigDecimal(0)) != 0){
+                throw new CrmebException("积分不足，请选择其他支付方式");
             }
             User user = userService.getById(storeOrder.getUid());
             if (ObjectUtil.isNull(user)) throw new CrmebException("用户不存在");
