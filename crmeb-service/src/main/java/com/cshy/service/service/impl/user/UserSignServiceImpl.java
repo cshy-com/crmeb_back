@@ -32,6 +32,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -83,7 +84,7 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
             return userSignVoList;
         }
         for (UserSign userSign : userSignList) {
-            userSignVoList.add(new UserSignVo(userSign.getTitle(), userSign.getNumber(), userSign.getCreateDay()));
+            userSignVoList.add(new UserSignVo(userSign.getTitle(), userSign.getNumber(), userSign.getCreateTime()));
         }
         return userSignVoList;
     }
@@ -102,13 +103,13 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
             user.setSignNum(0);
         } else {
             // 判断是否重复签到
-            String lastDate = DateUtil.dateToStr(lastUserSign.getCreateDay(), Constants.DATE_FORMAT_DATE);
+            String lastDate = DateUtil.dateToStr(lastUserSign.getCreateTime(), Constants.DATE_FORMAT_DATE);
             String nowDate = DateUtil.nowDate(Constants.DATE_FORMAT_DATE);
             //对比今天数据
             if (DateUtil.compareDate(lastDate, nowDate, Constants.DATE_FORMAT_DATE) == 0) {
                 throw new CrmebException("今日已签到。不可重复签到");
             }
-            String nextDate = DateUtil.addDay(lastUserSign.getCreateDay(), 1, Constants.DATE_FORMAT_DATE);
+            String nextDate = DateUtil.addDay(lastUserSign.getCreateTime(), 1, Constants.DATE_FORMAT_DATE);
             int compareDate = DateUtil.compareDate(nextDate, nowDate, Constants.DATE_FORMAT_DATE);
             if (compareDate != 0) {
                 //不相等，所以不是连续签到,重置签到次数
@@ -146,7 +147,6 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
         userSign.setNumber(configVo.getIntegral());
         userSign.setType(Constants.SIGN_TYPE_INTEGRAL);
         userSign.setBalance(user.getIntegral() + configVo.getIntegral());
-        userSign.setCreateDay(DateUtil.strToDate(DateUtil.nowDate(Constants.DATE_FORMAT_DATE), Constants.DATE_FORMAT_DATE));
 
         // 生成用户积分记录
         UserIntegralRecord integralRecord = new UserIntegralRecord();
@@ -238,7 +238,7 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
         LambdaQueryWrapper<UserSign> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(UserSign::getType, 1);
         lambdaQueryWrapper.eq(UserSign::getUid, userService.getUserIdException());
-        lambdaQueryWrapper.orderByDesc(UserSign::getCreateDay);
+        lambdaQueryWrapper.orderByDesc(UserSign::getCreateTime);
         List<UserSign> userSignList = dao.selectList(lambdaQueryWrapper);
 
         ArrayList<UserSignMonthVo> signMonthVoArrayList = new ArrayList<>();
@@ -247,8 +247,8 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
         }
 
         for (UserSign userSign : userSignList) {
-            String date = DateUtil.dateToStr(userSign.getCreateDay(), Constants.DATE_FORMAT_MONTH);
-            UserSignVo userSignVo = new UserSignVo(userSign.getTitle(), userSign.getNumber(), userSign.getCreateDay());
+            String date = DateUtil.dateToStr(userSign.getCreateTime(), Constants.DATE_FORMAT_MONTH);
+            UserSignVo userSignVo = new UserSignVo(userSign.getTitle(), userSign.getNumber(), userSign.getCreateTime());
             boolean findResult = false;
             if (signMonthVoArrayList.size() > 0) {
                 //有数据之后则 判断是否已存在，存在则更新
@@ -308,27 +308,28 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
     }
 
     private Boolean checkDaySign(Integer userId) {
-        List<UserSign> userSignList = getInfoByDay(userId, DateUtil.nowDate(Constants.DATE_FORMAT_DATE));
+        List<UserSign> userSignList = getInfoByDay(userId, new Date());
         return userSignList.size() != 0;
     }
 
     private Boolean checkYesterdaySign(Integer userId) {
-        String day = DateUtil.nowDate(Constants.DATE_FORMAT_DATE);
-        String yesterday = DateUtil.addDay(day, -1, Constants.DATE_FORMAT_DATE);
-        List<UserSign> userSignList = getInfoByDay(userId, yesterday);
+        String day = DateUtil.nowDate(Constants.DATE_FORMAT);
+        String yesterday = DateUtil.addDay(day, -1, Constants.DATE_FORMAT);
+        List<UserSign> userSignList = getInfoByDay(userId, DateUtil.strToDate(yesterday, Constants.DATE_FORMAT));
         return userSignList.size() != 0;
     }
 
-    private List<UserSign> getInfoByDay(Integer userId, String date) {
+    private List<UserSign> getInfoByDay(Integer userId, Date date) {
         LambdaQueryWrapper<UserSign> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(UserSign::getUid, userId).eq(UserSign::getType, 1).eq(UserSign::getCreateDay, date);
+        lambdaQueryWrapper.eq(UserSign::getUid, userId).eq(UserSign::getType, 1).between(UserSign::getCreateTime,DateUtil.dateToStr(date, Constants.DATE_FORMAT_START), DateUtil.dateToStr(date, Constants.DATE_FORMAT_END));
         return dao.selectList(lambdaQueryWrapper);
     }
 
     private Integer getCount(Integer userId) {
         LambdaQueryWrapper<UserSign> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(UserSign::getUid, userId).eq(UserSign::getType, 1);
-        return dao.selectCount(lambdaQueryWrapper);
+        lambdaQueryWrapper.last(" group by DATE_FORMAT(create_time, '%Y-%m-%d')");
+        return dao.selectList(lambdaQueryWrapper).size();
     }
 
     /**
@@ -338,9 +339,9 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
      */
     private UserSign getLastDayByUid(Integer uid) {
         LambdaQueryWrapper<UserSign> lqw = Wrappers.lambdaQuery();
-        lqw.select(UserSign::getCreateDay);
+        lqw.select(UserSign::getCreateTime);
         lqw.eq(UserSign::getUid, uid);
-        lqw.orderByDesc(UserSign::getCreateDay);
+        lqw.orderByDesc(UserSign::getCreateTime);
         lqw.last(" limit 1");
         return dao.selectOne(lqw);
     }
