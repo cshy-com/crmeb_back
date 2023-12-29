@@ -1,5 +1,6 @@
 package com.cshy.front.controller;
 
+import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.Type;
 import com.cshy.common.model.dto.AdvicesDto;
 import com.cshy.common.model.entity.base.BasePage;
@@ -18,8 +19,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
-@Api(value = "v2 -- 建议意见", tags = "v2- 建议意见")
+@Api(value = "v2 -- 建议意见", tags = "v2 -- 建议意见")
 @RestController
 @AllArgsConstructor
 @RequestMapping("api/front/advices")
@@ -57,8 +59,10 @@ public class AdvicesController {
 
     @ApiOperation("根据我的所有建议")
     @RequestMapping(value = "/myList",method = RequestMethod.POST)
-    public CommonResult<?> myList(AdvicesQuery advicesQuery, @Validated(Type.Page.class) @RequestBody BasePage basePage) {
+    public CommonResult<?> myList(@RequestBody AdvicesQuery advicesQuery, @Validated(Type.Page.class) @RequestBody BasePage basePage) {
         Integer userId = tokenComponent.getUserId();
+        if (Objects.isNull(userId))
+            throw new CrmebException("登录失效，请重试");
         advicesQuery.setUserId(userId);
         CommonPage<AdvicesVo> page = advicesService.page(advicesQuery, basePage);
         return CommonResult.success(page);

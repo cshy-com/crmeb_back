@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
-@Api(value = "v2 -- 建议意见", tags = "v2- 建议意见")
+@Api(value = "v2 -- 建议意见", tags = "v2 -- 建议意见")
 @RestController
 @AllArgsConstructor
 @RequestMapping("api/admin/advices")
