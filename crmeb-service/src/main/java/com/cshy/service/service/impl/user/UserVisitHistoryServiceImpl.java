@@ -5,7 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cshy.common.constants.DateFormatters;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.model.dto.user.UserVisitHistoryDto;
 import com.cshy.common.model.entity.base.BaseServiceImpl;
 import com.cshy.common.model.entity.product.StoreProduct;
@@ -43,9 +43,9 @@ public class UserVisitHistoryServiceImpl extends BaseServiceImpl<UserVisitHistor
     @Override
     protected void onBeforePage(UserVisitHistoryQuery query, QueryWrapper<UserVisitHistory> queryWrapper) {
         String date = query.getDate();
-        DateTime dateTime = DateUtil.parse(date, DateFormatters.DATE_FORMAT_DATE);
-        String start = DateUtil.format(dateTime, DateFormatters.DATE_FORMAT_START);
-        String end = DateUtil.format(dateTime, DateFormatters.DATE_FORMAT_END);
+        DateTime dateTime = DateUtil.parse(date, DateConstants.DATE_FORMAT_DATE);
+        String start = DateUtil.format(dateTime, DateConstants.DATE_FORMAT_START);
+        String end = DateUtil.format(dateTime, DateConstants.DATE_FORMAT_END);
         queryWrapper.between("create_time", start, end);
         super.onBeforePage(query, queryWrapper);
     }

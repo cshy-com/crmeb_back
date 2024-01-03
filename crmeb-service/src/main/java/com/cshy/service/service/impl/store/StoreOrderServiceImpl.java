@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.DateFormatters;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.store.*;
 import com.cshy.common.model.request.system.SystemWriteOffOrderSearchRequest;
@@ -755,17 +755,17 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         String dateStartD = dateRange.getStartTime();
         String dateEndD = dateRange.getEndTime();
         int days = DateUtil.daysBetween(
-                DateUtil.strToDate(dateStartD, DateFormatters.DATE_FORMAT_DATE),
-                DateUtil.strToDate(dateEndD, DateFormatters.DATE_FORMAT_DATE)
+                DateUtil.strToDate(dateStartD, DateConstants.DATE_FORMAT_DATE),
+                DateUtil.strToDate(dateEndD, DateConstants.DATE_FORMAT_DATE)
         );
         // 同时间区间的上一个时间起点
         String perDateStart = DateUtil.addDay(
-                DateUtil.strToDate(dateStartD, DateFormatters.DATE_FORMAT_DATE), -days, DateFormatters.DATE_FORMAT_START);
+                DateUtil.strToDate(dateStartD, DateConstants.DATE_FORMAT_DATE), -days, DateConstants.DATE_FORMAT_START);
         // 当前时间区间
         String dateStart = DateUtil.addDay(
-                DateUtil.strToDate(dateStartD, DateFormatters.DATE_FORMAT_DATE), 0, DateFormatters.DATE_FORMAT_START);
+                DateUtil.strToDate(dateStartD, DateConstants.DATE_FORMAT_DATE), 0, DateConstants.DATE_FORMAT_START);
         String dateEnd = DateUtil.addDay(
-                DateUtil.strToDate(dateEndD, DateFormatters.DATE_FORMAT_DATE), 0, DateFormatters.DATE_FORMAT_END);
+                DateUtil.strToDate(dateEndD, DateConstants.DATE_FORMAT_DATE), 0, DateConstants.DATE_FORMAT_END);
 
         // 上一个时间段查询
         List<StoreOrder> orderPerList = getOrderPayedByDateLimit(perDateStart, dateStart);
@@ -806,8 +806,8 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
      */
     @Override
     public List<StoreOrder> getUserCurrentDaySecKillOrders(Integer uid, Integer seckillId) {
-        String dayStart = DateUtil.nowDateTime(DateFormatters.DATE_FORMAT_START);
-        String dayEnd = DateUtil.nowDateTime(DateFormatters.DATE_FORMAT_END);
+        String dayStart = DateUtil.nowDateTime(DateConstants.DATE_FORMAT_START);
+        String dayEnd = DateUtil.nowDateTime(DateConstants.DATE_FORMAT_END);
         LambdaQueryWrapper<StoreOrder> lqw = Wrappers.lambdaQuery();
         lqw.eq(StoreOrder::getUid, uid);
         lqw.eq(StoreOrder::getSeckillId, seckillId);
@@ -1810,7 +1810,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
             }
             map.put(Constants.WE_CHAT_TEMP_KEY_FIRST, "订单配送提醒");
             map.put("keyword1", storeOrder.getOrderId());
-            map.put("keyword2", DateUtil.dateToStr(storeOrder.getCreateTime(), DateFormatters.DATE_FORMAT));
+            map.put("keyword2", DateUtil.dateToStr(storeOrder.getCreateTime(), DateConstants.DATE_FORMAT));
             //TODO 前后端修改
 //            map.put("keyword3", storeOrder.getUserAddress());
             map.put("keyword4", request.getDeliveryName());

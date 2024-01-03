@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.DateFormatters;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttr;
@@ -184,8 +184,8 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         // 获取当前时间
         DateTime dateTime = cn.hutool.core.date.DateUtil.date();
         // 开始、结束时间
-        String startTimeStr = cn.hutool.core.date.DateUtil.date(seckill.getStartTime()).toString(DateFormatters.DATE_FORMAT_DATE);
-        String stopTimeStr = cn.hutool.core.date.DateUtil.date(seckill.getStopTime()).toString(DateFormatters.DATE_FORMAT_DATE);
+        String startTimeStr = cn.hutool.core.date.DateUtil.date(seckill.getStartTime()).toString(DateConstants.DATE_FORMAT_DATE);
+        String stopTimeStr = cn.hutool.core.date.DateUtil.date(seckill.getStopTime()).toString(DateConstants.DATE_FORMAT_DATE);
         DateTime startDate = cn.hutool.core.date.DateUtil.parseDate(startTimeStr + " 00:00:00");
         DateTime stopDate = cn.hutool.core.date.DateUtil.parse(stopTimeStr + " 23:59:59");
 
@@ -241,8 +241,8 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         // 轮播图
         storeSeckill.setImages(systemAttachmentService.clearPrefix(storeSeckill.getImages()));
         // 设置秒杀开始时间和结束时间
-        storeSeckill.setStartTime(DateUtil.strToDate(request.getStartTime(), DateFormatters.DATE_FORMAT_DATE));
-        storeSeckill.setStopTime(DateUtil.strToDate(request.getStopTime(), DateFormatters.DATE_FORMAT_DATE));
+        storeSeckill.setStartTime(DateUtil.strToDate(request.getStartTime(), DateConstants.DATE_FORMAT_DATE));
+        storeSeckill.setStopTime(DateUtil.strToDate(request.getStopTime(), DateConstants.DATE_FORMAT_DATE));
 
         //计算价格
         List<StoreProductAttrValueAddRequest> attrValueAddRequestList = request.getAttrValue();
@@ -333,8 +333,8 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
 
         StoreSeckill seckill = new StoreSeckill();
         BeanUtils.copyProperties(request, seckill);
-        seckill.setStartTime(DateUtil.strToDate(request.getStartTime(),DateFormatters.DATE_FORMAT_DATE));
-        seckill.setStopTime(DateUtil.strToDate(request.getStopTime(),DateFormatters.DATE_FORMAT_DATE));
+        seckill.setStartTime(DateUtil.strToDate(request.getStartTime(), DateConstants.DATE_FORMAT_DATE));
+        seckill.setStopTime(DateUtil.strToDate(request.getStopTime(), DateConstants.DATE_FORMAT_DATE));
 
         //主图
         seckill.setImage(systemAttachmentService.clearPrefix(seckill.getImage()));
@@ -561,7 +561,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
             return 0;
         }
         if (storeSeckill.getStatus() == 1) {
-            String ymdStart = cn.hutool.core.date.DateUtil.date(storeSeckill.getStartTime()).toString(DateFormatters.DATE_FORMAT_DATE);
+            String ymdStart = cn.hutool.core.date.DateUtil.date(storeSeckill.getStartTime()).toString(DateConstants.DATE_FORMAT_DATE);
             String startTimeStr = seckillManger.getStartTime() < 10 ? "0" + seckillManger.getStartTime() : seckillManger.getStartTime().toString();
             DateTime startTime = cn.hutool.core.date.DateUtil.parse(ymdStart + " " + startTimeStr + ":00:00");
             Date nowDateTime = DateUtil.nowDateTime();
@@ -569,7 +569,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
                 // 即将开始
                 return 1;
             }
-            String ymdEnd = cn.hutool.core.date.DateUtil.date(storeSeckill.getStopTime()).toString(DateFormatters.DATE_FORMAT_DATE);
+            String ymdEnd = cn.hutool.core.date.DateUtil.date(storeSeckill.getStopTime()).toString(DateConstants.DATE_FORMAT_DATE);
             String endTimeStr = seckillManger.getStartTime() < 10 ? "0" + seckillManger.getEndTime() : seckillManger.getEndTime().toString();
             DateTime stopTime = cn.hutool.core.date.DateUtil.parse(ymdEnd + " " + endTimeStr + ":00:00");
             if (nowDateTime.compareTo(stopTime) >= 0) {
@@ -603,8 +603,8 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         infoResponse.setStoreName(storeSeckill.getTitle());
         infoResponse.setStoreInfo(storeSeckill.getInfo());
         infoResponse.setSliderImage(String.join(",",storeSeckill.getImages()));
-        infoResponse.setStartTimeStr(cn.hutool.core.date.DateUtil.format(storeSeckill.getStartTime(), DateFormatters.DATE_FORMAT_DATE));
-        infoResponse.setStopTimeStr(cn.hutool.core.date.DateUtil.format(storeSeckill.getStopTime(), DateFormatters.DATE_FORMAT_DATE));
+        infoResponse.setStartTimeStr(cn.hutool.core.date.DateUtil.format(storeSeckill.getStartTime(), DateConstants.DATE_FORMAT_DATE));
+        infoResponse.setStopTimeStr(cn.hutool.core.date.DateUtil.format(storeSeckill.getStopTime(), DateConstants.DATE_FORMAT_DATE));
         infoResponse.setProductId(storeSeckill.getProductId());
 
         // 查询attr
@@ -683,7 +683,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         lqw.eq(StoreSeckill::getIsDel,false);
         lqw.eq(StoreSeckill::getIsShow,true);
         lqw.eq(StoreSeckill::getTimeId,timeId);
-        String currentDate = DateUtil.nowDate(DateFormatters.DATE_FORMAT_DATE);
+        String currentDate = DateUtil.nowDate(DateConstants.DATE_FORMAT_DATE);
         lqw.le(StoreSeckill::getStartTime, currentDate);
         lqw.ge(StoreSeckill::getStopTime, currentDate);
         lqw.orderByDesc(StoreSeckill::getId);
@@ -699,7 +699,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
     @Override
     public List<StoreSecKillH5Response> getKillListByTimeId(String timeId, PageParamRequest pageParamRequest) {
         PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        String currentDate = DateUtil.nowDate(DateFormatters.DATE_FORMAT_DATE);
+        String currentDate = DateUtil.nowDate(DateConstants.DATE_FORMAT_DATE);
         LambdaQueryWrapper<StoreSeckill> lqw = Wrappers.lambdaQuery();
         lqw.eq(StoreSeckill::getStatus,1);
         lqw.eq(StoreSeckill::getIsDel,false);
@@ -863,7 +863,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         StoreSeckillManger seckillManger = currentSeckillManagerList.get(0);
 
         // 查询当前时段秒杀商品
-        String currentDate = DateUtil.nowDate(DateFormatters.DATE_FORMAT_DATE);
+        String currentDate = DateUtil.nowDate(DateConstants.DATE_FORMAT_DATE);
         LambdaQueryWrapper<StoreSeckill> lqw = Wrappers.lambdaQuery();
         lqw.select(StoreSeckill::getId, StoreSeckill::getProductId, StoreSeckill::getImage, StoreSeckill::getTitle, StoreSeckill::getPrice, StoreSeckill::getOtPrice);
         lqw.eq(StoreSeckill::getStatus,1);

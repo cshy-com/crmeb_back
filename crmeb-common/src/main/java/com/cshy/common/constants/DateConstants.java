@@ -1,6 +1,6 @@
 package com.cshy.common.constants;
 
-public class DateFormatters {
+public class DateConstants {
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final String DATE_FORMAT_UTC = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String DATE_FORMAT_DATE = "yyyy-MM-dd";

@@ -6,10 +6,9 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.DateFormatters;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.SearchAndPageRequest;
-import com.cshy.common.constants.Constants;
 import com.cshy.common.constants.CouponConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.service.service.*;
@@ -113,7 +112,7 @@ public class StoreCouponServiceImpl extends ServiceImpl<StoreCouponDao, StoreCou
                 throw new CrmebException("请选择领取时间范围！");
             }
 
-            int compareDate = DateUtil.compareDate(DateUtil.dateToStr(storeCoupon.getReceiveStartTime(), DateFormatters.DATE_FORMAT), DateUtil.dateToStr(storeCoupon.getReceiveEndTime(), DateFormatters.DATE_FORMAT), DateFormatters.DATE_FORMAT);
+            int compareDate = DateUtil.compareDate(DateUtil.dateToStr(storeCoupon.getReceiveStartTime(), DateConstants.DATE_FORMAT), DateUtil.dateToStr(storeCoupon.getReceiveEndTime(), DateConstants.DATE_FORMAT), DateConstants.DATE_FORMAT);
             if (compareDate > -1) {
                 throw new CrmebException("请选择正确的领取时间范围！");
             }
@@ -153,7 +152,7 @@ public class StoreCouponServiceImpl extends ServiceImpl<StoreCouponDao, StoreCou
         if (!(storeCoupon.getReceiveEndTime() == null || "".equals(storeCoupon.getReceiveEndTime()))) {
             //非永久可领取
             String date = DateUtil.nowDateTimeStr();
-            int result = DateUtil.compareDate(date, DateUtil.dateToStr(storeCoupon.getReceiveEndTime(), DateFormatters.DATE_FORMAT), DateFormatters.DATE_FORMAT);
+            int result = DateUtil.compareDate(date, DateUtil.dateToStr(storeCoupon.getReceiveEndTime(), DateConstants.DATE_FORMAT), DateConstants.DATE_FORMAT);
             if (result == 1) {
                 //过期了
                 throw new CrmebException("已超过优惠券领取最后期限！");
@@ -240,7 +239,7 @@ public class StoreCouponServiceImpl extends ServiceImpl<StoreCouponDao, StoreCou
      */
     @Override
     public List<StoreCoupon> findRegisterList() {
-        String dateStr = DateUtil.nowDate(DateFormatters.DATE_FORMAT);
+        String dateStr = DateUtil.nowDate(DateConstants.DATE_FORMAT);
         LambdaQueryWrapper<StoreCoupon> lqw = new LambdaQueryWrapper<>();
         lqw.eq(StoreCoupon::getType, 2);
         lqw.eq(StoreCoupon::getStatus, true);
@@ -258,7 +257,7 @@ public class StoreCouponServiceImpl extends ServiceImpl<StoreCouponDao, StoreCou
             // 判断是否达到可领取时间
             if (ObjectUtil.isNotNull(coupon.getReceiveStartTime())) {
                 //非永久可领取
-                int result = DateUtil.compareDate(dateStr, DateUtil.dateToStr(coupon.getReceiveStartTime(), DateFormatters.DATE_FORMAT), DateFormatters.DATE_FORMAT);
+                int result = DateUtil.compareDate(dateStr, DateUtil.dateToStr(coupon.getReceiveStartTime(), DateConstants.DATE_FORMAT), DateConstants.DATE_FORMAT);
                 if (result == -1) {
                     // 未开始
                     return false;
@@ -267,7 +266,7 @@ public class StoreCouponServiceImpl extends ServiceImpl<StoreCouponDao, StoreCou
 
             // 是否有领取结束时间
             if (ObjectUtil.isNotNull(coupon.getReceiveEndTime())) {
-                int compareDate = DateUtil.compareDate(dateStr, DateUtil.dateToStr(coupon.getReceiveEndTime(), DateFormatters.DATE_FORMAT), DateFormatters.DATE_FORMAT);
+                int compareDate = DateUtil.compareDate(dateStr, DateUtil.dateToStr(coupon.getReceiveEndTime(), DateConstants.DATE_FORMAT), DateConstants.DATE_FORMAT);
                 if (compareDate > 0) {
                     return false;
                 }
@@ -301,7 +300,7 @@ public class StoreCouponServiceImpl extends ServiceImpl<StoreCouponDao, StoreCou
             lqw.like(StoreCoupon::getName, request.getKeywords());
         }
         lqw.and(o -> o.eq(StoreCoupon::getIsLimited, false).or().ge(StoreCoupon::getLastTotal, 0));
-        lqw.and(o -> o.isNull(StoreCoupon::getReceiveEndTime).or().gt(StoreCoupon::getReceiveEndTime, DateUtil.nowDate(DateFormatters.DATE_FORMAT)));
+        lqw.and(o -> o.isNull(StoreCoupon::getReceiveEndTime).or().gt(StoreCoupon::getReceiveEndTime, DateUtil.nowDate(DateConstants.DATE_FORMAT)));
         lqw.orderByDesc(StoreCoupon::getSort, StoreCoupon::getId);
         return dao.selectList(lqw);
     }
@@ -357,8 +356,8 @@ public class StoreCouponServiceImpl extends ServiceImpl<StoreCouponDao, StoreCou
             }
 
             // 更改使用时间格式，去掉时分秒
-            response.setUseStartTimeStr(DateUtil.dateToStr(storeCoupon.getUseStartTime(), DateFormatters.DATE_FORMAT_DATE));
-            response.setUseEndTimeStr(DateUtil.dateToStr(storeCoupon.getUseEndTime(), DateFormatters.DATE_FORMAT_DATE));
+            response.setUseStartTimeStr(DateUtil.dateToStr(storeCoupon.getUseStartTime(), DateConstants.DATE_FORMAT_DATE));
+            response.setUseEndTimeStr(DateUtil.dateToStr(storeCoupon.getUseEndTime(), DateConstants.DATE_FORMAT_DATE));
             storeCouponFrontResponseArrayList.add(response);
         }
 

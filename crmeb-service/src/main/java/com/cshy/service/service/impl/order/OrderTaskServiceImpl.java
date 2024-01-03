@@ -5,7 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.DateFormatters;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.constants.TaskConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.order.StoreOrder;
@@ -264,8 +264,8 @@ public class OrderTaskServiceImpl implements OrderTaskService {
                 continue ;
             }
             // 判断是否到自动完成时间（收货时间向后偏移7天）
-            String comTime = DateUtil.addDay(orderStatus.getCreateTime(), 7, DateFormatters.DATE_FORMAT);
-            int compareDate = DateUtil.compareDate(comTime, DateUtil.nowDateTime(DateFormatters.DATE_FORMAT), DateFormatters.DATE_FORMAT);
+            String comTime = DateUtil.addDay(orderStatus.getCreateTime(), 7, DateConstants.DATE_FORMAT);
+            int compareDate = DateUtil.compareDate(comTime, DateUtil.nowDateTime(DateConstants.DATE_FORMAT), DateConstants.DATE_FORMAT);
             if (compareDate < 0) {
                 continue ;
             }

@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.DateFormatters;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttr;
@@ -154,7 +154,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
                 combinationResponse.setCountPeopleAll(pinkList.size());
                 combinationResponse.setCountPeoplePink(successTeam.size());
             }
-            combinationResponse.setStopTimeStr(DateUtil.timestamp2DateStr(combination.getStopTime(), DateFormatters.DATE_FORMAT_DATE));
+            combinationResponse.setStopTimeStr(DateUtil.timestamp2DateStr(combination.getStopTime(), DateConstants.DATE_FORMAT_DATE));
             return combinationResponse;
         }).collect(Collectors.toList());
 

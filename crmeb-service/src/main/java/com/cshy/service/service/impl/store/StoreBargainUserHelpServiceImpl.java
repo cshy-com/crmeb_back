@@ -86,7 +86,7 @@ public class StoreBargainUserHelpServiceImpl extends ServiceImpl<StoreBargainUse
         List<StoreBargainUserHelpResponse> list = helpList.stream().map(help -> {
             StoreBargainUserHelpResponse helpResponse = new StoreBargainUserHelpResponse();
             BeanUtils.copyProperties(help, helpResponse);
-            helpResponse.setAddTime(DateUtil.timestamp2DateStr(help.getAddTime(), DateFormatters.DATE_FORMAT));
+            helpResponse.setAddTime(DateUtil.timestamp2DateStr(help.getAddTime(), DateConstants.DATE_FORMAT));
             User user = userService.getById(help.getUid());
             helpResponse.setAvatar(user.getAvatar());
             helpResponse.setNickname(user.getNickname());

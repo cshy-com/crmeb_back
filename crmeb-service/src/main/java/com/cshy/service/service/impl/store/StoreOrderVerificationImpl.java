@@ -3,7 +3,7 @@ package com.cshy.service.service.impl.store;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.DateFormatters;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.constants.TaskConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.order.StoreOrder;
@@ -95,11 +95,11 @@ public class StoreOrderVerificationImpl implements StoreOrderVerification {
         storeStaffTopDetail.setRefundCount(dao.selectCount(lqwRefundCount));
 
         // 获取今日，昨日，本月，订单金额
-        String dayStart = DateUtil.nowDateTime(DateFormatters.DATE_FORMAT_START);
-        String dayEnd = DateUtil.nowDateTime(DateFormatters.DATE_FORMAT_END);
-        String yesterdayStart = DateUtil.addDay(dayStart,-1, DateFormatters.DATE_FORMAT_START);
-        String yesterdayEnd = DateUtil.addDay(dayEnd,-1, DateFormatters.DATE_FORMAT_END);
-        String monthStart = DateUtil.nowDateTime(DateFormatters.DATE_FORMAT_MONTH_START);
+        String dayStart = DateUtil.nowDateTime(DateConstants.DATE_FORMAT_START);
+        String dayEnd = DateUtil.nowDateTime(DateConstants.DATE_FORMAT_END);
+        String yesterdayStart = DateUtil.addDay(dayStart,-1, DateConstants.DATE_FORMAT_START);
+        String yesterdayEnd = DateUtil.addDay(dayEnd,-1, DateConstants.DATE_FORMAT_END);
+        String monthStart = DateUtil.nowDateTime(DateConstants.DATE_FORMAT_MONTH_START);
         String monthEnd = DateUtil.getMonthEndDay();
 
         // 今日订单数量

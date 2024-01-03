@@ -461,7 +461,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
 
         for (User user : list) {
-            map.put(DateUtil.dateToStr(user.getCreateTime(), DateFormatters.DATE_FORMAT_DATE), user.getUid());
+            map.put(DateUtil.dateToStr(user.getCreateTime(), DateConstants.DATE_FORMAT_DATE), user.getUid());
         }
         return map;
     }

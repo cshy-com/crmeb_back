@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.DateFormatters;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.store.*;
@@ -121,9 +121,9 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
         for (StoreBargain storeBargain : storeBargainList) {
             StoreBargainResponse storeBargainResponse = new StoreBargainResponse();
             BeanUtils.copyProperties(storeBargain, storeBargainResponse);
-            storeBargainResponse.setStartTime(DateUtil.timestamp2DateStr(storeBargain.getStartTime(), DateFormatters.DATE_FORMAT_DATE));
-            storeBargainResponse.setStopTime(DateUtil.timestamp2DateStr(storeBargain.getStopTime(), DateFormatters.DATE_FORMAT_DATE));
-            storeBargainResponse.setAddTime(DateUtil.timestamp2DateStr(storeBargain.getAddTime(), DateFormatters.DATE_FORMAT));
+            storeBargainResponse.setStartTime(DateUtil.timestamp2DateStr(storeBargain.getStartTime(), DateConstants.DATE_FORMAT_DATE));
+            storeBargainResponse.setStopTime(DateUtil.timestamp2DateStr(storeBargain.getStopTime(), DateConstants.DATE_FORMAT_DATE));
+            storeBargainResponse.setAddTime(DateUtil.timestamp2DateStr(storeBargain.getAddTime(), DateConstants.DATE_FORMAT));
             List<StoreBargainUser> bargainUserList = storeBargainUserService.getListByBargainId(storeBargain.getId());
             if (CollUtil.isEmpty(bargainUserList)) {
                 storeBargainResponse.setCountPeopleAll(0L);

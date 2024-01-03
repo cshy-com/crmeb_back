@@ -2,7 +2,7 @@ package com.cshy.common.utils;
 
 import cn.hutool.core.util.RandomUtil;
 import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.DateFormatters;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.exception.CrmebException;
 import org.apache.commons.io.FilenameUtils;
 
@@ -109,7 +109,7 @@ public class UploadUtil {
 
     public static String getWebPath() {
         // 文件分隔符转化为当前系统的格式
-        return getModelPath() + DateUtil.nowDate(DateFormatters.DATE_FORMAT_DATE).replace("-", "/") + "/";
+        return getModelPath() + DateUtil.nowDate(DateConstants.DATE_FORMAT_DATE).replace("-", "/") + "/";
 //        return getType() + getModelPath() + DateUtil.nowDate(DateFormatters.DATE_FORMAT_DATE).replace("-", "/") + "/";
     }
 }

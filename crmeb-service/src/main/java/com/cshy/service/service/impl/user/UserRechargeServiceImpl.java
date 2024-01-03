@@ -7,10 +7,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.DateFormatters;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -73,7 +72,7 @@ public class UserRechargeServiceImpl extends ServiceImpl<UserRechargeDao, UserRe
         //时间范围
         if (StrUtil.isNotBlank(dateLimit.getStartTime()) && StrUtil.isNotBlank(dateLimit.getEndTime())) {
             //判断时间
-            int compareDateResult = DateUtil.compareDate(dateLimit.getEndTime(), dateLimit.getStartTime(), DateFormatters.DATE_FORMAT);
+            int compareDateResult = DateUtil.compareDate(dateLimit.getEndTime(), dateLimit.getStartTime(), DateConstants.DATE_FORMAT);
             if(compareDateResult == -1){
                 throw new CrmebException("开始时间不能大于结束时间！");
             }
