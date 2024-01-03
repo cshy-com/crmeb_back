@@ -1,6 +1,7 @@
 package com.cshy.service.service.impl;
 
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.NumConstants;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.response.HomeRateResponse;
 import com.cshy.common.utils.DateUtil;
@@ -38,7 +39,7 @@ public class HomeServiceImpl implements HomeService {
     public Map<String, Object> chartOrder() {
         Map<String, Object> map = new HashMap<>();
 
-        List<StoreOrder> list = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_LATELY_30, Constants.NUM_TEN);
+        List<StoreOrder> list = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_LATELY_30, NumConstants.NUM_TEN);
 
         map.put("quality",
                 dataFormat(getOrderCountGroupByDate(list), Constants.SEARCH_DATE_LATELY_30)
@@ -153,30 +154,30 @@ public class HomeServiceImpl implements HomeService {
     public Map<String, Integer> chartUserBuy() {
         Map<String, Integer> map = new HashMap<>();
         //未消费用户
-        map.put("zero", userService.getCountByPayCount(Constants.NUM_ZERO, Constants.NUM_ZERO));
+        map.put("zero", userService.getCountByPayCount(NumConstants.NUM_ZERO, NumConstants.NUM_ZERO));
 
         //消费一次用户
-        map.put("one", userService.getCountByPayCount(Constants.NUM_ONE, Constants.NUM_ONE));
+        map.put("one", userService.getCountByPayCount(NumConstants.NUM_ONE, NumConstants.NUM_ONE));
 
         //留存客户
-        map.put("history", userService.getCountByPayCount(Constants.NUM_TWO, Constants.NUM_THREE));
+        map.put("history", userService.getCountByPayCount(NumConstants.NUM_TWO, NumConstants.NUM_THREE));
 
         //回流客户
-        map.put("back", userService.getCountByPayCount(Constants.NUM_ONE, Constants.EXPORT_MAX_LIMIT));
+        map.put("back", userService.getCountByPayCount(NumConstants.NUM_ONE, Constants.EXPORT_MAX_LIMIT));
 
         return map;
     }
 
     @Override
     public Map<String, Object> chartOrderInWeek() {
-        return returnOrderDate(Constants.SEARCH_DATE_WEEK, Constants.SEARCH_DATE_PRE_WEEK, Constants.NUM_TEN);
+        return returnOrderDate(Constants.SEARCH_DATE_WEEK, Constants.SEARCH_DATE_PRE_WEEK, NumConstants.NUM_TEN);
 
 
     }
 
     @Override
     public Map<String, Object> chartOrderInMonth() {
-        return returnOrderDate(Constants.SEARCH_DATE_MONTH, Constants.SEARCH_DATE_PRE_MONTH, Constants.NUM_TEN);
+        return returnOrderDate(Constants.SEARCH_DATE_MONTH, Constants.SEARCH_DATE_PRE_MONTH, NumConstants.NUM_TEN);
     }
 
     @Override
@@ -184,7 +185,7 @@ public class HomeServiceImpl implements HomeService {
         Map<String, Object> map = new HashMap<>();
 
         //查询本年订单量
-        List<StoreOrder> list = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_YEAR, Constants.NUM_SEVEN);
+        List<StoreOrder> list = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_YEAR, NumConstants.NUM_SEVEN);
 
         map.put("quality",
                 dataFormatYear(getOrderCountGroupByDate(list), Constants.SEARCH_DATE_YEAR)
@@ -194,7 +195,7 @@ public class HomeServiceImpl implements HomeService {
         );
 
         //查询上年订单量
-        List<StoreOrder> preList = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_PRE_YEAR, Constants.NUM_SEVEN);
+        List<StoreOrder> preList = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_PRE_YEAR, NumConstants.NUM_SEVEN);
 
         map.put("preQuality",
                 dataFormatYear(getOrderCountGroupByDate(preList), Constants.SEARCH_DATE_PRE_YEAR)

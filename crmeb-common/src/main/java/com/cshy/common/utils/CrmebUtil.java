@@ -8,6 +8,7 @@ import cn.hutool.crypto.symmetric.DES;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.NumConstants;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -355,12 +356,12 @@ public class CrmebUtil {
 
         if(b2.equals(b1)){
             //数值一样，说明没有增长
-            return Constants.NUM_ZERO;
+            return NumConstants.NUM_ZERO;
         }
 
         if(b2.equals(BigDecimal.ZERO)){
             //b2是0
-            return Constants.NUM_ONE_HUNDRED;
+            return NumConstants.NUM_ONE_HUNDRED;
         }
 
         return (b1.subtract(b2)).divide(b2, 2, BigDecimal.ROUND_UP).multiply(BigDecimal.TEN).multiply(BigDecimal.TEN).intValue();

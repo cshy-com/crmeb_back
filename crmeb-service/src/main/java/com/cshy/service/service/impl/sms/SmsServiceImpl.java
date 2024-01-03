@@ -10,6 +10,7 @@ import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponseBody;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.cshy.common.constants.NumConstants;
 import com.cshy.common.constants.OnePassConstants;
 import com.cshy.common.constants.SmsConstants;
 import com.cshy.common.model.entity.sms.SmsRecord;
@@ -203,7 +204,7 @@ public class SmsServiceImpl implements SmsService {
         //获取短信验证码过期时间
         String codeExpireStr = systemConfigService.getValueByKey(Constants.CONFIG_KEY_SMS_CODE_EXPIRE);
         if (StrUtil.isBlank(codeExpireStr) || Integer.parseInt(codeExpireStr) == 0) {
-            codeExpireStr = Constants.NUM_FIVE + "";// 默认5分钟过期
+            codeExpireStr = NumConstants.NUM_FIVE + "";// 默认5分钟过期
         }
         redisUtil.set(userService.getValidateCodeRedisKey(phone), code, Long.valueOf(codeExpireStr), TimeUnit.MINUTES);
 
@@ -285,7 +286,7 @@ public class SmsServiceImpl implements SmsService {
                 //获取短信验证码过期时间
                 String codeExpireStr = systemConfigService.getValueByKey(Constants.CONFIG_KEY_SMS_CODE_EXPIRE);
                 if (StrUtil.isBlank(codeExpireStr) || Integer.parseInt(codeExpireStr) == 0) {
-                    codeExpireStr = Constants.NUM_FIVE + "";// 默认5分钟过期
+                    codeExpireStr = NumConstants.NUM_FIVE + "";// 默认5分钟过期
                 }
                 Integer code = CrmebUtil.randomCount(111111, 999999);
                 HashMap<String, Object> justPram = new HashMap<>();
@@ -571,7 +572,7 @@ public class SmsServiceImpl implements SmsService {
             //获取短信验证码过期时间
             String codeExpireStr = systemConfigService.getValueByKey(Constants.CONFIG_KEY_SMS_CODE_EXPIRE);
             if (StrUtil.isBlank(codeExpireStr) || Integer.parseInt(codeExpireStr) == 0) {
-                codeExpireStr = Constants.NUM_FIVE + "";// 默认5分钟过期
+                codeExpireStr = NumConstants.NUM_FIVE + "";// 默认5分钟过期
             }
             Integer code = CrmebUtil.randomCount(111111, 999999);
             HashMap<String, Object> justPram = new HashMap<>();
