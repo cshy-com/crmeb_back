@@ -2,6 +2,7 @@ package com.cshy.service.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.DateFormatters;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.vo.CloudVo;
 import com.cshy.common.model.vo.FileResultVo;
@@ -131,7 +132,7 @@ public class UploadServiceImpl implements UploadService {
         // 创建目标文件的名称，规则：  子目录/年/月/日.后缀名
         // 文件分隔符转化为当前系统的格式
         // 文件分隔符转化为当前系统的格式
-        String webPath = uploadCommonVo.getType() + uploadCommonVo.getModelPath() + DateUtil.nowDate(Constants.DATE_FORMAT_DATE).replace("-", "/") + "/";
+        String webPath = uploadCommonVo.getType() + uploadCommonVo.getModelPath() + DateUtil.nowDate(DateFormatters.DATE_FORMAT_DATE).replace("-", "/") + "/";
         String destPath = FilenameUtils.separatorsToSystem(uploadCommonVo.getRootPath() + webPath) + newFileName;
 //        String destPath = "E://home/file/" + newFileName;
         // 创建文件
@@ -340,7 +341,7 @@ public class UploadServiceImpl implements UploadService {
         //规则：  子目录/年/月/日.后缀名
         // 文件分隔符转化为当前系统的格式
         // 文件分隔符转化为当前系统的格式
-        String webPath = uploadCommonVo.getType() + uploadCommonVo.getModelPath() + DateUtil.nowDate(Constants.DATE_FORMAT_DATE).replace("-", "/") + "/";
+        String webPath = uploadCommonVo.getType() + uploadCommonVo.getModelPath() + DateUtil.nowDate(DateFormatters.DATE_FORMAT_DATE).replace("-", "/") + "/";
         String destPath = FilenameUtils.separatorsToSystem(uploadCommonVo.getRootPath() + webPath) + newFileName;
         // 创建文件
         File file = UploadUtil.createFile(destPath);

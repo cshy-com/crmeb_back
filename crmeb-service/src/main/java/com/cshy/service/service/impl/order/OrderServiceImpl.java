@@ -605,7 +605,7 @@ public class OrderServiceImpl implements OrderService {
             List<String> configValues = systemConfigService.getValuesByKes(configKeys);
             Date timeSpace;
             timeSpace = DateUtil.addSecond(storeOrder.getCreateTime(), Double.valueOf(configValues.get(0)).intValue() * 3600);
-            record.set("msg", "请在" + DateUtil.dateToStr(timeSpace, Constants.DATE_FORMAT) + "前完成支付");
+            record.set("msg", "请在" + DateUtil.dateToStr(timeSpace, DateFormatters.DATE_FORMAT) + "前完成支付");
         } else if (storeOrder.getRefundStatus() == 1) {
             record.set("type", -1);
             record.set("title", "申请退款中");
@@ -635,7 +635,7 @@ public class OrderServiceImpl implements OrderService {
                     record.set("msg", "商家已发货,请耐心等待");
                     Optional<StoreOrderStatus> first = sOrderStatusResults.stream().filter(orderStatus -> orderStatus.getChangeType().equals(Constants.ORDER_LOG_EXPRESS)).findFirst();
                     if (first.isPresent())
-                        record.set("time", DateUtil.dateToStr(first.get().getCreateTime(), Constants.DATE_FORMAT));
+                        record.set("time", DateUtil.dateToStr(first.get().getCreateTime(), DateFormatters.DATE_FORMAT));
                 }
             } else {
                 StoreOrderStatus storeOrderStatus = new StoreOrderStatus();
@@ -1819,8 +1819,8 @@ public class OrderServiceImpl implements OrderService {
         }
         // 判断日期是否过期
         DateTime nowDateTime = cn.hutool.core.date.DateUtil.date();
-        String stopTimeStr = DateUtil.dateToStr(storeSeckill.getStopTime(), Constants.DATE_FORMAT_DATE);
-        Date stopDate = DateUtil.strToDate(stopTimeStr + " " + seckillManger.getEndTime() + ":00:00", Constants.DATE_FORMAT);
+        String stopTimeStr = DateUtil.dateToStr(storeSeckill.getStopTime(), DateFormatters.DATE_FORMAT_DATE);
+        Date stopDate = DateUtil.strToDate(stopTimeStr + " " + seckillManger.getEndTime() + ":00:00", DateFormatters.DATE_FORMAT);
         if (nowDateTime.getTime() - stopDate.getTime() >= 0) {
             throw new CrmebException("秒杀商品已过期");
         }

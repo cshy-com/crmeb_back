@@ -30,24 +30,6 @@ public class Constants {
      */
     public static final String RATE_LIMIT_KEY = "rate_limit:";
 
-    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final String DATE_FORMAT_UTC = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-    public static final String DATE_FORMAT_DATE = "yyyy-MM-dd";
-    public static final String DATE_FORMAT_YEAR = "yyyy";
-    public static final String DATE_FORMAT_MONTH_DATE = "MM-dd";
-    public static final String DATE_FORMAT_MONTH = "yyyy-MM";
-    public static final String DATE_TIME_FORMAT_NUM = "yyyyMMddHHmmss";
-    public static final String DATE_FORMAT_NUM = "yyyyMMdd";
-    public static final String DATE_FORMAT_START = "yyyy-MM-dd 00:00:00";
-    public static final String DATE_FORMAT_END = "yyyy-MM-dd 23:59:59";
-    public static final String DATE_FORMAT_MONTH_START = "yyyy-MM-01 00:00:00";
-    public static final String DATE_FORMAT_YEAR_START = "yyyy-01-01 00:00:00";
-    public static final String DATE_FORMAT_YEAR_END = "yyyy-12-31 23:59:59";
-    public static final String DATE_FORMAT_HHMMSS = "HH:mm:ss";
-    public static final String DATE_FORMAT_START_PEREND = "00:00:00";
-    public static final String DATE_FORMAT_END_PEREND = "23:59:59";
-    public static final String DATE_FORMAT_HHMM = "yyyy-MM-dd HH:mm";
-
     //后台管理员操作资金mark
     public static final String USER_BILL_OPERATE_LOG_TITLE = "{$title}{$operate}了{$value}{$founds}";
 
@@ -532,6 +514,7 @@ public class Constants {
     public static String RESULT_ORDER_NOTFOUND = "订单号 ${orderCode} 未找到";
     public static String RESULT_ORDER_NOTFOUND_IN_ID = "订单id ${orderId} 未找到";
     public static String RESULT_ORDER_PAYED = "订单号 ${orderCode} 已支付";
+
     public static String RESULT_ORDER_EDIT_PRICE_SAME = "修改价格不能和支付价格相同 原价 ${oldPrice} 修改价 ${editPrice}";
     public static String RESULT_ORDER_EDIT_PRICE_SUCCESS = "订单号 ${orderNo} 修改价格 ${price} 成功";
     public static String RESULT_ORDER_EDIT_PRICE_LOGS = "订单价格 ${orderPrice} 修改实际支付金额为 ${price} 元";
@@ -615,112 +598,6 @@ public class Constants {
      * https请求
      */
     public static final String HTTPS = "https://";
-
-    /**
-     * 登录成功
-     */
-    public static final String LOGIN_SUCCESS = "Success";
-
-    /**
-     * 注销
-     */
-    public static final String LOGOUT = "Logout";
-
-    /**
-     * 成功
-     */
-    public static final String SUCCESS_MESSAGE = "成功";
-
-    /**
-     * 成功码
-     */
-    public static final Integer SUCCESS_CODE = 0;
-
-    /**
-     * 注册
-     */
-    public static final String REGISTER = "Register";
-
-    /**
-     * 登录失败
-     */
-    public static final String LOGIN_FAIL = "Error";
-
-    /**
-     * 验证码有效期（分钟）
-     */
-    public static final Integer CAPTCHA_EXPIRATION = 5;
-
-    /**
-     * 令牌
-     */
-    public static final String TOKEN = "token";
-
-    /**
-     * 令牌前缀
-     */
-    public static final String TOKEN_PREFIX = "Bearer ";
-
-    /**
-     * 令牌前缀
-     */
-    public static final String LOGIN_USER_KEY = "login_user_key";
-
-    /**
-     * 用户ID
-     */
-    public static final String JWT_USERID = "userid";
-
-    /**
-     * 用户名称
-     */
-    public static final String JWT_USERNAME = Claims.SUBJECT;
-
-    /**
-     * 用户头像
-     */
-    public static final String JWT_AVATAR = "avatar";
-
-    /**
-     * 创建时间
-     */
-    public static final String JWT_CREATED = "created";
-
-    /**
-     * 用户权限
-     */
-    public static final String JWT_AUTHORITIES = "authorities";
-
-    /**
-     * 资源映射路径 前缀
-     */
-    public static final String RESOURCE_PREFIX = "/profile";
-
-    /**
-     * RMI 远程方法调用
-     */
-    public static final String LOOKUP_RMI = "rmi:";
-
-    /**
-     * LDAP 远程方法调用
-     */
-    public static final String LOOKUP_LDAP = "ldap:";
-
-    /**
-     * LDAPS 远程方法调用
-     */
-    public static final String LOOKUP_LDAPS = "ldaps:";
-
-    /**
-     * 定时任务白名单配置（仅允许访问的包名，如其他需要可以自行添加）
-     */
-    public static final String[] JOB_WHITELIST_STR = { "com.ruoyi" };
-
-    /**
-     * 定时任务违规的字符
-     */
-    public static final String[] JOB_ERROR_STR = { "java.net.URL", "javax.naming.InitialContext", "org.yaml.snakeyaml",
-            "org.springframework", "org.apache", "com.ruoyi.common.utils.file", "com.ruoyi.common.config" };
 
     /**
      * 阿里云短信模板列表查询

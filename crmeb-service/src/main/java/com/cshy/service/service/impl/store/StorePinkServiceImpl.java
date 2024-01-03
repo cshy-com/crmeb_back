@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.DateFormatters;
 import com.cshy.common.constants.NotifyConstants;
 import com.cshy.common.model.entity.system.SystemNotification;
 import com.cshy.common.model.page.CommonPage;
@@ -101,8 +102,8 @@ public class StorePinkServiceImpl extends ServiceImpl<StorePinkDao, StorePink> i
             BeanUtils.copyProperties(pink, storePinkResponse);
             Integer countPeople = getCountByKidAndCid(pink.getCid(), pink.getId());
             storePinkResponse.setCountPeople(countPeople);
-            storePinkResponse.setAddTime(DateUtil.timestamp2DateStr(pink.getAddTime(), Constants.DATE_FORMAT));
-            storePinkResponse.setStopTime(DateUtil.timestamp2DateStr(pink.getStopTime(), Constants.DATE_FORMAT));
+            storePinkResponse.setAddTime(DateUtil.timestamp2DateStr(pink.getAddTime(), DateFormatters.DATE_FORMAT));
+            storePinkResponse.setStopTime(DateUtil.timestamp2DateStr(pink.getStopTime(), DateFormatters.DATE_FORMAT));
             StoreCombination combination = storeCombinationService.getById(pink.getCid());
             storePinkResponse.setTitle(combination.getTitle());
             return storePinkResponse;

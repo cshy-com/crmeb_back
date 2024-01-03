@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.DateFormatters;
 import com.cshy.common.model.entity.wechat.WechatExceptions;
 import com.cshy.service.dao.wechat.WechatExceptionsDao;
 import com.cshy.service.service.wechat.WechatExceptionsService;
@@ -28,7 +29,7 @@ public class WechatExceptionsServiceImpl extends ServiceImpl<WechatExceptionsDao
      */
     @Override
     public void autoDeleteLog() {
-        String beforeDate = DateUtil.offsetDay(new Date(), -9).toString(Constants.DATE_FORMAT_DATE);
+        String beforeDate = DateUtil.offsetDay(new Date(), -9).toString(DateFormatters.DATE_FORMAT_DATE);
         UpdateWrapper<WechatExceptions> wrapper = Wrappers.update();
         wrapper.lt("create_time", beforeDate);
         dao.delete(wrapper);

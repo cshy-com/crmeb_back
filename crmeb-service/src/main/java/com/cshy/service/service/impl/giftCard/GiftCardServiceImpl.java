@@ -7,6 +7,7 @@ import cn.hutool.extra.qrcode.QrConfig;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.DateFormatters;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.NoModelWriteData;
 import com.cshy.common.model.dto.giftCard.GiftCardDto;
@@ -227,11 +228,11 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
         if (giftCard.getCardStatus() != 0)
             throw new CrmebException("礼品卡未生效，请联系客服");
 
-        String effectiveTime = DateUtil.dateToStr(giftCard.getEffectiveTime(), Constants.DATE_FORMAT_START);
-        String now = DateUtil.nowDate(Constants.DATE_FORMAT_START);
+        String effectiveTime = DateUtil.dateToStr(giftCard.getEffectiveTime(), DateFormatters.DATE_FORMAT_START);
+        String now = DateUtil.nowDate(DateFormatters.DATE_FORMAT_START);
 
-        Date effectiveDate = DateUtil.strToDate(effectiveTime, Constants.DATE_FORMAT_START);
-        Date nowDate = DateUtil.strToDate(now, Constants.DATE_FORMAT_START);
+        Date effectiveDate = DateUtil.strToDate(effectiveTime, DateFormatters.DATE_FORMAT_START);
+        Date nowDate = DateUtil.strToDate(now, DateFormatters.DATE_FORMAT_START);
         if (effectiveDate.after(nowDate))
             throw new CrmebException("该礼品卡未到可使用时间，生效时间为：" + effectiveTime);
         String encryptPassword = CrmebUtil.encryptPassword(secret, this.pickupSecretKey);
@@ -245,11 +246,11 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
         List<GiftCard> list = this.list();
         list.stream().forEach(giftCard -> {
             if (Objects.nonNull(giftCard.getEffectiveTime())) {
-                String effectiveTime = DateUtil.dateToStr(giftCard.getEffectiveTime(), Constants.DATE_FORMAT_START);
-                String now = DateUtil.nowDate(Constants.DATE_FORMAT_START);
+                String effectiveTime = DateUtil.dateToStr(giftCard.getEffectiveTime(), DateFormatters.DATE_FORMAT_START);
+                String now = DateUtil.nowDate(DateFormatters.DATE_FORMAT_START);
 
-                Date effectiveDate = DateUtil.strToDate(effectiveTime, Constants.DATE_FORMAT_START);
-                Date nowDate = DateUtil.strToDate(now, Constants.DATE_FORMAT_START);
+                Date effectiveDate = DateUtil.strToDate(effectiveTime, DateFormatters.DATE_FORMAT_START);
+                Date nowDate = DateUtil.strToDate(now, DateFormatters.DATE_FORMAT_START);
                 if (effectiveDate.equals(nowDate) || effectiveDate.before(nowDate))
                     giftCard.setCardStatus(0);
                 if (effectiveDate.after(nowDate))

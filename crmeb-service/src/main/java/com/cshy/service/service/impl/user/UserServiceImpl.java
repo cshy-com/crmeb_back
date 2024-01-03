@@ -461,7 +461,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         }
 
         for (User user : list) {
-            map.put(DateUtil.dateToStr(user.getCreateTime(), Constants.DATE_FORMAT_DATE), user.getUid());
+            map.put(DateUtil.dateToStr(user.getCreateTime(), DateFormatters.DATE_FORMAT_DATE), user.getUid());
         }
         return map;
     }
@@ -719,9 +719,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 //            couponList.forEach(storeCoupon -> {
 //                //是否有固定的使用时间
 //                if (!storeCoupon.getIsFixedTime()) {
-//                    String endTime = DateUtil.addDay(DateUtil.nowDate(Constants.DATE_FORMAT), storeCoupon.getDay(), Constants.DATE_FORMAT);
-//                    storeCoupon.setUseEndTime(DateUtil.strToDate(endTime, Constants.DATE_FORMAT));
-//                    storeCoupon.setUseStartTime(DateUtil.nowDateTimeReturnDate(Constants.DATE_FORMAT));
+//                    String endTime = DateUtil.addDay(DateUtil.nowDate(DateFormatters.DATE_FORMAT), storeCoupon.getDay(), DateFormatters.DATE_FORMAT);
+//                    storeCoupon.setUseEndTime(DateUtil.strToDate(endTime, DateFormatters.DATE_FORMAT));
+//                    storeCoupon.setUseStartTime(DateUtil.nowDateTimeReturnDate(DateFormatters.DATE_FORMAT));
 //                }
 //
 //                StoreCouponUser storeCouponUser = new StoreCouponUser();

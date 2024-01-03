@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.DateFormatters;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.constants.BrokerageRecordConstants;
@@ -162,7 +163,7 @@ public class UserBrokerageRecordServiceImpl extends ServiceImpl<UserBrokerageRec
 
         List<SpreadCommissionDetailResponse> responseList = CollUtil.newArrayList();
         for (UserBrokerageRecord record : list) {
-            String month = DateUtil.dateToStr(record.getUpdateTime(), Constants.DATE_FORMAT_MONTH);
+            String month = DateUtil.dateToStr(record.getUpdateTime(), DateFormatters.DATE_FORMAT_MONTH);
             responseList.add(new SpreadCommissionDetailResponse(month, getListByUidAndMonth(uid, month)));
         }
         return CommonPage.copyPageInfo(recordPage, responseList);
@@ -252,7 +253,7 @@ public class UserBrokerageRecordServiceImpl extends ServiceImpl<UserBrokerageRec
             return map;
         }
         list.forEach(record -> {
-            map.put(DateUtil.dateToStr(record.getUpdateTime(), Constants.DATE_FORMAT_MONTH), record.getUid());
+            map.put(DateUtil.dateToStr(record.getUpdateTime(), DateFormatters.DATE_FORMAT_MONTH), record.getUid());
         });
         return map;
     }

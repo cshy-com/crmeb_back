@@ -3,6 +3,7 @@ package com.cshy.common.utils;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.cshy.common.constants.DateFormatters;
 import com.cshy.common.model.vo.dateLimitUtilVo;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
@@ -36,7 +37,7 @@ public final class DateUtil {
      * @return
      */
     public static String nowDate() {
-        return nowDate(Constants.DATE_FORMAT_NUM);
+        return nowDate(DateFormatters.DATE_FORMAT_NUM);
     }
 
     /**
@@ -69,7 +70,7 @@ public final class DateUtil {
      * @return
      */
     public static Date nowDateTime() {
-        return strToDate(nowDateTimeStr(), Constants.DATE_FORMAT);
+        return strToDate(nowDateTimeStr(), DateFormatters.DATE_FORMAT);
     }
 
     /**
@@ -79,7 +80,7 @@ public final class DateUtil {
      * @return
      */
     public static String nowDateTimeStr() {
-        return nowDate(Constants.DATE_FORMAT);
+        return nowDate(DateFormatters.DATE_FORMAT);
     }
 
     /**
@@ -305,7 +306,7 @@ public final class DateUtil {
      * @return  相差天数
      */
     public static long getTwoDateDays(Date beforeDay, Date afterDay) {
-        SimpleDateFormat sm = new SimpleDateFormat(Constants.DATE_FORMAT_NUM);
+        SimpleDateFormat sm = new SimpleDateFormat(DateFormatters.DATE_FORMAT_NUM);
         long days = -1;
         try {
             days = (sm.parse(sm.format(afterDay)).getTime() - sm.parse(sm.format(beforeDay)).getTime()) / (1000 * 3600 * 24);
@@ -331,7 +332,7 @@ public final class DateUtil {
         if (null == date) {
             return 0;
         }
-        Date date1 = strToDate(date, Constants.DATE_FORMAT);
+        Date date1 = strToDate(date, DateFormatters.DATE_FORMAT);
         if(date1 == null){
             return 0;
         }
@@ -350,7 +351,7 @@ public final class DateUtil {
 
     //获取时间戳11位
     public static int getSecondTimestamp(){
-        Date date = strToDate(nowDateTime(Constants.DATE_FORMAT), Constants.DATE_FORMAT);
+        Date date = strToDate(nowDateTime(DateFormatters.DATE_FORMAT), DateFormatters.DATE_FORMAT);
         if (null == date) {
             return 0;
         }
@@ -377,17 +378,17 @@ public final class DateUtil {
 
     /** 获得本周最后一天:yyyy-MM-dd HH:mm:ss */
     public static String getWeekEndDay() {
-        return addDay(getWeekStartDay(), 7, Constants.DATE_FORMAT);
+        return addDay(getWeekStartDay(), 7, DateFormatters.DATE_FORMAT);
     }
 
     /** 获得上周第一天:yyyy-MM-dd HH:mm:ss */
     public static String getLastWeekStartDay() {
-        return addDay(getWeekStartDay(), -7, Constants.DATE_FORMAT);
+        return addDay(getWeekStartDay(), -7, DateFormatters.DATE_FORMAT);
     }
 
     /** 获得上周最后一天:yyyy-MM-dd HH:mm:ss */
     public static String getLastWeekEndDay() {
-        return addDay(getLastWeekStartDay(), 7, Constants.DATE_FORMAT);
+        return addDay(getLastWeekStartDay(), 7, DateFormatters.DATE_FORMAT);
     }
 
     /** 获得本月最后一天:yyyy-MM-dd HH:mm:ss */
@@ -435,9 +436,9 @@ public final class DateUtil {
     public static dateLimitUtilVo getDateLimit(String data){
         //时间计算
         String startTime = null;
-        String endTime = DateUtil.nowDateTime(Constants.DATE_FORMAT);
-        String day = DateUtil.nowDateTime(Constants.DATE_FORMAT_START);
-        String end = DateUtil.nowDateTime(Constants.DATE_FORMAT_END);
+        String endTime = DateUtil.nowDateTime(DateFormatters.DATE_FORMAT);
+        String day = DateUtil.nowDateTime(DateFormatters.DATE_FORMAT_START);
+        String end = DateUtil.nowDateTime(DateFormatters.DATE_FORMAT_END);
 
         if(!StringUtils.isBlank(data)){
             switch (data){
@@ -445,11 +446,11 @@ public final class DateUtil {
                     startTime = day;
                     break;
                 case Constants.SEARCH_DATE_YESTERDAY:
-                    startTime = DateUtil.addDay(day, -1, Constants.DATE_FORMAT_START);
-                    endTime = DateUtil.addDay(end, -1, Constants.DATE_FORMAT_END);
+                    startTime = DateUtil.addDay(day, -1, DateFormatters.DATE_FORMAT_START);
+                    endTime = DateUtil.addDay(end, -1, DateFormatters.DATE_FORMAT_END);
                     break;
                 case Constants.SEARCH_DATE_LATELY_7:
-                    startTime = DateUtil.addDay(day, -6, Constants.DATE_FORMAT_START);
+                    startTime = DateUtil.addDay(day, -6, DateFormatters.DATE_FORMAT_START);
                     break;
                 case Constants.SEARCH_DATE_WEEK:
                     startTime = getWeekStartDay();
@@ -460,10 +461,10 @@ public final class DateUtil {
                     endTime = getLastWeekEndDay();
                     break;
                 case Constants.SEARCH_DATE_LATELY_30:
-                    startTime = DateUtil.addDay(day, -30, Constants.DATE_FORMAT_START);
+                    startTime = DateUtil.addDay(day, -30, DateFormatters.DATE_FORMAT_START);
                     break;
                 case Constants.SEARCH_DATE_MONTH:
-                    startTime = DateUtil.nowDateTime(Constants.DATE_FORMAT_MONTH_START);
+                    startTime = DateUtil.nowDateTime(DateFormatters.DATE_FORMAT_MONTH_START);
                     endTime = getMonthEndDay();
                     break;
                 case Constants.SEARCH_DATE_PRE_MONTH:
@@ -471,8 +472,8 @@ public final class DateUtil {
                     endTime = getLastMonthEndDay();
                     break;
                 case Constants.SEARCH_DATE_YEAR:
-                    startTime = DateUtil.nowDateTime(Constants.DATE_FORMAT_YEAR_START);
-                    endTime = DateUtil.nowDateTime(Constants.DATE_FORMAT_YEAR_END);
+                    startTime = DateUtil.nowDateTime(DateFormatters.DATE_FORMAT_YEAR_START);
+                    endTime = DateUtil.nowDateTime(DateFormatters.DATE_FORMAT_YEAR_START);
                     break;
                 case Constants.SEARCH_DATE_PRE_YEAR:
                     startTime = getLastYearStartDay();
@@ -493,8 +494,8 @@ public final class DateUtil {
                     endTime = list.get(1);
 
 //                    if (startTime.equals(endTime)) {
-                        startTime = DateUtil.appointedDayStrToFormatStr(startTime, Constants.DATE_FORMAT_DATE, Constants.DATE_FORMAT_START);
-                        endTime = DateUtil.appointedDayStrToFormatStr(endTime, Constants.DATE_FORMAT_DATE, Constants.DATE_FORMAT_END);
+                        startTime = DateUtil.appointedDayStrToFormatStr(startTime, DateFormatters.DATE_FORMAT_DATE, DateFormatters.DATE_FORMAT_START);
+                        endTime = DateUtil.appointedDayStrToFormatStr(endTime, DateFormatters.DATE_FORMAT_DATE, DateFormatters.DATE_FORMAT_END);
 //                    }
                     break;
             }
@@ -511,14 +512,14 @@ public final class DateUtil {
         List<String> date = new ArrayList<>();
 
         //开始日期
-        Date startDate = DateUtil.strToDate(dateLimit.getStartTime(), Constants.DATE_FORMAT);
+        Date startDate = DateUtil.strToDate(dateLimit.getStartTime(), DateFormatters.DATE_FORMAT);
 
         //结束日期
-        Date endDate = DateUtil.strToDate(dateLimit.getEndTime(), Constants.DATE_FORMAT);
+        Date endDate = DateUtil.strToDate(dateLimit.getEndTime(), DateFormatters.DATE_FORMAT);
 
         while (endDate.after(startDate)){
-            date.add(DateUtil.dateToStr(startDate, Constants.DATE_FORMAT_DATE)); // 放入集合
-            startDate = DateUtil.strToDate(DateUtil.addDay(startDate, 1, Constants.DATE_FORMAT), Constants.DATE_FORMAT); //循环一次 加一天
+            date.add(DateUtil.dateToStr(startDate, DateFormatters.DATE_FORMAT_DATE)); // 放入集合
+            startDate = DateUtil.strToDate(DateUtil.addDay(startDate, 1, DateFormatters.DATE_FORMAT), DateFormatters.DATE_FORMAT); //循环一次 加一天
         }
 
         return date;
@@ -581,7 +582,7 @@ public final class DateUtil {
             return "";
         }
         if (StrUtil.isBlank(dateFormat)) {
-            dateFormat = Constants.DATE_FORMAT;
+            dateFormat = DateFormatters.DATE_FORMAT;
         }
         Date date = new Date(timestamp);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);

@@ -6,15 +6,12 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.*;
 import com.cshy.common.model.entity.user.User;
 import com.cshy.common.model.entity.user.UserExperienceRecord;
 import com.cshy.common.model.entity.user.UserIntegralRecord;
 import com.cshy.common.model.entity.user.UserSign;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.ExperienceRecordConstants;
-import com.cshy.common.constants.IntegralRecordConstants;
-import com.cshy.common.constants.SysGroupDataConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.response.UserSignInfoResponse;
 import com.cshy.common.model.vo.user.UserSignMonthVo;
@@ -103,14 +100,14 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
             user.setSignNum(0);
         } else {
             // 判断是否重复签到
-            String lastDate = DateUtil.dateToStr(lastUserSign.getCreateTime(), Constants.DATE_FORMAT_DATE);
-            String nowDate = DateUtil.nowDate(Constants.DATE_FORMAT_DATE);
+            String lastDate = DateUtil.dateToStr(lastUserSign.getCreateTime(), DateFormatters.DATE_FORMAT_DATE);
+            String nowDate = DateUtil.nowDate(DateFormatters.DATE_FORMAT_DATE);
             //对比今天数据
-            if (DateUtil.compareDate(lastDate, nowDate, Constants.DATE_FORMAT_DATE) == 0) {
+            if (DateUtil.compareDate(lastDate, nowDate, DateFormatters.DATE_FORMAT_DATE) == 0) {
                 throw new CrmebException("今日已签到。不可重复签到");
             }
-            String nextDate = DateUtil.addDay(lastUserSign.getCreateTime(), 1, Constants.DATE_FORMAT_DATE);
-            int compareDate = DateUtil.compareDate(nextDate, nowDate, Constants.DATE_FORMAT_DATE);
+            String nextDate = DateUtil.addDay(lastUserSign.getCreateTime(), 1, DateFormatters.DATE_FORMAT_DATE);
+            int compareDate = DateUtil.compareDate(nextDate, nowDate, DateFormatters.DATE_FORMAT_DATE);
             if (compareDate != 0) {
                 //不相等，所以不是连续签到,重置签到次数
                 user.setSignNum(0);
@@ -247,7 +244,7 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
         }
 
         for (UserSign userSign : userSignList) {
-            String date = DateUtil.dateToStr(userSign.getCreateTime(), Constants.DATE_FORMAT_MONTH);
+            String date = DateUtil.dateToStr(userSign.getCreateTime(), DateFormatters.DATE_FORMAT_MONTH);
             UserSignVo userSignVo = new UserSignVo(userSign.getTitle(), userSign.getNumber(), userSign.getCreateTime());
             boolean findResult = false;
             if (signMonthVoArrayList.size() > 0) {
@@ -313,15 +310,15 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
     }
 
     private Boolean checkYesterdaySign(Integer userId) {
-        String day = DateUtil.nowDate(Constants.DATE_FORMAT);
-        String yesterday = DateUtil.addDay(day, -1, Constants.DATE_FORMAT);
-        List<UserSign> userSignList = getInfoByDay(userId, DateUtil.strToDate(yesterday, Constants.DATE_FORMAT));
+        String day = DateUtil.nowDate(DateFormatters.DATE_FORMAT);
+        String yesterday = DateUtil.addDay(day, -1, DateFormatters.DATE_FORMAT);
+        List<UserSign> userSignList = getInfoByDay(userId, DateUtil.strToDate(yesterday, DateFormatters.DATE_FORMAT));
         return userSignList.size() != 0;
     }
 
     private List<UserSign> getInfoByDay(Integer userId, Date date) {
         LambdaQueryWrapper<UserSign> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(UserSign::getUid, userId).eq(UserSign::getType, 1).between(UserSign::getCreateTime,DateUtil.dateToStr(date, Constants.DATE_FORMAT_START), DateUtil.dateToStr(date, Constants.DATE_FORMAT_END));
+        lambdaQueryWrapper.eq(UserSign::getUid, userId).eq(UserSign::getType, 1).between(UserSign::getCreateTime,DateUtil.dateToStr(date, DateFormatters.DATE_FORMAT_START), DateUtil.dateToStr(date, DateFormatters.DATE_FORMAT_END));
         return dao.selectList(lambdaQueryWrapper);
     }
 

@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.DateFormatters;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.user.UserCouponReceiveRequest;
 import com.cshy.common.model.vo.MyRecord;
@@ -153,9 +154,9 @@ public class StoreCouponUserServiceImpl extends ServiceImpl<StoreCouponUserDao, 
 
         //是否有固定的使用时间
         if (!storeCoupon.getIsFixedTime()) {
-            String endTime = DateUtil.addDay(DateUtil.nowDate(Constants.DATE_FORMAT), storeCoupon.getDay(), Constants.DATE_FORMAT);
-            storeCoupon.setUseEndTime(DateUtil.strToDate(endTime, Constants.DATE_FORMAT));
-            storeCoupon.setUseStartTime(DateUtil.nowDateTimeReturnDate(Constants.DATE_FORMAT));
+            String endTime = DateUtil.addDay(DateUtil.nowDate(DateFormatters.DATE_FORMAT), storeCoupon.getDay(), DateFormatters.DATE_FORMAT);
+            storeCoupon.setUseEndTime(DateUtil.strToDate(endTime, DateFormatters.DATE_FORMAT));
+            storeCoupon.setUseStartTime(DateUtil.nowDateTimeReturnDate(DateFormatters.DATE_FORMAT));
         }
 
         ArrayList<StoreCouponUser> storeCouponUserList = new ArrayList<>();
@@ -314,11 +315,11 @@ public class StoreCouponUserServiceImpl extends ServiceImpl<StoreCouponUserDao, 
         }
         // 判断优惠券是否过期
         List<StoreCouponUser> updateList = CollUtil.newArrayList();
-        String nowDateStr = DateUtil.nowDate(Constants.DATE_FORMAT);
+        String nowDateStr = DateUtil.nowDate(DateFormatters.DATE_FORMAT);
         couponList.forEach(coupon -> {
             if (ObjectUtil.isNotNull(coupon.getEndTime())) {
-                String endDateStr = DateUtil.dateToStr(coupon.getEndTime(), Constants.DATE_FORMAT);
-                if (DateUtil.compareDate(nowDateStr, endDateStr, Constants.DATE_FORMAT) >= 0) {
+                String endDateStr = DateUtil.dateToStr(coupon.getEndTime(), DateFormatters.DATE_FORMAT);
+                if (DateUtil.compareDate(nowDateStr, endDateStr, DateFormatters.DATE_FORMAT) >= 0) {
                     coupon.setStatus(2);
                     updateList.add(coupon);
                 }
@@ -356,9 +357,9 @@ public class StoreCouponUserServiceImpl extends ServiceImpl<StoreCouponUserDao, 
         }
         //是否有固定的使用时间
         if (!storeCoupon.getIsFixedTime()) {
-            String endTime = DateUtil.addDay(DateUtil.nowDate(Constants.DATE_FORMAT), storeCoupon.getDay(), Constants.DATE_FORMAT);
-            storeCoupon.setUseEndTime(DateUtil.strToDate(endTime, Constants.DATE_FORMAT));
-            storeCoupon.setUseStartTime(DateUtil.nowDateTimeReturnDate(Constants.DATE_FORMAT));
+            String endTime = DateUtil.addDay(DateUtil.nowDate(DateFormatters.DATE_FORMAT), storeCoupon.getDay(), DateFormatters.DATE_FORMAT);
+            storeCoupon.setUseEndTime(DateUtil.strToDate(endTime, DateFormatters.DATE_FORMAT));
+            storeCoupon.setUseStartTime(DateUtil.nowDateTimeReturnDate(DateFormatters.DATE_FORMAT));
         }
         StoreCouponUser storeCouponUser = new StoreCouponUser();
         storeCouponUser.setCouponId(storeCoupon.getId());
@@ -403,7 +404,7 @@ public class StoreCouponUserServiceImpl extends ServiceImpl<StoreCouponUserDao, 
         if (ObjectUtil.isNotNull(storeCoupon.getReceiveStartTime())) {
             //非永久可领取
             String date = DateUtil.nowDateTimeStr();
-            int result = DateUtil.compareDate(date, DateUtil.dateToStr(storeCoupon.getReceiveStartTime(), Constants.DATE_FORMAT), Constants.DATE_FORMAT);
+            int result = DateUtil.compareDate(date, DateUtil.dateToStr(storeCoupon.getReceiveStartTime(), DateFormatters.DATE_FORMAT), DateFormatters.DATE_FORMAT);
             if (result == -1) {
                 // 未开始
                 record.set("errMsg", "还未达到优惠券领取时间！");
@@ -415,7 +416,7 @@ public class StoreCouponUserServiceImpl extends ServiceImpl<StoreCouponUserDao, 
         if (storeCoupon.getReceiveEndTime() != null) {
             //非永久可领取
             String date = DateUtil.nowDateTimeStr();
-            int result = DateUtil.compareDate(date, DateUtil.dateToStr(storeCoupon.getReceiveEndTime(), Constants.DATE_FORMAT), Constants.DATE_FORMAT);
+            int result = DateUtil.compareDate(date, DateUtil.dateToStr(storeCoupon.getReceiveEndTime(), DateFormatters.DATE_FORMAT), DateFormatters.DATE_FORMAT);
             if (result == 1) {
                 //过期了
                 record.set("errMsg", "已超过优惠券领取最后期限！");
@@ -441,9 +442,9 @@ public class StoreCouponUserServiceImpl extends ServiceImpl<StoreCouponUserDao, 
 
         //是否有固定的使用时间
         if (!storeCoupon.getIsFixedTime()) {
-            String endTime = DateUtil.addDay(DateUtil.nowDate(Constants.DATE_FORMAT), storeCoupon.getDay(), Constants.DATE_FORMAT);
-            storeCoupon.setUseEndTime(DateUtil.strToDate(endTime, Constants.DATE_FORMAT));
-            storeCoupon.setUseStartTime(DateUtil.nowDateTimeReturnDate(Constants.DATE_FORMAT));
+            String endTime = DateUtil.addDay(DateUtil.nowDate(DateFormatters.DATE_FORMAT), storeCoupon.getDay(), DateFormatters.DATE_FORMAT);
+            storeCoupon.setUseEndTime(DateUtil.strToDate(endTime, DateFormatters.DATE_FORMAT));
+            storeCoupon.setUseStartTime(DateUtil.nowDateTimeReturnDate(DateFormatters.DATE_FORMAT));
         }
 
         StoreCouponUser storeCouponUser = new StoreCouponUser();
@@ -552,8 +553,8 @@ public class StoreCouponUserServiceImpl extends ServiceImpl<StoreCouponUserDao, 
             storeCouponUserResponse.setValidStr(validStr);
 
             // 更改使用时间格式，去掉时分秒
-            storeCouponUserResponse.setUseStartTimeStr(DateUtil.dateToStr(storeCouponUserResponse.getStartTime(), Constants.DATE_FORMAT_DATE));
-            storeCouponUserResponse.setUseEndTimeStr(DateUtil.dateToStr(storeCouponUserResponse.getEndTime(), Constants.DATE_FORMAT_DATE));
+            storeCouponUserResponse.setUseStartTimeStr(DateUtil.dateToStr(storeCouponUserResponse.getStartTime(), DateFormatters.DATE_FORMAT_DATE));
+            storeCouponUserResponse.setUseEndTimeStr(DateUtil.dateToStr(storeCouponUserResponse.getEndTime(), DateFormatters.DATE_FORMAT_DATE));
             responseList.add(storeCouponUserResponse);
         }
         return CommonPage.restPage(responseList);

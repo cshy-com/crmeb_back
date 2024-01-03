@@ -332,7 +332,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
             userSpreadOrderItemChildResponse.setNickname(userMap.get(orderUid).getNickname());
             userSpreadOrderItemChildResponse.setType("返佣");
 
-            String month = DateUtil.dateToStr(record.getUpdateTime(), Constants.DATE_FORMAT_MONTH);
+            String month = DateUtil.dateToStr(record.getUpdateTime(), DateFormatters.DATE_FORMAT_MONTH);
             if (monthList.contains(month)) {
                 //如果在已有的数据中找到当前月份数据则追加
                 for (UserSpreadOrderItemResponse userSpreadOrderItemResponse : userSpreadOrderItemResponseList) {
@@ -747,7 +747,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
         // 获取年-月
         Map<String, List<UserBill>> map = new HashMap<>();
         list.forEach(i -> {
-            String month = StrUtil.subPre(DateUtil.dateToStr(i.getCreateTime(), Constants.DATE_FORMAT), 7);
+            String month = StrUtil.subPre(DateUtil.dateToStr(i.getCreateTime(), DateFormatters.DATE_FORMAT), 7);
             if (map.containsKey(month)) {
                 map.get(month).add(i);
             } else {
@@ -1017,9 +1017,9 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
             couponList.forEach(storeCoupon -> {
                 //是否有固定的使用时间
                 if (!storeCoupon.getIsFixedTime()) {
-                    String endTime = DateUtil.addDay(DateUtil.nowDate(Constants.DATE_FORMAT), storeCoupon.getDay(), Constants.DATE_FORMAT);
-                    storeCoupon.setUseEndTime(DateUtil.strToDate(endTime, Constants.DATE_FORMAT));
-                    storeCoupon.setUseStartTime(DateUtil.nowDateTimeReturnDate(Constants.DATE_FORMAT));
+                    String endTime = DateUtil.addDay(DateUtil.nowDate(DateFormatters.DATE_FORMAT), storeCoupon.getDay(), DateFormatters.DATE_FORMAT);
+                    storeCoupon.setUseEndTime(DateUtil.strToDate(endTime, DateFormatters.DATE_FORMAT));
+                    storeCoupon.setUseStartTime(DateUtil.nowDateTimeReturnDate(DateFormatters.DATE_FORMAT));
                 }
 
                 StoreCouponUser storeCouponUser = new StoreCouponUser();

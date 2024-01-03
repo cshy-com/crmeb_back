@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.DateFormatters;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.constants.BrokerageRecordConstants;
@@ -305,7 +306,7 @@ public class UserExtractServiceImpl extends ServiceImpl<UserExtractDao, UserExtr
         }
         ArrayList<UserExtractRecordResponse> userExtractRecordResponseList = CollectionUtil.newArrayList();
         for (UserExtract userExtract : list) {
-            String date = DateUtil.dateToStr(userExtract.getCreateTime(), Constants.DATE_FORMAT_MONTH);
+            String date = DateUtil.dateToStr(userExtract.getCreateTime(), DateFormatters.DATE_FORMAT_MONTH);
             userExtractRecordResponseList.add(new UserExtractRecordResponse(date, getListByMonth(userId, date)));
         }
 

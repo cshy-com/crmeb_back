@@ -6,10 +6,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.BargainConstants;
-import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.NotifyConstants;
-import com.cshy.common.constants.UserConstants;
+import com.cshy.common.constants.*;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.system.SystemNotification;
 import com.cshy.common.model.request.BargainFrontRequest;
@@ -89,7 +86,7 @@ public class StoreBargainUserHelpServiceImpl extends ServiceImpl<StoreBargainUse
         List<StoreBargainUserHelpResponse> list = helpList.stream().map(help -> {
             StoreBargainUserHelpResponse helpResponse = new StoreBargainUserHelpResponse();
             BeanUtils.copyProperties(help, helpResponse);
-            helpResponse.setAddTime(DateUtil.timestamp2DateStr(help.getAddTime(), Constants.DATE_FORMAT));
+            helpResponse.setAddTime(DateUtil.timestamp2DateStr(help.getAddTime(), DateFormatters.DATE_FORMAT));
             User user = userService.getById(help.getUid());
             helpResponse.setAvatar(user.getAvatar());
             helpResponse.setNickname(user.getNickname());

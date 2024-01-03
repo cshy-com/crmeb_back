@@ -2,6 +2,7 @@ package com.cshy.service.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.cshy.common.config.CrmebConfig;
+import com.cshy.common.constants.DateFormatters;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
@@ -94,7 +95,7 @@ public class ExcelServiceImpl implements ExcelService {
         ExportUtil.setUpload(crmebConfig.getImagePath(), Constants.UPLOAD_MODEL_PATH_EXCEL, Constants.UPLOAD_TYPE_FILE);
 
         // 文件名
-        String fileName = "砍价".concat(DateUtil.nowDateTime(Constants.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
+        String fileName = "砍价".concat(DateUtil.nowDateTime(DateFormatters.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
 
         //自定义标题别名
         LinkedHashMap<String, String> aliasMap = new LinkedHashMap<>();
@@ -130,7 +131,7 @@ public class ExcelServiceImpl implements ExcelService {
             CombinationProductExcelVo vo = new CombinationProductExcelVo();
             BeanUtils.copyProperties(temp, vo);
             vo.setIsShow(temp.getIsShow() ? "开启" : "关闭");
-            vo.setStopTime(DateUtil.timestamp2DateStr(temp.getStopTime(), Constants.DATE_FORMAT_DATE));
+            vo.setStopTime(DateUtil.timestamp2DateStr(temp.getStopTime(), DateFormatters.DATE_FORMAT_DATE));
             return vo;
         }).collect(Collectors.toList());
 
@@ -138,7 +139,7 @@ public class ExcelServiceImpl implements ExcelService {
         ExportUtil.setUpload(crmebConfig.getImagePath(), Constants.UPLOAD_MODEL_PATH_EXCEL, Constants.UPLOAD_TYPE_FILE);
 
         // 文件名
-        String fileName = "拼团".concat(DateUtil.nowDateTime(Constants.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
+        String fileName = "拼团".concat(DateUtil.nowDateTime(DateFormatters.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
 
         //自定义标题别名
         LinkedHashMap<String, String> aliasMap = new LinkedHashMap<>();
@@ -204,7 +205,7 @@ public class ExcelServiceImpl implements ExcelService {
         ExportUtil.setUpload(crmebConfig.getImagePath(), Constants.UPLOAD_MODEL_PATH_EXCEL, Constants.UPLOAD_TYPE_FILE);
 
         // 文件名
-        String fileName = "商品导出_".concat(DateUtil.nowDateTime(Constants.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
+        String fileName = "商品导出_".concat(DateUtil.nowDateTime(DateFormatters.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
 
         //自定义标题别名
         LinkedHashMap<String, String> aliasMap = new LinkedHashMap<>();
@@ -259,7 +260,7 @@ public class ExcelServiceImpl implements ExcelService {
         ExportUtil.setUpload(crmebConfig.getImagePath(), Constants.UPLOAD_MODEL_PATH_EXCEL, Constants.UPLOAD_TYPE_FILE);
 
         // 文件名
-        String fileName = "订单导出_".concat(DateUtil.nowDateTime(Constants.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
+        String fileName = "订单导出_".concat(DateUtil.nowDateTime(DateFormatters.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
 
         //自定义标题别名
         LinkedHashMap<String, String> aliasMap = new LinkedHashMap<>();

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.DateFormatters;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttr;
@@ -153,7 +154,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
                 combinationResponse.setCountPeopleAll(pinkList.size());
                 combinationResponse.setCountPeoplePink(successTeam.size());
             }
-            combinationResponse.setStopTimeStr(DateUtil.timestamp2DateStr(combination.getStopTime(), Constants.DATE_FORMAT_DATE));
+            combinationResponse.setStopTimeStr(DateUtil.timestamp2DateStr(combination.getStopTime(), DateFormatters.DATE_FORMAT_DATE));
             return combinationResponse;
         }).collect(Collectors.toList());
 
@@ -392,8 +393,8 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
         }
         StoreProductInfoResponse storeProductResponse = new StoreProductInfoResponse();
         BeanUtils.copyProperties(storeCombination, storeProductResponse);
-//        storeProductResponse.setStartTimeStr(DateUtil.timestamp2DateStr(storeCombination.getStartTime(), Constants.DATE_FORMAT_DATE));
-//        storeProductResponse.setStopTimeStr(DateUtil.timestamp2DateStr(storeCombination.getStopTime(), Constants.DATE_FORMAT_DATE));
+//        storeProductResponse.setStartTimeStr(DateUtil.timestamp2DateStr(storeCombination.getStartTime(), DateFormatters.DATE_FORMAT_DATE));
+//        storeProductResponse.setStopTimeStr(DateUtil.timestamp2DateStr(storeCombination.getStopTime(), DateFormatters.DATE_FORMAT_DATE));
 
         // 查询attr
         List<StoreProductAttr> attrs = storeProductAttrService.getListByProductIdAndTypeNotDel(id, Constants.PRODUCT_TYPE_PINGTUAN);

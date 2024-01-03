@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.DateFormatters;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.BargainFrontRequest;
 import com.cshy.common.model.request.PageParamRequest;
@@ -91,7 +92,7 @@ public class StoreBargainUserServiceImpl extends ServiceImpl<StoreBargainUserDao
         List<StoreBargainUserResponse> list = bargainUserList.stream().map(bargainUser -> {
             StoreBargainUserResponse bargainUserResponse = new StoreBargainUserResponse();
             BeanUtils.copyProperties(bargainUser, bargainUserResponse);
-            bargainUserResponse.setAddTime(DateUtil.timestamp2DateStr(bargainUser.getAddTime(), Constants.DATE_FORMAT));
+            bargainUserResponse.setAddTime(DateUtil.timestamp2DateStr(bargainUser.getAddTime(), DateFormatters.DATE_FORMAT));
             bargainUserResponse.setNowPrice(bargainUser.getBargainPrice().subtract(bargainUser.getPrice()));
             // 查询用户信息
             User user = userService.getById(bargainUser.getUid());
@@ -101,7 +102,7 @@ public class StoreBargainUserServiceImpl extends ServiceImpl<StoreBargainUserDao
             StoreBargain storeBargain = storeBargainService.getById(bargainUser.getBargainId());
             bargainUserResponse.setTitle(storeBargain.getTitle());
 
-            bargainUserResponse.setDataTime(DateUtil.timestamp2DateStr(storeBargain.getStopTime(), Constants.DATE_FORMAT));
+            bargainUserResponse.setDataTime(DateUtil.timestamp2DateStr(storeBargain.getStopTime(), DateFormatters.DATE_FORMAT));
             bargainUserResponse.setPeopleNum(storeBargain.getPeopleNum());
             // 剩余砍价次数
             Long helpCount = storeBargainUserHelpService.getHelpCountByBargainIdAndBargainUid(storeBargain.getId(), bargainUser.getId());
