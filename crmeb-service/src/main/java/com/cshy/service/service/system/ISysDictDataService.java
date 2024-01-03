@@ -1,7 +1,9 @@
 package com.cshy.service.service.system;
 
 
+import com.cshy.common.model.entity.base.BasePage;
 import com.cshy.common.model.entity.system.SysDictData;
+import com.github.pagehelper.PageInfo;
 
 import java.util.List;
 
@@ -33,14 +35,14 @@ public interface ISysDictDataService
      * @param dictCode 字典数据ID
      * @return 字典数据
      */
-    public SysDictData selectDictDataById(Long dictCode);
+    public SysDictData selectDictDataById(Integer dictCode);
 
     /**
      * 批量删除字典数据信息
      * 
      * @param dictCodes 需要删除的字典数据ID
      */
-    public void deleteDictDataByIds(Long[] dictCodes);
+    public void deleteDictDataByIds(Integer[] dictCodes);
 
     /**
      * 新增保存字典数据信息
@@ -59,4 +61,6 @@ public interface ISysDictDataService
     public int updateDictData(SysDictData dictData);
 
     String getUrl(Integer number);
+
+    PageInfo<SysDictData> selectDictTypePage(SysDictData dictData, BasePage basePage);
 }

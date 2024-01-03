@@ -1,6 +1,7 @@
 package com.cshy.service.service.impl.system;
 
 import com.cshy.common.exception.CrmebException;
+import com.cshy.common.model.entity.base.BasePage;
 import com.cshy.common.model.entity.system.SysDictData;
 import com.cshy.common.model.entity.system.SysDictType;
 import com.cshy.common.utils.DictUtils;
@@ -8,6 +9,8 @@ import com.cshy.common.utils.StringUtils;
 import com.cshy.service.dao.system.SysDictDataMapper;
 import com.cshy.service.dao.system.SysDictTypeMapper;
 import com.cshy.service.service.system.ISysDictTypeService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,7 +95,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
      * @return 字典类型
      */
     @Override
-    public SysDictType selectDictTypeById(String dictId)
+    public SysDictType selectDictTypeById(Integer dictId)
     {
         return dictTypeMapper.selectDictTypeById(dictId);
     }
@@ -115,9 +118,9 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
      * @param dictIds 需要删除的字典ID
      */
     @Override
-    public void deleteDictTypeByIds(String[] dictIds)
+    public void deleteDictTypeByIds(Integer[] dictIds)
     {
-        for (String dictId : dictIds)
+        for (Integer dictId : dictIds)
         {
             SysDictType dictType = selectDictTypeById(dictId);
             if (dictDataMapper.countDictDataByType(dictType.getDictType()) > 0)
@@ -210,12 +213,20 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService
     @Override
     public boolean checkDictTypeUnique(SysDictType dict)
     {
-        String dictId = StringUtils.isNull(dict.getDictId()) ? "" : dict.getDictId();
+        Integer dictId = dict.getDictId();
         SysDictType dictType = dictTypeMapper.checkDictTypeUnique(dict.getDictType());
         if (StringUtils.isNotNull(dictType) && !dictType.getDictId().equals(dictId))
         {
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
+    }
+
+    @Override
+    public PageInfo<SysDictType> selectDictTypePage(SysDictType dictType, BasePage basePage) {
+        PageHelper.startPage(basePage.getCurrent().intValue(), basePage.getSize().intValue());
+
+        List<SysDictType> sysDictTypes = dictTypeMapper.selectDictTypeList(dictType);
+        return new PageInfo<>(sysDictTypes);
     }
 }

@@ -14,7 +14,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</resultMap>
 	
 	<sql id="selectDictTypeVo">
-        select dict_id, dict_name, dict_type, status, create_time, remark
+        select dict_id, dict_name, dict_type, status, create_time
 		from sys_dict_type
     </sql>
 
@@ -30,12 +30,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="dictType != null and dictType != ''">
 				AND dict_type like concat('%', #{dictType}, '%')
 			</if>
-			<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
-				and date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
-			</if>
-			<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
-				and date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
-			</if>
 	    </where>
 	</select>
 	
@@ -43,12 +37,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<include refid="selectDictTypeVo"/>
 	</select>
 	
-	<select id="selectDictTypeById" parameterType="String" resultMap="SysDictTypeResult">
+	<select id="selectDictTypeById" parameterType="Integer" resultMap="SysDictTypeResult">
 		<include refid="selectDictTypeVo"/>
 		where dict_id = #{dictId}
 	</select>
 	
-	<select id="selectDictTypeByType" parameterType="String" resultMap="SysDictTypeResult">
+	<select id="selectDictTypeByType" parameterType="Integer" resultMap="SysDictTypeResult">
 		<include refid="selectDictTypeVo"/>
 		where dict_type = #{dictType}
 	</select>
@@ -58,11 +52,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where dict_type = #{dictType} limit 1
 	</select>
 	
-	<delete id="deleteDictTypeById" parameterType="String">
+	<delete id="deleteDictTypeById" parameterType="Integer">
  		delete from sys_dict_type where dict_id = #{dictId}
  	</delete>
  	
- 	<delete id="deleteDictTypeByIds" parameterType="String">
+ 	<delete id="deleteDictTypeByIds" parameterType="Integer">
  		delete from sys_dict_type where dict_id in
  		<foreach collection="array" item="dictId" open="(" separator="," close=")">
  			#{dictId}
@@ -75,29 +69,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="dictName != null and dictName != ''">dict_name = #{dictName},</if>
  			<if test="dictType != null and dictType != ''">dict_type = #{dictType},</if>
  			<if test="status != null">status = #{status},</if>
- 			<if test="remark != null">remark = #{remark},</if>
  			update_time = sysdate()
  		</set>
  		where dict_id = #{dictId}
 	</update>
  	
  	<insert id="insertDictType" parameterType="com.cshy.common.model.entity.system.SysDictType">
-		<selectKey keyProperty="dictId" resultType="String" order="BEFORE">
-			select replace(uuid(), '-', '') as dict_id from dual
-		</selectKey>
  		insert into sys_dict_type(
  			<if test="dictId != null and dictId != ''">dict_id,</if>
  			<if test="dictName != null and dictName != ''">dict_name,</if>
  			<if test="dictType != null and dictType != ''">dict_type,</if>
  			<if test="status != null">status,</if>
- 			<if test="remark != null and remark != ''">remark,</if>
  			create_time
  		)values(
 			<if test="dictId != null and dictId != ''">dict_id,</if>
 			<if test="dictName != null and dictName != ''">#{dictName},</if>
  			<if test="dictType != null and dictType != ''">#{dictType},</if>
  			<if test="status != null">#{status},</if>
- 			<if test="remark != null and remark != ''">#{remark},</if>
  			sysdate()
  		)
 	</insert>

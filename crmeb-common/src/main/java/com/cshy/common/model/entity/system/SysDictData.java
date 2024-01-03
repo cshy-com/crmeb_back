@@ -11,7 +11,7 @@ public class SysDictData extends BaseModel<SysDictData>
     private static final long serialVersionUID = 1L;
 
     /** 字典编码 */
-    private String dictCode;
+    private Integer dictCode;
 
     /** 字典排序 */
     private Long dictSort;
@@ -37,12 +37,12 @@ public class SysDictData extends BaseModel<SysDictData>
     /** 状态（0正常 1停用） */
     private String status;
 
-    public String getDictCode()
+    public Integer getDictCode()
     {
         return dictCode;
     }
 
-    public void setDictCode(String dictCode)
+    public void setDictCode(Integer dictCode)
     {
         this.dictCode = dictCode;
     }

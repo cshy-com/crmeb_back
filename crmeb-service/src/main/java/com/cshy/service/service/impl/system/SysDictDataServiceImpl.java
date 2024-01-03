@@ -1,10 +1,14 @@
 package com.cshy.service.service.impl.system;
 
 import com.cshy.common.exception.CrmebException;
+import com.cshy.common.model.entity.base.BasePage;
 import com.cshy.common.model.entity.system.SysDictData;
+import com.cshy.common.model.entity.system.SysDictType;
 import com.cshy.common.utils.DictUtils;
 import com.cshy.service.dao.system.SysDictDataMapper;
 import com.cshy.service.service.system.ISysDictDataService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +57,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService
      * @return 字典数据
      */
     @Override
-    public SysDictData selectDictDataById(Long dictCode)
+    public SysDictData selectDictDataById(Integer dictCode)
     {
         return dictDataMapper.selectDictDataById(dictCode);
     }
@@ -64,9 +68,9 @@ public class SysDictDataServiceImpl implements ISysDictDataService
      * @param dictCodes 需要删除的字典数据ID
      */
     @Override
-    public void deleteDictDataByIds(Long[] dictCodes)
+    public void deleteDictDataByIds(Integer[] dictCodes)
     {
-        for (Long dictCode : dictCodes)
+        for (Integer dictCode : dictCodes)
         {
             SysDictData data = selectDictDataById(dictCode);
             dictDataMapper.deleteDictDataById(dictCode);
@@ -129,6 +133,14 @@ public class SysDictDataServiceImpl implements ISysDictDataService
         if (Objects.nonNull(sysDictData))
             url = sysDictData.getDictValue();
         return url;
+    }
+
+    @Override
+    public PageInfo<SysDictData> selectDictTypePage(SysDictData dictData, BasePage basePage) {
+        PageHelper.startPage(basePage.getCurrent().intValue(), basePage.getSize().intValue());
+
+        List<SysDictData> sysDictData = dictDataMapper.selectDictDataList(dictData);
+        return new PageInfo<>(sysDictData);
     }
 
 }

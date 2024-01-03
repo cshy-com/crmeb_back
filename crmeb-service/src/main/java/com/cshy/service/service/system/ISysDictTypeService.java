@@ -1,8 +1,10 @@
 package com.cshy.service.service.system;
 
 
+import com.cshy.common.model.entity.base.BasePage;
 import com.cshy.common.model.entity.system.SysDictData;
 import com.cshy.common.model.entity.system.SysDictType;
+import com.github.pagehelper.PageInfo;
 
 import java.util.List;
 
@@ -40,7 +42,7 @@ public interface ISysDictTypeService
      * @param dictId 字典类型ID
      * @return 字典类型
      */
-    public SysDictType selectDictTypeById(String dictId);
+    public SysDictType selectDictTypeById(Integer dictId);
 
     /**
      * 根据字典类型查询信息
@@ -55,7 +57,7 @@ public interface ISysDictTypeService
      * 
      * @param dictIds 需要删除的字典ID
      */
-    public void deleteDictTypeByIds(String[] dictIds);
+    public void deleteDictTypeByIds(Integer[] dictIds);
 
     /**
      * 加载字典缓存数据
@@ -95,4 +97,6 @@ public interface ISysDictTypeService
      * @return 结果
      */
     public boolean checkDictTypeUnique(SysDictType dictType);
+
+    PageInfo<SysDictType> selectDictTypePage(SysDictType dictType, BasePage basePage);
 }

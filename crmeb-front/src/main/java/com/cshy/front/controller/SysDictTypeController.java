@@ -35,7 +35,7 @@ public class SysDictTypeController {
      */
     @GetMapping(value = "/{dictId}")
     @ApiOperation(value = "查询字典类型详细")
-    public CommonResult<SysDictType> getInfo(@PathVariable String dictId) {
+    public CommonResult<SysDictType> getInfo(@PathVariable Integer dictId) {
         return CommonResult.success(dictTypeService.selectDictTypeById(dictId));
     }
 

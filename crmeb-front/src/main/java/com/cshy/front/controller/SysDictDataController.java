@@ -41,7 +41,7 @@ public class SysDictDataController
      */
     @GetMapping(value = "/{dictCode}")
     @ApiOperation(value = "查询字典数据详细")
-    public CommonResult<SysDictData> getInfo(@PathVariable Long dictCode)
+    public CommonResult<SysDictData> getInfo(@PathVariable Integer dictCode)
     {
         return CommonResult.success(dictDataService.selectDictDataById(dictCode));
     }
