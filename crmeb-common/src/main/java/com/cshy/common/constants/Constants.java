@@ -124,9 +124,6 @@ public class Constants {
     public static final String WE_CHAT_MESSAGE_KEY_PROGRAM = "we_chat_program_message_list";
     public static final String WE_CHAT_MESSAGE_INDUSTRY_KEY = "we_chat_message_industry";
 
-    //config表数据redis
-    public static final String CONFIG_LIST = "config_list"; //配置列表
-
     //物流缓存key
     public static final String EXPRESS_LIMIT = "express_limit"; //配置列表
 
@@ -159,6 +156,7 @@ public class Constants {
     public static final String CONFIG_KEY_PAY_WE_CHAT_APP_APP_ID = "pay_weixin_app_appid"; //公众号appId
     public static final String CONFIG_KEY_PAY_WE_CHAT_APP_MCH_ID = "pay_weixin_app_mchid"; //公众号配的商户号
     public static final String CONFIG_KEY_PAY_WE_CHAT_APP_APP_KEY = "pay_weixin_app_key"; //公众号支付key
+    public static final String SYS_CONFIG_KEY = "sys_config:";
 
     public static final String CONFIG_KEY_RECHARGE_MIN_AMOUNT = "store_user_min_recharge"; //最小充值金额
 //    public static final String CONFIG_KEY_PROGRAM_LOGO = "routine_logo"; //小程序logo
@@ -493,7 +491,6 @@ public class Constants {
     public static final String WE_CHAT_PROGRAM_TEMP_KEY_ORDER_PAY = "516";// 订单支付成功通知
     public static final String WE_CHAT_PROGRAM_TEMP_KEY_ORDER_RECEIVING = "9283";// 订单收货通知
     public static final String WE_CHAT_PROGRAM_TEMP_KEY_RECHARGE = "OPENTM200565260";
-
 
 
     //CND  URL测试用

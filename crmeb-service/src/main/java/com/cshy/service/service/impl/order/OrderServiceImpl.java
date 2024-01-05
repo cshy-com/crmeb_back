@@ -602,7 +602,7 @@ public class OrderServiceImpl implements OrderService {
             configKeys.add("order_bargain_time");
             configKeys.add("order_seckill_time");
             configKeys.add("order_pink_time");
-            List<String> configValues = systemConfigService.getValuesByKes(configKeys);
+            List<String> configValues = systemConfigService.getValuesByKeys(configKeys);
             Date timeSpace;
             timeSpace = DateUtil.addSecond(storeOrder.getCreateTime(), Double.valueOf(configValues.get(0)).intValue() * 3600);
             record.set("msg", "请在" + DateUtil.dateToStr(timeSpace, DateConstants.DATE_FORMAT) + "前完成支付");

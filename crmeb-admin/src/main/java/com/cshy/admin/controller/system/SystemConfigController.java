@@ -57,17 +57,6 @@ public class SystemConfigController {
     }
 
     /**
-     * 检测表单name是否存在
-     * @param name name
-     */
-    @PreAuthorize("hasAuthority('admin:system:config:check')")
-    @ApiOperation(value = "检测表单name是否存在")
-    @RequestMapping(value = "/check", method = RequestMethod.GET)
-    public CommonResult<Boolean> check(@RequestParam String name) {
-        return CommonResult.success(systemConfigService.checkName(name));
-    }
-
-    /**
      * 配置表中仅仅存储对应的配置
      * @param key 配置表中的配置字段
      * @param value 对应的值
@@ -91,26 +80,13 @@ public class SystemConfigController {
     }
 
     /**
-     * 根据key获取配置
+     * 同步缓存
      */
-    @PreAuthorize("hasAuthority('admin:system:config:get')")
-    @ApiOperation(value = "根据key获取配置")
-    @RequestMapping(value = "/get", method = RequestMethod.GET)
-    public CommonResult<List<SystemConfig>> getByKey(@RequestParam String key) {
-        return CommonResult.success(systemConfigService.getListByKey(key));
-    }
-
-    /**
-     * 更新配置信息
-     */
-    @PreAuthorize("hasAuthority('admin:system:config:update')")
-    @ApiOperation(value = "更新配置信息")
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public CommonResult<List<SystemConfig>> getByKey(@RequestBody @Validated List<SystemConfigAdminRequest> requestList) {
-        if (systemConfigService.updateByList(requestList)) {
-            return CommonResult.success();
-        }
-        return CommonResult.failed();
+    @ApiOperation(value = "同步缓存")
+    @RequestMapping(value = "/async", method = RequestMethod.GET)
+    public CommonResult<Object> async() {
+        systemConfigService.resetConfigCache();
+        return CommonResult.success("success");
     }
 }
 

@@ -1,5 +1,6 @@
 package com.cshy.service.service.impl.system;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -18,19 +19,18 @@ import com.cshy.service.dao.system.SystemConfigDao;
 import com.cshy.service.service.system.SystemAttachmentService;
 import com.cshy.service.service.system.SystemConfigService;
 import com.cshy.service.service.system.SystemFormTempService;
+import com.google.common.collect.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * SystemConfigServiceImpl 接口实现
- 
  */
 @Service
 public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, SystemConfig> implements SystemConfigService {
@@ -50,26 +50,36 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
     @Autowired
     CrmebConfig crmebConfig;
 
-    private static final String redisKey = Constants.CONFIG_LIST;
+    private static final String redisKey = Constants.SYS_CONFIG_KEY;
+
+    /**
+     * 项目启动时，初始化参数到缓存
+     */
+    @PostConstruct
+    public void init() {
+        loadingConfigCache();
+    }
 
     /**
      * 根据menu name 获取 value
+     *
      * @param name menu name
      * @return String
      */
     @Override
     public String getValueByKey(String name) {
-        return get(name);
+        return get(name).getValue();
     }
 
 
     /**
      * 同时获取多个配置
+     *
      * @param keys 多个配置key
      * @return List<String>
      */
     @Override
-    public List<String> getValuesByKes(List<String> keys) {
+    public List<String> getValuesByKeys(List<String> keys) {
         List<String> result = new ArrayList<>();
         for (String key : keys) {
             result.add(getValueByKey(key));
@@ -79,14 +89,15 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
 
     /**
      * 根据 name 获取 value 找不到抛异常
+     *
      * @param name menu name
      * @return String
      */
     @Override
     public String getValueByKeyException(String name) {
-        String value = get(name);
+        String value = get(name).getValue();
         if (null == value) {
-            throw new CrmebException("没有找到"+ name +"数据");
+            throw new CrmebException("没有找到" + name + "数据");
         }
 
         return value;
@@ -94,6 +105,7 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
 
     /**
      * 整体保存表单数据
+     *
      * @param systemFormCheckRequest SystemFormCheckRequest 数据保存
      * @return boolean
      */
@@ -137,9 +149,9 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
     }
 
 
-
     /**
      * updateStatusByGroupId
+     *
      * @param formId Integer formId
      */
     private void updateStatusByFormId(Integer formId) {
@@ -164,7 +176,8 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
 
     /**
      * 保存或更新配置数据
-     * @param name 菜单名称
+     *
+     * @param name  菜单名称
      * @param value 菜单值
      * @return boolean
      */
@@ -176,15 +189,17 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
         lambdaQueryWrapper.eq(SystemConfig::getName, name);
         List<SystemConfig> systemConfigs = dao.selectList(lambdaQueryWrapper);
         if (systemConfigs.size() >= 2) {
-            throw new CrmebException("配置名称存在多个请检查配置 eb_system_config 重复数据："+name+"条数："+systemConfigs.size());
+            throw new CrmebException("配置名称存在多个请检查配置 sys_config 重复数据：" + name + "条数：" + systemConfigs.size());
         } else if (systemConfigs.size() == 1) {
-            systemConfigs.get(0).setValue(value);
-            updateById(systemConfigs.get(0));
-            asyncRedis(name);
+            SystemConfig systemConfig = systemConfigs.get(0);
+            systemConfig.setValue(value);
+            updateById(systemConfig);
+            setRedis(systemConfig);
             return true;
         } else {
-            save(new SystemConfig().setName(name).setValue(value));
-            asyncRedis(name);
+            SystemConfig systemConfig = new SystemConfig().setName(name).setValue(value).setFormId(0);
+            save(systemConfig);
+            setRedis(systemConfig);
             return true;
         }
     }
@@ -192,82 +207,72 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
 
     /**
      * 根据formId查询数据
+     *
      * @param formId Integer id
      * @return HashMap<String, String>
      */
     @Override
     public HashMap<String, String> info(Integer formId) {
-        LambdaQueryWrapper<SystemConfig> lambdaQueryWrapper1 = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper1.eq(SystemConfig::getFormId, formId);
-        List<SystemConfig> systemConfigList = dao.selectList(lambdaQueryWrapper1);
-        if (ObjectUtil.isNull(systemConfigList)) {
-            return new HashMap<>();
-        }
+        //缓存获取
+        Collection<String> keys = redisUtil.keys(getCacheKey(formId + ":*"));
         HashMap<String, String> map = new HashMap<>();
-        for (SystemConfig systemConfig : systemConfigList) {
+        keys.stream().forEach(key -> {
+            Object o = redisUtil.get(key);
+            SystemConfig systemConfig = (SystemConfig) o;
             map.put(systemConfig.getName(), systemConfig.getValue());
-        }
-        map.put("id", formId.toString());
+            map.put("id", formId.toString());
+        });
         return map;
     }
 
     /**
-     * 根据name查询数据
-     * @param name name
-     * @return boolean
-     */
-    @Override
-    public Boolean checkName(String name) {
-        String value = get(name);
-        return StrUtil.isBlank(value);
-    }
-
-    /**
-     * 根据key获取配置
-     * @param key key
-     * @return List
-     */
-    @Override
-    public List<SystemConfig> getListByKey(String key) {
-        LambdaQueryWrapper<SystemConfig> lqw = Wrappers.lambdaQuery();
-        lqw.eq(SystemConfig::getName, key);
-        return dao.selectList(lqw);
-    }
-
-    /**
      * 获取面单默认配置信息
+     *
      * @return ExpressSheetVo
      */
     @Override
     public ExpressSheetVo getDeliveryInfo() {
-        String exportId = get("config_export_id");
-        String exportTempId = get("config_export_temp_id");
-        String exportCom = get("config_export_com");
-        String exportToName = get("config_export_to_name");
-        String exportToTel = get("config_export_to_tel");
-        String exportToAddress = get("config_export_to_address");
-        String exportSiid = get("config_export_siid");
-        String exportOpen = get("config_export_open");
+        String exportId = get("config_export_id").getValue();
+        String exportTempId = get("config_export_temp_id").getValue();
+        String exportCom = get("config_export_com").getValue();
+        String exportToName = get("config_export_to_name").getValue();
+        String exportToTel = get("config_export_to_tel").getValue();
+        String exportToAddress = get("config_export_to_address").getValue();
+        String exportSiid = get("config_export_siid").getValue();
+        String exportOpen = get("config_export_open").getValue();
         return new ExpressSheetVo(Integer.valueOf(exportId), exportCom, exportTempId, exportToName, exportToTel, exportToAddress, exportSiid, Integer.valueOf(exportOpen));
     }
 
     /**
-     * 更新配置信息
-     * @param requestList 请求数组
-     * @return Boolean
+     * 加载参数缓存数据
      */
     @Override
-    public Boolean updateByList(List<SystemConfigAdminRequest> requestList) {
-        List<SystemConfig> configList = requestList.stream().map(e -> {
-            SystemConfig systemConfig = new SystemConfig();
-            BeanUtils.copyProperties(e, systemConfig);
-            return systemConfig;
-        }).collect(Collectors.toList());
-        return updateBatchById(configList);
+    public void loadingConfigCache() {
+        List<SystemConfig> configsList = this.list();
+        Map<Integer, List<SystemConfig>> listMap = configsList.stream().collect(Collectors.groupingBy(SystemConfig::getFormId));
+        listMap.forEach((k, list) -> {
+            list.forEach(config -> redisUtil.set(getCacheKey(k + ":" + config.getName()), config));
+        });
+    }
+
+    @Override
+    public void resetConfigCache() {
+        clearConfigCache();
+        loadingConfigCache();
+    }
+
+    /**
+     * 清空参数缓存数据
+     */
+    @Override
+    public void clearConfigCache() {
+        Collection<String> keys = redisUtil.keys(redisKey + "*");
+        redisUtil.deleteObject(keys);
     }
 
     /**
      * 获取颜色配置
+     *
      * @return SystemConfig
      */
     @Override
@@ -294,50 +299,39 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
 
     /**
      * 把数据同步到redis
+     *
      * @param systemConfigList List<SystemConfig> 需要同步的数据
      */
     private void async(List<SystemConfig> systemConfigList) {
-        if (!crmebConfig.isAsyncConfig()) {
-            //如果配置没有开启
-            return;
-        }
         for (SystemConfig systemConfig : systemConfigList) {
-            redisUtil.hmSet(redisKey, systemConfig.getName(), systemConfig.getValue());
+            redisUtil.set(redisKey + systemConfig.getFormId() + ":" + systemConfig.getName(), systemConfig);
         }
     }
 
     private void deleteRedis(String name) {
-        if (!crmebConfig.isAsyncConfig()) {
-            //如果配置没有开启
-            return;
-        }
-        redisUtil.hmDelete(redisKey, name);
+        redisUtil.hmDelete(redisKey, "*:" + name);
     }
 
     /**
      * 把数据同步到redis
+     *
      * @param name String
      * @return String
      */
-    private String get(String name) {
-        if (!crmebConfig.isAsyncConfig()) {
-            //如果配置没有开启
-            LambdaQueryWrapper<SystemConfig> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-            lambdaQueryWrapper.eq(SystemConfig::getStatus, false).eq(SystemConfig::getName, name);
-            SystemConfig systemConfig = dao.selectOne(lambdaQueryWrapper);
-            if (ObjectUtil.isNull(systemConfig) || StrUtil.isBlank(systemConfig.getValue())) {
-                return "";
-            }
-            return systemConfig.getValue();
-        }
-        setRedisByVoList();
-        Object data = redisUtil.hmGet(redisKey, name);
-        if (ObjectUtil.isNull(data) || StrUtil.isBlank(data.toString())) {
+    private SystemConfig get(String name) {
+        Collection<String> keys = redisUtil.keys(redisKey + "*:" + name);
+        if (CollUtil.isEmpty(keys)){
             //没有找到数据
-            return "";
+            //去数据库查找，然后写入redis
+            SystemConfig systemConfig = dao.selectOne(new LambdaQueryWrapper<SystemConfig>().eq(SystemConfig::getName, name));
+            if (Objects.nonNull(systemConfig)) {
+                setRedis(systemConfig);
+                return systemConfig;
+            }
+            return new SystemConfig();
         }
-        //去数据库查找，然后写入redis
-        return data.toString();
+        String[] keyArr = new String[keys.size()];
+        return (SystemConfig) redisUtil.get(keys.toArray(keyArr)[0]);
     }
 
     /**
@@ -346,7 +340,7 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
     private void setRedisByVoList() {
         //检测redis是否为空
         Long size = redisUtil.getHashSize(redisKey);
-        if (size > 0 || !crmebConfig.isAsyncConfig()) {
+        if (size > 0) {
             return;
         }
 
@@ -354,6 +348,20 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
         lambdaQueryWrapper.eq(SystemConfig::getStatus, false);
         List<SystemConfig> systemConfigList = dao.selectList(lambdaQueryWrapper);
         async(systemConfigList);
+    }
+
+    private void setRedis(SystemConfig systemConfig) {
+        async(Lists.newArrayList(systemConfig));
+    }
+
+    /**
+     * 设置cache key
+     *
+     * @param configKey 参数键
+     * @return 缓存键key
+     */
+    private String getCacheKey(String configKey) {
+        return redisKey + configKey;
     }
 }
 

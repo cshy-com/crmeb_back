@@ -5,7 +5,6 @@ crmeb:
   wechat-api-url:  #请求微信接口中专服务器
   wechat-js-api-debug: false #微信js api系列是否开启调试模式
   wechat-js-api-beta: true #微信js api是否是beta版本
-  asyncConfig: false #是否同步config表数据到redis
   asyncWeChatProgramTempList: true #是否同步小程序公共模板库
   imagePath: /home/file/ # 服务器图片路径配置 斜杠结尾
 

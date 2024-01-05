@@ -1,7 +1,6 @@
 package com.cshy.service.service.system;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.cshy.common.model.request.system.SystemConfigAdminRequest;
 import com.cshy.common.model.request.system.SystemFormCheckRequest;
 import com.cshy.common.model.vo.ExpressSheetVo;
 import com.cshy.common.model.entity.system.SystemConfig;
@@ -27,7 +26,7 @@ public interface SystemConfigService extends IService<SystemConfig> {
      * @param keys 多个配置key
      * @return 查询到的多个结果
      */
-    List<String> getValuesByKes(List<String> keys);
+    List<String> getValuesByKeys(List<String> keys);
 
     /**
      * 保存或更新配置数据
@@ -59,35 +58,29 @@ public interface SystemConfigService extends IService<SystemConfig> {
     HashMap<String, String> info(Integer formId);
 
     /**
-     * 根据name查询数据
-     * @param name name
-     * @return Boolean
-     */
-    Boolean checkName(String name);
-
-    /**
-     * 根据key获取配置
-     * @param key key
-     * @return List
-     */
-    List<SystemConfig> getListByKey(String key);
-
-    /**
      * 获取面单默认配置信息
      * @return ExpressSheetVo
      */
     ExpressSheetVo getDeliveryInfo();
 
     /**
-     * 更新配置信息
-     * @param requestList 请求数组
-     * @return Boolean
-     */
-    Boolean updateByList(List<SystemConfigAdminRequest> requestList);
-
-    /**
      * 获取颜色配置
      * @return SystemConfig
      */
     SystemConfig getColorConfig();
+
+    /**
+     * 加载参数缓存数据
+     */
+    public void loadingConfigCache();
+
+    /**
+     * 重置参数缓存数据
+     */
+    public void resetConfigCache();
+
+    /**
+     * 清空参数缓存数据
+     */
+    public void clearConfigCache();
 }
