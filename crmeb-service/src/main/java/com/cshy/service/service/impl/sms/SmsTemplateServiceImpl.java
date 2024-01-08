@@ -9,6 +9,7 @@ import com.aliyun.dysmsapi20170525.models.QuerySmsTemplateListResponseBody;
 import com.aliyun.tea.TeaException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.cshy.common.constants.AliSMSTemplateStatus;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.dto.sms.SmsTemplateDto;
@@ -163,17 +164,17 @@ public class SmsTemplateServiceImpl extends BaseServiceImpl<SmsTemplate, SmsTemp
     private static String switchAuditStatus(QuerySmsTemplateListResponseBody.QuerySmsTemplateListResponseBodySmsTemplateList smsTemplate) {
         String auditStatus;
         switch (smsTemplate.getAuditStatus()) {
-            case Constants.AUDIT_STATE_INIT:
+            case AliSMSTemplateStatus.INIT:
                 auditStatus = "审核中";
                 break;
-            case Constants.AUDIT_STATE_PASS:
+            case AliSMSTemplateStatus.PASS:
                 auditStatus = "审核通过";
                 break;
-            case Constants.AUDIT_STATE_NOT_PASS:
+            case AliSMSTemplateStatus.NOT_PASS:
                 auditStatus = "审核未通过";
                 break;
-            case Constants.AUDIT_STATE_CANCEL:
-            case Constants.AUDIT_SATE_CANCEL:
+            case AliSMSTemplateStatus.STATE_CANCEL:
+            case AliSMSTemplateStatus.SATE_CANCEL:
                 auditStatus = "取消审核";
                 break;
             default:

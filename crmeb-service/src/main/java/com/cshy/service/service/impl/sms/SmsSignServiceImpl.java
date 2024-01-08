@@ -4,6 +4,7 @@ import com.aliyun.dysmsapi20170525.Client;
 import com.aliyun.dysmsapi20170525.models.QuerySmsSignListResponse;
 import com.aliyun.dysmsapi20170525.models.QuerySmsSignListResponseBody;
 import com.aliyun.tea.TeaException;
+import com.cshy.common.constants.AliSMSTemplateStatus;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.model.dto.sms.SmsSignDto;
 import com.cshy.common.model.entity.base.BaseServiceImpl;
@@ -90,17 +91,17 @@ public class SmsSignServiceImpl extends BaseServiceImpl<SmsSign, SmsSignDto,
     private static String switchAuditStatus(QuerySmsSignListResponseBody.QuerySmsSignListResponseBodySmsSignList SmsSign) {
         String auditStatus;
         switch (SmsSign.getAuditStatus()) {
-            case Constants.AUDIT_STATE_INIT:
+            case AliSMSTemplateStatus.INIT:
                 auditStatus = "审核中";
                 break;
-            case Constants.AUDIT_STATE_PASS:
+            case AliSMSTemplateStatus.PASS:
                 auditStatus = "审核通过";
                 break;
-            case Constants.AUDIT_STATE_NOT_PASS:
+            case AliSMSTemplateStatus.NOT_PASS:
                 auditStatus = "审核未通过";
                 break;
-            case Constants.AUDIT_STATE_CANCEL:
-            case Constants.AUDIT_SATE_CANCEL:
+            case AliSMSTemplateStatus.STATE_CANCEL:
+            case AliSMSTemplateStatus.SATE_CANCEL:
                 auditStatus = "取消审核";
                 break;
             default:
