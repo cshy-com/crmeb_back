@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.constants.DateConstants;
+import com.cshy.common.constants.ProductType;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttr;
@@ -142,7 +143,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
             storeProductResponse.setImages(CrmebUtil.stringToArrayStr(product.getImages()));
 
             StoreProductAttr storeProductAttrPram = new StoreProductAttr();
-            storeProductAttrPram.setProductId(product.getId()).setType(Constants.PRODUCT_TYPE_SECKILL);
+            storeProductAttrPram.setProductId(product.getId()).setType(ProductType.PRODUCT_TYPE_SECKILL);
             List<StoreProductAttr> attrs = attrService.getByEntity(storeProductAttrPram);
 
             if (attrs.size() > 0) {
@@ -152,7 +153,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
             StoreProductDescription sd = storeProductDescriptionService.getOne(
                     new LambdaQueryWrapper<StoreProductDescription>()
                             .eq(StoreProductDescription::getProductId, product.getId())
-                                .eq(StoreProductDescription::getType, Constants.PRODUCT_TYPE_SECKILL));
+                                .eq(StoreProductDescription::getType, ProductType.PRODUCT_TYPE_SECKILL));
             if (null != sd) {
                 storeProductResponse.setContent(null == sd.getDescription()?"":sd.getDescription());
             }
@@ -264,7 +265,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         List<StoreProductAttr> attrList = addRequestList.stream().map(e -> {
             StoreProductAttr attr = new StoreProductAttr();
             BeanUtils.copyProperties(e, attr);
-            attr.setType(Constants.PRODUCT_TYPE_SECKILL);
+            attr.setType(ProductType.PRODUCT_TYPE_SECKILL);
             return attr;
         }).collect(Collectors.toList());
 
@@ -275,7 +276,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
             attrValue.setSuk(e.getSuk());
             attrValue.setQuota(e.getQuota());
             attrValue.setQuotaShow(e.getQuota());
-            attrValue.setType(Constants.PRODUCT_TYPE_SECKILL);
+            attrValue.setType(ProductType.PRODUCT_TYPE_SECKILL);
             attrValue.setImage(systemAttachmentService.clearPrefix(e.getImage()));
             return attrValue;
         }).collect(Collectors.toList());
@@ -283,7 +284,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         // 处理富文本
         StoreProductDescription spd = new StoreProductDescription();
         spd.setDescription(request.getContent().length() > 0 ? systemAttachmentService.clearPrefix(request.getContent()) : "");
-        spd.setType(Constants.PRODUCT_TYPE_SECKILL);
+        spd.setType(ProductType.PRODUCT_TYPE_SECKILL);
 
         Boolean execute = transactionTemplate.execute(e -> {
             save(storeSeckill);
@@ -294,7 +295,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
             storeProductAttrValueService.saveBatch(attrValueList);
 
             spd.setProductId(storeSeckill.getId());
-            storeProductDescriptionService.deleteByProductId(storeSeckill.getId(), Constants.PRODUCT_TYPE_SECKILL);
+            storeProductDescriptionService.deleteByProductId(storeSeckill.getId(), ProductType.PRODUCT_TYPE_SECKILL);
             storeProductDescriptionService.save(spd);
             return Boolean.TRUE;
         });
@@ -361,7 +362,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
             BeanUtils.copyProperties(e, attr);
             if (ObjectUtil.isNull(attr.getId())) {
                 attr.setProductId(seckill.getId());
-                attr.setType(Constants.PRODUCT_TYPE_SECKILL);
+                attr.setType(ProductType.PRODUCT_TYPE_SECKILL);
                 attrAddList.add(attr);
             } else {
                 attr.setProductId(seckill.getId());
@@ -382,7 +383,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
                 attrValue.setProductId(seckill.getId());
                 attrValue.setQuota(e.getQuota());
                 attrValue.setQuotaShow(e.getQuota());
-                attrValue.setType(Constants.PRODUCT_TYPE_SECKILL);
+                attrValue.setType(ProductType.PRODUCT_TYPE_SECKILL);
                 attrValueAddList.add(attrValue);
             } else {
                 attrValue.setProductId(seckill.getId());
@@ -394,15 +395,15 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         // 处理富文本
         StoreProductDescription spd = new StoreProductDescription();
         spd.setDescription(request.getContent().length() > 0 ? systemAttachmentService.clearPrefix(request.getContent()) : "");
-        spd.setType(Constants.PRODUCT_TYPE_SECKILL);
+        spd.setType(ProductType.PRODUCT_TYPE_SECKILL);
         spd.setProductId(seckill.getId());
 
         Boolean execute = transactionTemplate.execute(e -> {
             dao.updateById(seckill);
 
             // 先删除原用attr+value
-            attrService.deleteByProductIdAndType(seckill.getId(), Constants.PRODUCT_TYPE_SECKILL);
-            storeProductAttrValueService.deleteByProductIdAndType(seckill.getId(), Constants.PRODUCT_TYPE_SECKILL);
+            attrService.deleteByProductIdAndType(seckill.getId(), ProductType.PRODUCT_TYPE_SECKILL);
+            storeProductAttrValueService.deleteByProductIdAndType(seckill.getId(), ProductType.PRODUCT_TYPE_SECKILL);
 
             if (CollUtil.isNotEmpty(attrAddList)) {
                 attrService.saveBatch(attrAddList);
@@ -418,7 +419,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
                 storeProductAttrValueService.saveOrUpdateBatch(attrValueUpdateList);
             }
 
-            storeProductDescriptionService.deleteByProductId(seckill.getId(), Constants.PRODUCT_TYPE_SECKILL);
+            storeProductDescriptionService.deleteByProductId(seckill.getId(), ProductType.PRODUCT_TYPE_SECKILL);
             storeProductDescriptionService.save(spd);
 
             return Boolean.TRUE;
@@ -478,7 +479,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         StoreProductDescription sd = storeProductDescriptionService.getOne(
                 new LambdaQueryWrapper<StoreProductDescription>()
                         .eq(StoreProductDescription::getProductId, skillId)
-                        .eq(StoreProductDescription::getType, Constants.PRODUCT_TYPE_SECKILL));
+                        .eq(StoreProductDescription::getType, ProductType.PRODUCT_TYPE_SECKILL));
         if (ObjectUtil.isNotNull(sd)) {
             detailH5Response.setContent(ObjectUtil.isNull(sd.getDescription()) ? "" : sd.getDescription());
         }
@@ -509,16 +510,16 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         productDetailResponse.setStoreSeckill(detailH5Response);
 
         // 获取秒杀商品规格
-        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(skillId, Constants.PRODUCT_TYPE_SECKILL);
+        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(skillId, ProductType.PRODUCT_TYPE_SECKILL);
         // 根据制式设置attr属性
         productDetailResponse.setProductAttr(attrList);
 
         // 根据制式设置sku属性
         HashMap<String, Object> skuMap = new HashMap<>();
         // 获取主商品sku
-        List<StoreProductAttrValue> storeProductAttrValues = storeProductAttrValueService.getListByProductIdAndType(storeSeckill.getProductId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttrValue> storeProductAttrValues = storeProductAttrValueService.getListByProductIdAndType(storeSeckill.getProductId(), ProductType.PRODUCT_TYPE_NORMAL);
         // 获取秒杀商品sku
-        List<StoreProductAttrValue> seckillAttrValues = storeProductAttrValueService.getListByProductIdAndType(storeSeckill.getId(), Constants.PRODUCT_TYPE_SECKILL);
+        List<StoreProductAttrValue> seckillAttrValues = storeProductAttrValueService.getListByProductIdAndType(storeSeckill.getId(), ProductType.PRODUCT_TYPE_SECKILL);
 
         for (int i = 0; i < storeProductAttrValues.size(); i++) {
             StoreProductAttrValueResponse atr = new StoreProductAttrValueResponse();
@@ -608,13 +609,13 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         infoResponse.setProductId(storeSeckill.getProductId());
 
         // 查询attr
-        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(skillId, Constants.PRODUCT_TYPE_SECKILL);
+        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(skillId, ProductType.PRODUCT_TYPE_SECKILL);
         infoResponse.setAttr(attrList);
 
         // 注意：数据瓶装步骤：分别查询秒杀和商品本山信息组装sku信息之后，再对比sku属性是否相等来赋值是否秒杀sku信息
-        List<StoreProductAttrValue> seckillAttrValueList = storeProductAttrValueService.getListByProductIdAndType(skillId, Constants.PRODUCT_TYPE_SECKILL);
+        List<StoreProductAttrValue> seckillAttrValueList = storeProductAttrValueService.getListByProductIdAndType(skillId, ProductType.PRODUCT_TYPE_SECKILL);
         // 查询主商品sku
-        List<StoreProductAttrValue> attrValueList = storeProductAttrValueService.getListByProductIdAndType(storeSeckill.getProductId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttrValue> attrValueList = storeProductAttrValueService.getListByProductIdAndType(storeSeckill.getProductId(), ProductType.PRODUCT_TYPE_NORMAL);
 
         List<AttrValueResponse> valueResponseList = attrValueList.stream().map(e -> {
             AttrValueResponse valueResponse = new AttrValueResponse();
@@ -636,7 +637,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         }).collect(Collectors.toList());
         infoResponse.setAttrValue(valueResponseList);
 
-        StoreProductDescription sd = storeProductDescriptionService.getByProductIdAndType(skillId, Constants.PRODUCT_TYPE_SECKILL);
+        StoreProductDescription sd = storeProductDescriptionService.getByProductIdAndType(skillId, ProductType.PRODUCT_TYPE_SECKILL);
         if (ObjectUtil.isNotNull(sd)) {
             infoResponse.setContent(ObjectUtil.isNull(sd.getDescription()) ? "" : sd.getDescription());
         }
@@ -939,7 +940,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
                         .setNum(storeProductStockRequest.getNum())
                         .setOperationType("add")
                         .setProductId(storeProductStockRequest.getProductId())
-                        .setType(Constants.PRODUCT_TYPE_NORMAL)
+                        .setType(ProductType.PRODUCT_TYPE_NORMAL)
                         .setSuk(storeProductStockRequest.getSuk());
                 storeProductService.doProductStock(r);
             }

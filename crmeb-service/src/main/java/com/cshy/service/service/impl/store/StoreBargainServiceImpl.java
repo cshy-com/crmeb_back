@@ -8,15 +8,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.DateConstants;
+import com.cshy.common.constants.*;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.store.*;
 import com.cshy.common.model.response.*;
 import com.cshy.common.model.vo.MyRecord;
-import com.cshy.common.constants.BargainConstants;
-import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.ProductConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.service.service.store.*;
 import com.cshy.service.service.system.SystemAttachmentService;
@@ -235,20 +232,20 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
         List<StoreProductAttr> attrList = addRequestList.stream().map(e -> {
             StoreProductAttr attr = new StoreProductAttr();
             BeanUtils.copyProperties(e, attr);
-            attr.setType(Constants.PRODUCT_TYPE_BARGAIN);
+            attr.setType(ProductType.PRODUCT_TYPE_BARGAIN);
             return attr;
         }).collect(Collectors.toList());
 
         // 处理商品属性值，砍价商品只有一条属性值
         StoreProductAttrValue singleAttrValue = new StoreProductAttrValue();
         BeanUtils.copyProperties(attrValueRequest, singleAttrValue);
-        singleAttrValue.setType(ProductConstants.PRODUCT_TYPE_BARGAIN);
+        singleAttrValue.setType(ProductType.PRODUCT_TYPE_BARGAIN);
         singleAttrValue.setImage(systemAttachmentService.clearPrefix(singleAttrValue.getImage()));
 
         // 处理富文本
         StoreProductDescription spd = new StoreProductDescription();
         spd.setDescription(request.getContent().length() > 0 ? systemAttachmentService.clearPrefix(request.getContent()) : "");
-        spd.setType(Constants.PRODUCT_TYPE_BARGAIN);
+        spd.setType(ProductType.PRODUCT_TYPE_BARGAIN);
 
         Boolean execute = transactionTemplate.execute(e -> {
             save(bargain);
@@ -258,7 +255,7 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
             attrValueService.save(singleAttrValue);
 
             spd.setProductId(bargain.getId());
-            storeProductDescriptionService.deleteByProductId(spd.getProductId(), ProductConstants.PRODUCT_TYPE_BARGAIN);
+            storeProductDescriptionService.deleteByProductId(spd.getProductId(), ProductType.PRODUCT_TYPE_BARGAIN);
             storeProductDescriptionService.save(spd);
 
             return Boolean.TRUE;
@@ -330,7 +327,7 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
             BeanUtils.copyProperties(e, attr);
             if (ObjectUtil.isNull(attr.getId())) {
                 attr.setProductId(bargain.getId());
-                attr.setType(Constants.PRODUCT_TYPE_BARGAIN);
+                attr.setType(ProductType.PRODUCT_TYPE_BARGAIN);
                 attrAddList.add(attr);
             } else {
                 attr.setProductId(bargain.getId());
@@ -348,7 +345,7 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
             attrValue.setProductId(bargain.getId());
             attrValue.setQuota(attrValueRequest.getQuota());
             attrValue.setQuotaShow(attrValueRequest.getQuota());
-            attrValue.setType(Constants.PRODUCT_TYPE_BARGAIN);
+            attrValue.setType(ProductType.PRODUCT_TYPE_BARGAIN);
         } else {
             attrValue.setIsDel(false);
         }
@@ -356,15 +353,15 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
         // 处理富文本
         StoreProductDescription spd = new StoreProductDescription();
         spd.setDescription(request.getContent().length() > 0 ? systemAttachmentService.clearPrefix(request.getContent()) : "");
-        spd.setType(Constants.PRODUCT_TYPE_BARGAIN);
+        spd.setType(ProductType.PRODUCT_TYPE_BARGAIN);
         spd.setProductId(bargain.getId());
 
         Boolean execute = transactionTemplate.execute(e -> {
             dao.updateById(bargain);
 
             // 先删除原用attr+value
-            attrService.deleteByProductIdAndType(bargain.getId(), Constants.PRODUCT_TYPE_BARGAIN);
-            attrValueService.deleteByProductIdAndType(bargain.getId(), Constants.PRODUCT_TYPE_BARGAIN);
+            attrService.deleteByProductIdAndType(bargain.getId(), ProductType.PRODUCT_TYPE_BARGAIN);
+            attrValueService.deleteByProductIdAndType(bargain.getId(), ProductType.PRODUCT_TYPE_BARGAIN);
 
             if (CollUtil.isNotEmpty(attrAddList)) {
                 attrService.saveBatch(attrAddList);
@@ -379,7 +376,7 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
                 attrValueService.save(attrValue);
             }
 
-            storeProductDescriptionService.deleteByProductId(bargain.getId(), Constants.PRODUCT_TYPE_BARGAIN);
+            storeProductDescriptionService.deleteByProductId(bargain.getId(), ProductType.PRODUCT_TYPE_BARGAIN);
             storeProductDescriptionService.save(spd);
             return Boolean.TRUE;
         });
@@ -428,7 +425,7 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
         storeProductResponse.setStatus(storeBargain.getStatus().equals(true) ? 1 : 0);
 
         // 查询attr
-        List<StoreProductAttr> attrs = attrService.getListByProductIdAndTypeNotDel(storeBargain.getId(), ProductConstants.PRODUCT_TYPE_BARGAIN);
+        List<StoreProductAttr> attrs = attrService.getListByProductIdAndTypeNotDel(storeBargain.getId(), ProductType.PRODUCT_TYPE_BARGAIN);
         storeProductResponse.setAttr(attrs);
         storeProductResponse.setSliderImage(String.join(",",storeBargain.getImages()));
 
@@ -439,9 +436,9 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
         storeProductResponse.setSpecType(specType);
 
         // 注意：数据瓶装步骤：分别查询砍价和商品本身信息组装sku信息之后，再对比sku属性是否相等来赋值是否砍价sku信息
-        List<StoreProductAttrValue> bargainAttrValueList = attrValueService.getListByProductIdAndType(bargainId, ProductConstants.PRODUCT_TYPE_BARGAIN);
+        List<StoreProductAttrValue> bargainAttrValueList = attrValueService.getListByProductIdAndType(bargainId, ProductType.PRODUCT_TYPE_BARGAIN);
         // 查询主商品sku
-        List<StoreProductAttrValue> attrValueList = attrValueService.getListByProductIdAndType(storeBargain.getProductId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttrValue> attrValueList = attrValueService.getListByProductIdAndType(storeBargain.getProductId(), ProductType.PRODUCT_TYPE_NORMAL);
 
         List<AttrValueResponse> valueResponseList = attrValueList.stream().map(e -> {
             AttrValueResponse valueResponse = new AttrValueResponse();
@@ -464,7 +461,7 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
         }).collect(Collectors.toList());
         storeProductResponse.setAttrValue(valueResponseList);
 
-        StoreProductDescription sd = storeProductDescriptionService.getByProductIdAndType(bargainId, Constants.PRODUCT_TYPE_BARGAIN);
+        StoreProductDescription sd = storeProductDescriptionService.getByProductIdAndType(bargainId, ProductType.PRODUCT_TYPE_BARGAIN);
         if(ObjectUtil.isNotNull(sd)){
             storeProductResponse.setContent(ObjectUtil.isNull(sd.getDescription()) ? "" : sd.getDescription());
         }
@@ -526,7 +523,7 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
             detailH5Response.setMasterStatus("normal");
         }
 
-        List<StoreProductAttrValue> storeProductAttrValuesBargain = attrValueService.getListByProductIdAndType(id, ProductConstants.PRODUCT_TYPE_BARGAIN);
+        List<StoreProductAttrValue> storeProductAttrValuesBargain = attrValueService.getListByProductIdAndType(id, ProductType.PRODUCT_TYPE_BARGAIN);
         if (CollUtil.isEmpty(storeProductAttrValuesBargain)) {
             throw new CrmebException("砍价商品规格属性值未找到");
         }
@@ -537,7 +534,7 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
         StoreProductDescription sd = storeProductDescriptionService.getOne(
                 new LambdaQueryWrapper<StoreProductDescription>()
                         .eq(StoreProductDescription::getProductId, id)
-                        .eq(StoreProductDescription::getType, ProductConstants.PRODUCT_TYPE_BARGAIN));
+                        .eq(StoreProductDescription::getType, ProductType.PRODUCT_TYPE_BARGAIN));
         if (ObjectUtil.isNotNull(sd)) {
             detailH5Response.setContent(ObjectUtil.isNull(sd.getDescription()) ? "" : sd.getDescription());
         }
@@ -902,7 +899,7 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
                         .setNum(storeProductStockRequest.getNum())
                         .setOperationType("add")
                         .setProductId(storeProductStockRequest.getProductId())
-                        .setType(Constants.PRODUCT_TYPE_NORMAL)
+                        .setType(ProductType.PRODUCT_TYPE_NORMAL)
                         .setSuk(storeProductStockRequest.getSuk());
                 storeProductService.doProductStock(r);
             }

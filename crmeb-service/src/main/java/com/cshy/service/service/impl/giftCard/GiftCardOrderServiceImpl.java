@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.ProductType;
 import com.cshy.common.enums.SmsTriggerEnum;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.dto.giftCard.GiftCardOrderDto;
@@ -141,7 +142,7 @@ public class GiftCardOrderServiceImpl extends BaseServiceImpl<GiftCardOrder, Gif
             // 普通商品库存
             storeProductService.operationStock(dto.getProductId(), 1, "sub");
             // 普通商品规格扣库存
-            storeProductAttrValueService.operationStock(attrValue.getId(), 1, "sub", Constants.PRODUCT_TYPE_NORMAL);
+            storeProductAttrValueService.operationStock(attrValue.getId(), 1, "sub", ProductType.PRODUCT_TYPE_NORMAL);
             return true;
         });
 

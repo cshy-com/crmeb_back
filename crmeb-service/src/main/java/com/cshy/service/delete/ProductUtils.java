@@ -3,6 +3,7 @@ package com.cshy.service.delete;
 import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSON;
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.ProductType;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.response.ProductActivityItemResponse;
 import com.cshy.common.utils.CrmebUtil;
@@ -434,7 +435,7 @@ public class ProductUtils {
                     ProductActivityItemResponse secKillResponse = new ProductActivityItemResponse();
                     secKillResponse.setId(currentSecKills.get(0).getId());
                     secKillResponse.setTime(secKillEndSecondTimestamp);
-                    secKillResponse.setType(Constants.PRODUCT_TYPE_SECKILL+"");
+                    secKillResponse.setType(ProductType.PRODUCT_TYPE_SECKILL+"");
                     result.put(code,secKillResponse);
                 }
             }
@@ -444,7 +445,7 @@ public class ProductUtils {
                     ProductActivityItemResponse bargainResponse = new ProductActivityItemResponse();
                     bargainResponse.setId(currentBargains.get(0).getId());
                     bargainResponse.setTime(DateUtil.getSecondTimestamp(currentBargains.get(0).getStopTime()));
-                    bargainResponse.setType(Constants.PRODUCT_TYPE_BARGAIN +"");
+                    bargainResponse.setType(ProductType.PRODUCT_TYPE_BARGAIN +"");
                     result.put(code, bargainResponse);
                 }
             }
@@ -454,7 +455,7 @@ public class ProductUtils {
                     ProductActivityItemResponse bargainResponse = new ProductActivityItemResponse();
                     bargainResponse.setId(currentCombinations.get(0).getId());
                     bargainResponse.setTime(DateUtil.getSecondTimestamp(currentCombinations.get(0).getStopTime()));
-                    bargainResponse.setType(Constants.PRODUCT_TYPE_PINGTUAN +"");
+                    bargainResponse.setType(ProductType.PRODUCT_TYPE_PINGTUAN +"");
                     result.put(code, bargainResponse);
                 }
             }

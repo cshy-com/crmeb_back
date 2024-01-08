@@ -850,7 +850,7 @@ public class OrderServiceImpl implements OrderService {
         OrderInfoVo orderInfoVo = validatePreOrderRequest(request, user);
         // 商品总计金额
         BigDecimal totalPrice;
-        if (orderInfoVo.getOrderDetailList().get(0).getProductType().equals(Constants.PRODUCT_TYPE_NORMAL)) {
+        if (orderInfoVo.getOrderDetailList().get(0).getProductType().equals(ProductType.PRODUCT_TYPE_NORMAL)) {
             // 普通商品
             totalPrice = orderInfoVo.getOrderDetailList().stream().map(e -> e.getVipPrice().multiply(new BigDecimal(e.getPayNum()))).reduce(BigDecimal.ZERO, BigDecimal::add);
         } else {
@@ -1225,7 +1225,7 @@ public class OrderServiceImpl implements OrderService {
 //                throw new CrmebException("秒杀商品已关闭");
 //            }
 //            OrderInfoDetailVo detailVo = orderInfoVo.getOrderDetailList().get(0);
-//            StoreProductAttrValue seckillAttrValue = storeProductAttrValueService.getByIdAndProductIdAndType(detailVo.getAttrValueId(), orderInfoVo.getSeckillId(), Constants.PRODUCT_TYPE_SECKILL);
+//            StoreProductAttrValue seckillAttrValue = storeProductAttrValueService.getByIdAndProductIdAndType(detailVo.getAttrValueId(), orderInfoVo.getSeckillId(), ProductType.PRODUCT_TYPE_SECKILL);
 //            if (ObjectUtil.isNull(seckillAttrValue)) {
 //                throw new CrmebException("秒杀商品规格不存在");
 //            }
@@ -1388,38 +1388,38 @@ public class OrderServiceImpl implements OrderService {
 //                // 秒杀商品扣库存
 //                storeSeckillService.operationStock(skuRecord.getInt("activityId"), skuRecord.getInt("num"), "sub");
 //                // 秒杀商品规格扣库存
-//                storeProductAttrValueService.operationStock(skuRecord.getInt("activityAttrValueId"), skuRecord.getInt("num"), "sub", Constants.PRODUCT_TYPE_SECKILL);
+//                storeProductAttrValueService.operationStock(skuRecord.getInt("activityAttrValueId"), skuRecord.getInt("num"), "sub", ProductType.PRODUCT_TYPE_SECKILL);
 //                // 普通商品口库存
 //                storeProductService.operationStock(skuRecord.getInt("productId"), skuRecord.getInt("num"), "sub");
 //                // 普通商品规格扣库存
-//                storeProductAttrValueService.operationStock(skuRecord.getInt("attrValueId"), skuRecord.getInt("num"), "sub", Constants.PRODUCT_TYPE_NORMAL);
+//                storeProductAttrValueService.operationStock(skuRecord.getInt("attrValueId"), skuRecord.getInt("num"), "sub", ProductType.PRODUCT_TYPE_NORMAL);
 //            } else if (storeOrder.getBargainId() > 0) {// 砍价扣库存
 //                MyRecord skuRecord = skuRecordList.get(0);
 //                // 砍价商品扣库存
 //                storeBargainService.operationStock(skuRecord.getInt("activityId"), skuRecord.getInt("num"), "sub");
 //                // 砍价商品规格扣库存
-//                storeProductAttrValueService.operationStock(skuRecord.getInt("activityAttrValueId"), skuRecord.getInt("num"), "sub", Constants.PRODUCT_TYPE_BARGAIN);
+//                storeProductAttrValueService.operationStock(skuRecord.getInt("activityAttrValueId"), skuRecord.getInt("num"), "sub", ProductType.PRODUCT_TYPE_BARGAIN);
 //                // 普通商品口库存
 //                storeProductService.operationStock(skuRecord.getInt("productId"), skuRecord.getInt("num"), "sub");
 //                // 普通商品规格扣库存
-//                storeProductAttrValueService.operationStock(skuRecord.getInt("attrValueId"), skuRecord.getInt("num"), "sub", Constants.PRODUCT_TYPE_NORMAL);
+//                storeProductAttrValueService.operationStock(skuRecord.getInt("attrValueId"), skuRecord.getInt("num"), "sub", ProductType.PRODUCT_TYPE_NORMAL);
 //            } else if (storeOrder.getCombinationId() > 0) {// 拼团扣库存
 //                MyRecord skuRecord = skuRecordList.get(0);
 //                // 拼团商品扣库存
 //                Boolean operationStock = storeCombinationService.operationStock(skuRecord.getInt("activityId"), skuRecord.getInt("num"), "sub");
 //                System.out.println("拼团商品扣库存operationStock " + operationStock);
 //                // 拼团商品规格扣库存
-//                storeProductAttrValueService.operationStock(skuRecord.getInt("activityAttrValueId"), skuRecord.getInt("num"), "sub", Constants.PRODUCT_TYPE_PINGTUAN);
+//                storeProductAttrValueService.operationStock(skuRecord.getInt("activityAttrValueId"), skuRecord.getInt("num"), "sub", ProductType.PRODUCT_TYPE_PINGTUAN);
 //                // 普通商品口库存
 //                storeProductService.operationStock(skuRecord.getInt("productId"), skuRecord.getInt("num"), "sub");
 //                // 普通商品规格扣库存
-//                storeProductAttrValueService.operationStock(skuRecord.getInt("attrValueId"), skuRecord.getInt("num"), "sub", Constants.PRODUCT_TYPE_NORMAL);
+//                storeProductAttrValueService.operationStock(skuRecord.getInt("attrValueId"), skuRecord.getInt("num"), "sub", ProductType.PRODUCT_TYPE_NORMAL);
 //            } else { // 普通商品
             for (MyRecord skuRecord : skuRecordList) {
                 // 普通商品口库存
                 storeProductService.operationStock(skuRecord.getInt("productId"), skuRecord.getInt("num"), "sub");
                 // 普通商品规格扣库存
-                storeProductAttrValueService.operationStock(skuRecord.getInt("attrValueId"), skuRecord.getInt("num"), "sub", Constants.PRODUCT_TYPE_NORMAL);
+                storeProductAttrValueService.operationStock(skuRecord.getInt("attrValueId"), skuRecord.getInt("num"), "sub", ProductType.PRODUCT_TYPE_NORMAL);
 //                }
             }
 
@@ -1476,7 +1476,7 @@ public class OrderServiceImpl implements OrderService {
             Integer seckillId = orderInfoVo.getSeckillId();
             OrderInfoDetailVo detailVo = orderInfoVo.getOrderDetailList().get(0);
             StoreSeckill storeSeckill = storeSeckillService.getByIdException(seckillId);
-            StoreProductAttrValue seckillAttrValue = storeProductAttrValueService.getByIdAndProductIdAndTypeNotDel(detailVo.getAttrValueId(), seckillId, Constants.PRODUCT_TYPE_SECKILL);
+            StoreProductAttrValue seckillAttrValue = storeProductAttrValueService.getByIdAndProductIdAndTypeNotDel(detailVo.getAttrValueId(), seckillId, ProductType.PRODUCT_TYPE_SECKILL);
             if (ObjectUtil.isNull(seckillAttrValue)) {
                 throw new CrmebException("秒杀商品规格不存在");
             }
@@ -1501,7 +1501,7 @@ public class OrderServiceImpl implements OrderService {
             if (storeBargain.getStock().equals(0) || detailVo.getPayNum() > storeBargain.getStock()) {
                 throw new CrmebException("砍价商品库存不足");
             }
-            StoreProductAttrValue bargainAttrValue = storeProductAttrValueService.getByIdAndProductIdAndTypeNotDel(detailVo.getAttrValueId(), bargainId, Constants.PRODUCT_TYPE_BARGAIN);
+            StoreProductAttrValue bargainAttrValue = storeProductAttrValueService.getByIdAndProductIdAndTypeNotDel(detailVo.getAttrValueId(), bargainId, ProductType.PRODUCT_TYPE_BARGAIN);
             if (ObjectUtil.isNull(bargainAttrValue)) {
                 throw new CrmebException("砍价商品规格不存在");
             }
@@ -1522,7 +1522,7 @@ public class OrderServiceImpl implements OrderService {
             Integer combinationId = orderInfoVo.getCombinationId();
             OrderInfoDetailVo detailVo = orderInfoVo.getOrderDetailList().get(0);
             StoreCombination storeCombination = storeCombinationService.getByIdException(combinationId);
-            StoreProductAttrValue combinationAttrValue = storeProductAttrValueService.getByIdAndProductIdAndTypeNotDel(detailVo.getAttrValueId(), combinationId, Constants.PRODUCT_TYPE_PINGTUAN);
+            StoreProductAttrValue combinationAttrValue = storeProductAttrValueService.getByIdAndProductIdAndTypeNotDel(detailVo.getAttrValueId(), combinationId, ProductType.PRODUCT_TYPE_PINGTUAN);
             if (ObjectUtil.isNull(combinationAttrValue)) {
                 throw new CrmebException("拼团商品规格不存在");
             }
@@ -1556,7 +1556,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new CrmebException("购买的商品库存不足");
             }
             // 查询商品规格属性值信息
-            StoreProductAttrValue attrValue = attrValueService.getByIdAndProductIdAndTypeNotDel(e.getAttrValueId(), e.getProductId(), Constants.PRODUCT_TYPE_NORMAL);
+            StoreProductAttrValue attrValue = attrValueService.getByIdAndProductIdAndTypeNotDel(e.getAttrValueId(), e.getProductId(), ProductType.PRODUCT_TYPE_NORMAL);
             if (ObjectUtil.isNull(attrValue)) {
                 throw new CrmebException("购买的商品规格信息不存在");
             }
@@ -1629,9 +1629,9 @@ public class OrderServiceImpl implements OrderService {
                 // 查询商品规格属性值信息
                 StoreProductAttrValue attrValue;
                 if (request.getIsGiftCard() == 0)
-                    attrValue = attrValueService.getByIdAndProductIdAndTypeNotDel(detailRequest.getAttrValueId(), detailRequest.getProductId(), Constants.PRODUCT_TYPE_NORMAL);
+                    attrValue = attrValueService.getByIdAndProductIdAndTypeNotDel(detailRequest.getAttrValueId(), detailRequest.getProductId(), ProductType.PRODUCT_TYPE_NORMAL);
                 else
-                    attrValue = attrValueService.getByIdAndProductIdAndType(detailRequest.getAttrValueId(), detailRequest.getProductId(), Constants.PRODUCT_TYPE_NORMAL);
+                    attrValue = attrValueService.getByIdAndProductIdAndType(detailRequest.getAttrValueId(), detailRequest.getProductId(), ProductType.PRODUCT_TYPE_NORMAL);
                 if (ObjectUtil.isNull(attrValue)) {
                     throw new CrmebException("商品规格信息不存在，请刷新后重新选择");
                 }
@@ -1655,7 +1655,7 @@ public class OrderServiceImpl implements OrderService {
                 detailVo.setWeight(attrValue.getWeight());
                 detailVo.setTempId(storeProduct.getTempId());
                 detailVo.setIsSub(storeProduct.getIsSub());
-                detailVo.setProductType(Constants.PRODUCT_TYPE_NORMAL);
+                detailVo.setProductType(ProductType.PRODUCT_TYPE_NORMAL);
                 detailVo.setVipPrice(detailVo.getPrice());
                 detailVo.setGiveIntegral(storeProduct.getGiveIntegral());
                 if (ObjectUtil.isNotNull(userLevel)) {
@@ -1711,9 +1711,9 @@ public class OrderServiceImpl implements OrderService {
             StoreProductAttrValue attrValue;
             // 查询商品规格属性值信息
             if (request.getIsGiftCard() == 0)
-                attrValue = attrValueService.getByIdAndProductIdAndTypeNotDel(Integer.valueOf(storeCart.getProductAttrUnique()), storeCart.getProductId(), Constants.PRODUCT_TYPE_NORMAL);
+                attrValue = attrValueService.getByIdAndProductIdAndTypeNotDel(Integer.valueOf(storeCart.getProductAttrUnique()), storeCart.getProductId(), ProductType.PRODUCT_TYPE_NORMAL);
             else
-                attrValue = attrValueService.getByIdAndProductIdAndType(Integer.valueOf(storeCart.getProductAttrUnique()), storeCart.getProductId(), Constants.PRODUCT_TYPE_NORMAL);
+                attrValue = attrValueService.getByIdAndProductIdAndType(Integer.valueOf(storeCart.getProductAttrUnique()), storeCart.getProductId(), ProductType.PRODUCT_TYPE_NORMAL);
             if (ObjectUtil.isNull(attrValue)) {
                 throw new CrmebException("商品规格信息不存在，请刷新后重新选择");
             }
@@ -1734,7 +1734,7 @@ public class OrderServiceImpl implements OrderService {
             detailVo.setTempId(storeProduct.getTempId());
             detailVo.setGiveIntegral(storeProduct.getGiveIntegral());
             detailVo.setIsSub(storeProduct.getIsSub());
-            detailVo.setProductType(Constants.PRODUCT_TYPE_NORMAL);
+            detailVo.setProductType(ProductType.PRODUCT_TYPE_NORMAL);
             detailVo.setVipPrice(detailVo.getPrice());
             if (ObjectUtil.isNotNull(finalUserLevel)) {
                 BigDecimal vipPrice = detailVo.getPrice().multiply(new BigDecimal(finalUserLevel.getDiscount())).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP);
@@ -1758,7 +1758,7 @@ public class OrderServiceImpl implements OrderService {
         if (storeSeckill.getStatus().equals(0)) {
             throw new CrmebException("秒杀商品已关闭");
         }
-        StoreProductAttrValue seckillAttrValue = storeProductAttrValueService.getByIdAndProductIdAndTypeNotDel(detailRequest.getAttrValueId(), seckillId, Constants.PRODUCT_TYPE_SECKILL);
+        StoreProductAttrValue seckillAttrValue = storeProductAttrValueService.getByIdAndProductIdAndTypeNotDel(detailRequest.getAttrValueId(), seckillId, ProductType.PRODUCT_TYPE_SECKILL);
         if (ObjectUtil.isNull(seckillAttrValue)) {
             throw new CrmebException("秒杀商品规格不存在");
         }
@@ -1776,7 +1776,7 @@ public class OrderServiceImpl implements OrderService {
         detailVo.setVolume(seckillAttrValue.getVolume());
         detailVo.setWeight(seckillAttrValue.getWeight());
         detailVo.setTempId(storeSeckill.getTempId());
-        detailVo.setProductType(Constants.PRODUCT_TYPE_SECKILL);
+        detailVo.setProductType(ProductType.PRODUCT_TYPE_SECKILL);
         return detailVo;
     }
 
@@ -1804,7 +1804,7 @@ public class OrderServiceImpl implements OrderService {
             throw new CrmebException("秒杀主商品库存不足");
         }
         // 主商品sku
-        StoreProductAttrValue productAttrValue = storeProductAttrValueService.getByProductIdAndSkuAndType(storeSeckill.getProductId(), seckillAttrValue.getSuk(), Constants.PRODUCT_TYPE_NORMAL);
+        StoreProductAttrValue productAttrValue = storeProductAttrValueService.getByProductIdAndSkuAndType(storeSeckill.getProductId(), seckillAttrValue.getSuk(), ProductType.PRODUCT_TYPE_NORMAL);
         if (ObjectUtil.isNull(productAttrValue)) {
             throw new CrmebException("秒杀主商品规格不存在");
         }
@@ -1865,7 +1865,7 @@ public class OrderServiceImpl implements OrderService {
         // 砍价部分判断
         Integer bargainId = detailRequest.getBargainId();
         StoreBargain storeBargain = storeBargainService.getByIdException(bargainId);
-        StoreProductAttrValue bargainAttrValue = storeProductAttrValueService.getByIdAndProductIdAndTypeNotDel(detailRequest.getAttrValueId(), bargainId, Constants.PRODUCT_TYPE_BARGAIN);
+        StoreProductAttrValue bargainAttrValue = storeProductAttrValueService.getByIdAndProductIdAndTypeNotDel(detailRequest.getAttrValueId(), bargainId, ProductType.PRODUCT_TYPE_BARGAIN);
         if (ObjectUtil.isNull(bargainAttrValue)) {
             throw new CrmebException("砍价商品规格不存在");
         }
@@ -1884,7 +1884,7 @@ public class OrderServiceImpl implements OrderService {
         detailVo.setVolume(bargainAttrValue.getVolume());
         detailVo.setWeight(bargainAttrValue.getWeight());
         detailVo.setTempId(storeBargain.getTempId());
-        detailVo.setProductType(Constants.PRODUCT_TYPE_BARGAIN);
+        detailVo.setProductType(ProductType.PRODUCT_TYPE_BARGAIN);
         return detailVo;
     }
 
@@ -1951,7 +1951,7 @@ public class OrderServiceImpl implements OrderService {
             throw new CrmebException("砍价主商品库存不足");
         }
         // 主商品sku
-        StoreProductAttrValue productAttrValue = storeProductAttrValueService.getByProductIdAndSkuAndType(storeBargain.getProductId(), bargainAttrValue.getSuk(), Constants.PRODUCT_TYPE_NORMAL);
+        StoreProductAttrValue productAttrValue = storeProductAttrValueService.getByProductIdAndSkuAndType(storeBargain.getProductId(), bargainAttrValue.getSuk(), ProductType.PRODUCT_TYPE_NORMAL);
         if (ObjectUtil.isNull(productAttrValue)) {
             throw new CrmebException("砍价主商品规格不存在");
         }
@@ -1978,7 +1978,7 @@ public class OrderServiceImpl implements OrderService {
         if (storeCombination.getStock().equals(0) || detailRequest.getProductNum() > storeCombination.getStock()) {
             throw new CrmebException("拼团商品库存不足");
         }
-        StoreProductAttrValue combinationAttrValue = storeProductAttrValueService.getByIdAndProductIdAndTypeNotDel(detailRequest.getAttrValueId(), combinationId, Constants.PRODUCT_TYPE_PINGTUAN);
+        StoreProductAttrValue combinationAttrValue = storeProductAttrValueService.getByIdAndProductIdAndTypeNotDel(detailRequest.getAttrValueId(), combinationId, ProductType.PRODUCT_TYPE_PINGTUAN);
         if (ObjectUtil.isNull(combinationAttrValue)) {
             throw new CrmebException("拼团商品规格不存在");
         }
@@ -1996,7 +1996,7 @@ public class OrderServiceImpl implements OrderService {
         detailVo.setVolume(combinationAttrValue.getVolume());
         detailVo.setWeight(combinationAttrValue.getWeight());
         detailVo.setTempId(storeCombination.getTempId());
-        detailVo.setProductType(Constants.PRODUCT_TYPE_PINGTUAN);
+        detailVo.setProductType(ProductType.PRODUCT_TYPE_PINGTUAN);
         return detailVo;
     }
 
@@ -2035,7 +2035,7 @@ public class OrderServiceImpl implements OrderService {
             throw new CrmebException("拼团主商品库存不足");
         }
         // 主商品sku
-        StoreProductAttrValue productAttrValue = storeProductAttrValueService.getByProductIdAndSkuAndType(storeCombination.getProductId(), combinationAttrValue.getSuk(), Constants.PRODUCT_TYPE_NORMAL);
+        StoreProductAttrValue productAttrValue = storeProductAttrValueService.getByProductIdAndSkuAndType(storeCombination.getProductId(), combinationAttrValue.getSuk(), ProductType.PRODUCT_TYPE_NORMAL);
         if (ObjectUtil.isNull(productAttrValue)) {
             throw new CrmebException("拼团主商品规格不存在");
         }
@@ -2111,7 +2111,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new CrmebException("商品库存不足，请刷新后重新选择");
             }
             // 查询商品规格属性值信息
-            StoreProductAttrValue attrValue = attrValueService.getByIdAndProductIdAndTypeNotDel(detailVo.getAttrValueId(), detailVo.getProductId(), Constants.PRODUCT_TYPE_NORMAL);
+            StoreProductAttrValue attrValue = attrValueService.getByIdAndProductIdAndTypeNotDel(detailVo.getAttrValueId(), detailVo.getProductId(), ProductType.PRODUCT_TYPE_NORMAL);
             if (ObjectUtil.isNull(attrValue)) {
                 throw new CrmebException("商品规格信息不存在，请刷新后重新选择");
             }
@@ -2132,7 +2132,7 @@ public class OrderServiceImpl implements OrderService {
             tempDetailVo.setTempId(storeProduct.getTempId());
             tempDetailVo.setGiveIntegral(storeProduct.getGiveIntegral());
             tempDetailVo.setIsSub(storeProduct.getIsSub());
-            tempDetailVo.setProductType(Constants.PRODUCT_TYPE_NORMAL);
+            tempDetailVo.setProductType(ProductType.PRODUCT_TYPE_NORMAL);
             tempDetailVo.setVipPrice(attrValue.getPrice());
             if (ObjectUtil.isNotNull(finalUserLevel)) {
                 tempDetailVo.setVipPrice(attrValue.getPrice());

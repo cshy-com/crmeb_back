@@ -15,6 +15,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.ProductType;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.category.Category;
 import com.cshy.common.model.entity.coupon.StoreCoupon;
@@ -184,7 +185,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
             StoreProductResponse storeProductResponse = new StoreProductResponse();
             BeanUtils.copyProperties(product, storeProductResponse);
             StoreProductAttr storeProductAttrPram = new StoreProductAttr();
-            storeProductAttrPram.setProductId(product.getId()).setType(Constants.PRODUCT_TYPE_NORMAL);
+            storeProductAttrPram.setProductId(product.getId()).setType(ProductType.PRODUCT_TYPE_NORMAL);
             List<StoreProductAttr> attrs = attrService.getByEntity(storeProductAttrPram);
 
             if (attrs.size() > 0) {
@@ -193,7 +194,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
             List<StoreProductAttrValueResponse> storeProductAttrValueResponse = new ArrayList<>();
 
             StoreProductAttrValue storeProductAttrValuePram = new StoreProductAttrValue();
-            storeProductAttrValuePram.setProductId(product.getId()).setType(Constants.PRODUCT_TYPE_NORMAL);
+            storeProductAttrValuePram.setProductId(product.getId()).setType(ProductType.PRODUCT_TYPE_NORMAL);
             List<StoreProductAttrValue> storeProductAttrValues = storeProductAttrValueService.getByEntity(storeProductAttrValuePram);
             storeProductAttrValues.stream().map(e -> {
                 StoreProductAttrValueResponse response = new StoreProductAttrValueResponse();
@@ -206,7 +207,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
             StoreProductDescription sd = storeProductDescriptionService.getOne(
                     new LambdaQueryWrapper<StoreProductDescription>()
                             .eq(StoreProductDescription::getProductId, product.getId())
-                            .eq(StoreProductDescription::getType, Constants.PRODUCT_TYPE_NORMAL));
+                            .eq(StoreProductDescription::getType, ProductType.PRODUCT_TYPE_NORMAL));
             if (null != sd) {
                 storeProductResponse.setContent(null == sd.getDescription() ? "" : sd.getDescription());
             }
@@ -312,7 +313,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         List<StoreProductAttr> attrList = addRequestList.stream().map(e -> {
             StoreProductAttr attr = new StoreProductAttr();
             BeanUtils.copyProperties(e, attr);
-            attr.setType(Constants.PRODUCT_TYPE_NORMAL);
+            attr.setType(ProductType.PRODUCT_TYPE_NORMAL);
             return attr;
         }).collect(Collectors.toList());
 
@@ -323,7 +324,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
             attrValue.setSuk(getSku(e.getAttrValue()));
             attrValue.setQuota(0);
             attrValue.setQuotaShow(0);
-            attrValue.setType(Constants.PRODUCT_TYPE_NORMAL);
+            attrValue.setType(ProductType.PRODUCT_TYPE_NORMAL);
             attrValue.setImage(systemAttachmentService.clearPrefix(e.getImage()));
             return attrValue;
         }).collect(Collectors.toList());
@@ -331,7 +332,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         // 处理富文本
         StoreProductDescription spd = new StoreProductDescription();
         spd.setDescription(request.getContent().length() > 0 ? systemAttachmentService.clearPrefix(request.getContent()) : "");
-        spd.setType(Constants.PRODUCT_TYPE_NORMAL);
+        spd.setType(ProductType.PRODUCT_TYPE_NORMAL);
 
         Boolean execute = transactionTemplate.execute(e -> {
             //生成商品唯一编码
@@ -347,7 +348,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
             storeProductAttrValueService.saveBatch(attrValueList);
 
             spd.setProductId(storeProduct.getId());
-            storeProductDescriptionService.deleteByProductId(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+            storeProductDescriptionService.deleteByProductId(storeProduct.getId(), ProductType.PRODUCT_TYPE_NORMAL);
             storeProductDescriptionService.save(spd);
 
             if (CollUtil.isNotEmpty(request.getCouponIds())) {
@@ -395,17 +396,17 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         List<Integer> activities = new ArrayList<>();
         activityList.forEach(e -> {
             switch (e) {
-                case Constants.PRODUCT_TYPE_NORMAL_STR:
-                    activities.add(Constants.PRODUCT_TYPE_NORMAL);
+                case ProductType.PRODUCT_TYPE_NORMAL_STR:
+                    activities.add(ProductType.PRODUCT_TYPE_NORMAL);
                     break;
-                case Constants.PRODUCT_TYPE_SECKILL_STR:
-                    activities.add(Constants.PRODUCT_TYPE_SECKILL);
+                case ProductType.PRODUCT_TYPE_SECKILL_STR:
+                    activities.add(ProductType.PRODUCT_TYPE_SECKILL);
                     break;
-                case Constants.PRODUCT_TYPE_BARGAIN_STR:
-                    activities.add(Constants.PRODUCT_TYPE_BARGAIN);
+                case ProductType.PRODUCT_TYPE_BARGAIN_STR:
+                    activities.add(ProductType.PRODUCT_TYPE_BARGAIN);
                     break;
-                case Constants.PRODUCT_TYPE_PINGTUAN_STR:
-                    activities.add(Constants.PRODUCT_TYPE_PINGTUAN);
+                case ProductType.PRODUCT_TYPE_PINGTUAN_STR:
+                    activities.add(ProductType.PRODUCT_TYPE_PINGTUAN);
                     break;
             }
         });
@@ -480,7 +481,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
             BeanUtils.copyProperties(e, attr);
             attr.setProductId(storeProduct.getId());
             if (ObjectUtil.isNull(attr.getId())) {
-                attr.setType(Constants.PRODUCT_TYPE_NORMAL);
+                attr.setType(ProductType.PRODUCT_TYPE_NORMAL);
                 attrAddList.add(attr);
             } else {
                 attr.setIsDel(false);
@@ -501,7 +502,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
                 attrValue.setId(null);
                 attrValue.setQuota(0);
                 attrValue.setQuotaShow(0);
-                attrValue.setType(Constants.PRODUCT_TYPE_NORMAL);
+                attrValue.setType(ProductType.PRODUCT_TYPE_NORMAL);
                 attrValueAddList.add(attrValue);
             } else {
                 attrValue.setIsDel(false);
@@ -512,15 +513,15 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         // 处理富文本
         StoreProductDescription spd = new StoreProductDescription();
         spd.setDescription(storeProductRequest.getContent().length() > 0 ? systemAttachmentService.clearPrefix(storeProductRequest.getContent()) : "");
-        spd.setType(Constants.PRODUCT_TYPE_NORMAL);
+        spd.setType(ProductType.PRODUCT_TYPE_NORMAL);
         spd.setProductId(storeProduct.getId());
 
         Boolean execute = transactionTemplate.execute(e -> {
             dao.updateById(storeProduct);
 
             // 先删除原用attr+value
-            attrService.deleteByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
-            storeProductAttrValueService.deleteByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+            attrService.deleteByProductIdAndType(storeProduct.getId(), ProductType.PRODUCT_TYPE_NORMAL);
+            storeProductAttrValueService.deleteByProductIdAndType(storeProduct.getId(), ProductType.PRODUCT_TYPE_NORMAL);
 
             if (CollUtil.isNotEmpty(attrAddList)) {
                 attrService.saveBatch(attrAddList);
@@ -536,7 +537,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
                 storeProductAttrValueService.saveOrUpdateBatch(attrValueUpdateList);
             }
 
-            storeProductDescriptionService.deleteByProductId(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+            storeProductDescriptionService.deleteByProductId(storeProduct.getId(), ProductType.PRODUCT_TYPE_NORMAL);
             storeProductDescriptionService.save(spd);
 
             if (CollUtil.isNotEmpty(storeProductRequest.getCouponIds())) {
@@ -570,13 +571,13 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         StoreProductResponse storeProductResponse = new StoreProductResponse();
         BeanUtils.copyProperties(storeProduct, storeProductResponse);
         StoreProductAttr spaPram = new StoreProductAttr();
-        spaPram.setProductId(storeProduct.getId()).setType(Constants.PRODUCT_TYPE_NORMAL);
+        spaPram.setProductId(storeProduct.getId()).setType(ProductType.PRODUCT_TYPE_NORMAL);
         storeProductResponse.setAttr(attrService.getByEntity(spaPram));
 
         // 设置商品所参与的活动
         storeProductResponse.setActivityH5(productUtils.getProductCurrentActivity(storeProduct));
         StoreProductAttrValue spavPram = new StoreProductAttrValue();
-        spavPram.setProductId(id).setType(Constants.PRODUCT_TYPE_NORMAL);
+        spavPram.setProductId(id).setType(ProductType.PRODUCT_TYPE_NORMAL);
         List<StoreProductAttrValue> storeProductAttrValues = storeProductAttrValueService.getByEntity(spavPram);
         // 根据attrValue生成前端所需的数据
         List<HashMap<String, Object>> attrValues = new ArrayList<>();
@@ -584,7 +585,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         if (storeProduct.getSpecType()) {
             // 后端多属性用于编辑
             StoreProductAttrResult sparPram = new StoreProductAttrResult();
-            sparPram.setProductId(storeProduct.getId()).setType(Constants.PRODUCT_TYPE_NORMAL);
+            sparPram.setProductId(storeProduct.getId()).setType(ProductType.PRODUCT_TYPE_NORMAL);
             List<StoreProductAttrResult> attrResults = storeProductAttrResultService.getByEntity(sparPram);
             if (null == attrResults || attrResults.size() == 0) {
                 throw new CrmebException("未找到对应属性值");
@@ -637,7 +638,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         StoreProductDescription sd = storeProductDescriptionService.getOne(
                 new LambdaQueryWrapper<StoreProductDescription>()
                         .eq(StoreProductDescription::getProductId, storeProduct.getId())
-                        .eq(StoreProductDescription::getType, Constants.PRODUCT_TYPE_NORMAL));
+                        .eq(StoreProductDescription::getType, ProductType.PRODUCT_TYPE_NORMAL));
         if (null != sd) {
             storeProductResponse.setContent(null == sd.getDescription() ? "" : sd.getDescription());
         }
@@ -673,10 +674,10 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         List<String> activityList = getProductActivityList(storeProduct.getActivity());
         storeProductResponse.setActivity(activityList);
 
-        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(storeProduct.getId(), ProductType.PRODUCT_TYPE_NORMAL);
         storeProductResponse.setAttr(attrList);
 
-        List<StoreProductAttrValue> attrValueList = storeProductAttrValueService.getListByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttrValue> attrValueList = storeProductAttrValueService.getListByProductIdAndType(storeProduct.getId(), ProductType.PRODUCT_TYPE_NORMAL);
         List<AttrValueResponse> valueResponseList = attrValueList.stream().map(e -> {
             AttrValueResponse valueResponse = new AttrValueResponse();
             BeanUtils.copyProperties(e, valueResponse);
@@ -684,7 +685,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         }).collect(Collectors.toList());
         storeProductResponse.setAttrValue(valueResponseList);
 
-        StoreProductDescription sd = storeProductDescriptionService.getByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+        StoreProductDescription sd = storeProductDescriptionService.getByProductIdAndType(storeProduct.getId(), ProductType.PRODUCT_TYPE_NORMAL);
         if (ObjectUtil.isNotNull(sd)) {
             storeProductResponse.setContent(ObjectUtil.isNull(sd.getDescription()) ? "" : sd.getDescription());
         }
@@ -707,26 +708,26 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
     private List<String> getProductActivityList(String activityStr) {
         List<String> activityList = CollUtil.newArrayList();
         if ("0, 1, 2, 3".equals(activityStr)) {
-            activityList.add(Constants.PRODUCT_TYPE_NORMAL_STR);
-            activityList.add(Constants.PRODUCT_TYPE_SECKILL_STR);
-            activityList.add(Constants.PRODUCT_TYPE_BARGAIN_STR);
-            activityList.add(Constants.PRODUCT_TYPE_PINGTUAN_STR);
+            activityList.add(ProductType.PRODUCT_TYPE_NORMAL_STR);
+            activityList.add(ProductType.PRODUCT_TYPE_SECKILL_STR);
+            activityList.add(ProductType.PRODUCT_TYPE_BARGAIN_STR);
+            activityList.add(ProductType.PRODUCT_TYPE_PINGTUAN_STR);
             return activityList;
         }
         String[] split = activityStr.split(",");
         for (String s : split) {
             Integer integer = Integer.valueOf(s);
-            if (integer.equals(Constants.PRODUCT_TYPE_NORMAL)) {
-                activityList.add(Constants.PRODUCT_TYPE_NORMAL_STR);
+            if (integer.equals(ProductType.PRODUCT_TYPE_NORMAL)) {
+                activityList.add(ProductType.PRODUCT_TYPE_NORMAL_STR);
             }
-            if (integer.equals(Constants.PRODUCT_TYPE_SECKILL)) {
-                activityList.add(Constants.PRODUCT_TYPE_SECKILL_STR);
+            if (integer.equals(ProductType.PRODUCT_TYPE_SECKILL)) {
+                activityList.add(ProductType.PRODUCT_TYPE_SECKILL_STR);
             }
-            if (integer.equals(Constants.PRODUCT_TYPE_BARGAIN)) {
-                activityList.add(Constants.PRODUCT_TYPE_BARGAIN_STR);
+            if (integer.equals(ProductType.PRODUCT_TYPE_BARGAIN)) {
+                activityList.add(ProductType.PRODUCT_TYPE_BARGAIN_STR);
             }
-            if (integer.equals(Constants.PRODUCT_TYPE_PINGTUAN)) {
-                activityList.add(Constants.PRODUCT_TYPE_PINGTUAN_STR);
+            if (integer.equals(ProductType.PRODUCT_TYPE_PINGTUAN)) {
+                activityList.add(ProductType.PRODUCT_TYPE_PINGTUAN_STR);
             }
         }
         return activityList;
@@ -1133,7 +1134,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         // 获取商品skuid
         StoreProductAttrValue tempSku = new StoreProductAttrValue();
         tempSku.setProductId(id);
-        tempSku.setType(Constants.PRODUCT_TYPE_NORMAL);
+        tempSku.setType(ProductType.PRODUCT_TYPE_NORMAL);
         List<StoreProductAttrValue> skuList = storeProductAttrValueService.getByEntity(tempSku);
         List<Integer> skuIdList = skuList.stream().map(StoreProductAttrValue::getId).collect(Collectors.toList());
 
@@ -1276,7 +1277,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         StoreProductDescription sd = storeProductDescriptionService.getOne(
                 new LambdaQueryWrapper<StoreProductDescription>()
                         .eq(StoreProductDescription::getProductId, storeProduct.getId())
-                        .eq(StoreProductDescription::getType, Constants.PRODUCT_TYPE_NORMAL));
+                        .eq(StoreProductDescription::getType, ProductType.PRODUCT_TYPE_NORMAL));
         if (ObjectUtil.isNotNull(sd)) {
             storeProduct.setContent(StrUtil.isBlank(sd.getDescription()) ? "" : sd.getDescription());
         }
@@ -1299,7 +1300,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         StoreProductDescription sd = storeProductDescriptionService.getOne(
                 new LambdaQueryWrapper<StoreProductDescription>()
                         .eq(StoreProductDescription::getProductId, storeProduct.getId())
-                        .eq(StoreProductDescription::getType, Constants.PRODUCT_TYPE_NORMAL));
+                        .eq(StoreProductDescription::getType, ProductType.PRODUCT_TYPE_NORMAL));
         if (ObjectUtil.isNotNull(sd)) {
             storeProduct.setContent(StrUtil.isBlank(sd.getDescription()) ? "" : sd.getDescription());
         }

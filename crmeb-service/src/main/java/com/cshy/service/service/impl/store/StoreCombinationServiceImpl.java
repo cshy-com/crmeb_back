@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.DateConstants;
+import com.cshy.common.constants.ProductType;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttr;
@@ -210,7 +211,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
         List<StoreProductAttr> attrList = addRequestList.stream().map(e -> {
             StoreProductAttr attr = new StoreProductAttr();
             BeanUtils.copyProperties(e, attr);
-            attr.setType(Constants.PRODUCT_TYPE_PINGTUAN);
+            attr.setType(ProductType.PRODUCT_TYPE_PINGTUAN);
             return attr;
         }).collect(Collectors.toList());
 
@@ -220,7 +221,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
             attrValue.setSuk(e.getSuk());
             attrValue.setQuota(e.getQuota());
             attrValue.setQuotaShow(e.getQuota());
-            attrValue.setType(Constants.PRODUCT_TYPE_PINGTUAN);
+            attrValue.setType(ProductType.PRODUCT_TYPE_PINGTUAN);
             attrValue.setImage(systemAttachmentService.clearPrefix(e.getImage()));
             return attrValue;
         }).collect(Collectors.toList());
@@ -228,7 +229,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
         // 处理富文本
         StoreProductDescription spd = new StoreProductDescription();
         spd.setDescription(request.getContent().length() > 0 ? systemAttachmentService.clearPrefix(request.getContent()) : "");
-        spd.setType(Constants.PRODUCT_TYPE_PINGTUAN);
+        spd.setType(ProductType.PRODUCT_TYPE_PINGTUAN);
 
         Boolean execute = transactionTemplate.execute(e -> {
             save(storeCombination);
@@ -239,7 +240,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
             storeProductAttrValueService.saveBatch(attrValueList);
 
             spd.setProductId(storeCombination.getId());
-            storeProductDescriptionService.deleteByProductId(storeCombination.getId(), Constants.PRODUCT_TYPE_PINGTUAN);
+            storeProductDescriptionService.deleteByProductId(storeCombination.getId(), ProductType.PRODUCT_TYPE_PINGTUAN);
             storeProductDescriptionService.save(spd);
 
             return Boolean.TRUE;
@@ -313,7 +314,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
             BeanUtils.copyProperties(e, attr);
             if (ObjectUtil.isNull(attr.getId())) {
                 attr.setProductId(storeCombination.getId());
-                attr.setType(Constants.PRODUCT_TYPE_PINGTUAN);
+                attr.setType(ProductType.PRODUCT_TYPE_PINGTUAN);
                 attrAddList.add(attr);
             } else {
                 attr.setProductId(storeCombination.getId());
@@ -334,7 +335,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
             attrValue.setQuotaShow(e.getQuota());
             if (ObjectUtil.isNull(attrValue.getId())) {
                 attrValue.setProductId(storeCombination.getId());
-                attrValue.setType(Constants.PRODUCT_TYPE_PINGTUAN);
+                attrValue.setType(ProductType.PRODUCT_TYPE_PINGTUAN);
                 attrValueAddList.add(attrValue);
             } else {
                 attrValue.setProductId(storeCombination.getId());
@@ -346,15 +347,15 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
         // 处理富文本
         StoreProductDescription spd = new StoreProductDescription();
         spd.setDescription(request.getContent().length() > 0 ? systemAttachmentService.clearPrefix(request.getContent()) : "");
-        spd.setType(Constants.PRODUCT_TYPE_PINGTUAN);
+        spd.setType(ProductType.PRODUCT_TYPE_PINGTUAN);
         spd.setProductId(request.getId());
 
         Boolean execute = transactionTemplate.execute(e -> {
             dao.updateById(storeCombination);
 
             // 先删除原用attr+value
-            storeProductAttrService.deleteByProductIdAndType(storeCombination.getId(), Constants.PRODUCT_TYPE_PINGTUAN);
-            storeProductAttrValueService.deleteByProductIdAndType(storeCombination.getId(), Constants.PRODUCT_TYPE_PINGTUAN);
+            storeProductAttrService.deleteByProductIdAndType(storeCombination.getId(), ProductType.PRODUCT_TYPE_PINGTUAN);
+            storeProductAttrValueService.deleteByProductIdAndType(storeCombination.getId(), ProductType.PRODUCT_TYPE_PINGTUAN);
 
             if (CollUtil.isNotEmpty(attrAddList)) {
                 storeProductAttrService.saveBatch(attrAddList);
@@ -370,7 +371,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
                 storeProductAttrValueService.saveOrUpdateBatch(attrValueUpdateList);
             }
 
-            storeProductDescriptionService.deleteByProductId(storeCombination.getId(), Constants.PRODUCT_TYPE_PINGTUAN);
+            storeProductDescriptionService.deleteByProductId(storeCombination.getId(), ProductType.PRODUCT_TYPE_PINGTUAN);
             storeProductDescriptionService.save(spd);
 
             return Boolean.TRUE;
@@ -397,7 +398,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
 //        storeProductResponse.setStopTimeStr(DateUtil.timestamp2DateStr(storeCombination.getStopTime(), DateFormatters.DATE_FORMAT_DATE));
 
         // 查询attr
-        List<StoreProductAttr> attrs = storeProductAttrService.getListByProductIdAndTypeNotDel(id, Constants.PRODUCT_TYPE_PINGTUAN);
+        List<StoreProductAttr> attrs = storeProductAttrService.getListByProductIdAndTypeNotDel(id, ProductType.PRODUCT_TYPE_PINGTUAN);
         storeProductResponse.setAttr(attrs);
         storeProductResponse.setSliderImage(String.join(",", storeCombination.getImages()));
 
@@ -407,9 +408,9 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
         }
         storeProductResponse.setSpecType(specType);
 
-        List<StoreProductAttrValue> comAttrValueList = storeProductAttrValueService.getListByProductIdAndType(id, ProductConstants.PRODUCT_TYPE_PINGTUAN);
+        List<StoreProductAttrValue> comAttrValueList = storeProductAttrValueService.getListByProductIdAndType(id, ProductType.PRODUCT_TYPE_PINGTUAN);
         // 查询主商品sku
-        List<StoreProductAttrValue> attrValueList = storeProductAttrValueService.getListByProductIdAndType(storeCombination.getProductId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttrValue> attrValueList = storeProductAttrValueService.getListByProductIdAndType(storeCombination.getProductId(), ProductType.PRODUCT_TYPE_NORMAL);
 
         List<AttrValueResponse> valueResponseList = attrValueList.stream().map(e -> {
             AttrValueResponse valueResponse = new AttrValueResponse();
@@ -431,7 +432,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
         }).collect(Collectors.toList());
         storeProductResponse.setAttrValue(valueResponseList);
 
-        StoreProductDescription sd = storeProductDescriptionService.getByProductIdAndType(id, Constants.PRODUCT_TYPE_PINGTUAN);
+        StoreProductDescription sd = storeProductDescriptionService.getByProductIdAndType(id, ProductType.PRODUCT_TYPE_PINGTUAN);
         if (ObjectUtil.isNotNull(sd)) {
             storeProductResponse.setContent(ObjectUtil.isNull(sd.getDescription()) ? "" : sd.getDescription());
         }
@@ -531,7 +532,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
         StoreProductDescription sd = storeProductDescriptionService.getOne(
                 new LambdaQueryWrapper<StoreProductDescription>()
                         .eq(StoreProductDescription::getProductId, comId)
-                        .eq(StoreProductDescription::getType, Constants.PRODUCT_TYPE_PINGTUAN));
+                        .eq(StoreProductDescription::getType, ProductType.PRODUCT_TYPE_PINGTUAN));
         if (ObjectUtil.isNotNull(sd)) {
             infoResponse.setContent(ObjectUtil.isNull(sd.getDescription()) ? "" : sd.getDescription());
         }
@@ -555,7 +556,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
         detailResponse.setStoreCombination(infoResponse);
 
         // 获取拼团商品规格
-        List<StoreProductAttr> attrList = storeProductAttrService.getListByProductIdAndTypeNotDel(comId, Constants.PRODUCT_TYPE_PINGTUAN);
+        List<StoreProductAttr> attrList = storeProductAttrService.getListByProductIdAndTypeNotDel(comId, ProductType.PRODUCT_TYPE_PINGTUAN);
         // 根据制式设置attr属性
 //        List<ProductAttrResponse> skuAttr = getSkuAttr(attrList);
         detailResponse.setProductAttr(attrList);
@@ -563,9 +564,9 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
         // 根据制式设置sku属性
         HashMap<String, Object> skuMap = new HashMap<>();
         // 获取主商品sku
-        List<StoreProductAttrValue> storeProductAttrValues = storeProductAttrValueService.getListByProductIdAndType(storeCombination.getProductId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttrValue> storeProductAttrValues = storeProductAttrValueService.getListByProductIdAndType(storeCombination.getProductId(), ProductType.PRODUCT_TYPE_NORMAL);
         // 获取拼团商品sku
-        List<StoreProductAttrValue> combinationAttrValues = storeProductAttrValueService.getListByProductIdAndType(storeCombination.getId(), Constants.PRODUCT_TYPE_PINGTUAN);
+        List<StoreProductAttrValue> combinationAttrValues = storeProductAttrValueService.getListByProductIdAndType(storeCombination.getId(), ProductType.PRODUCT_TYPE_PINGTUAN);
 
         for (StoreProductAttrValue productAttrValue : storeProductAttrValues) {
             StoreProductAttrValueResponse atr = new StoreProductAttrValueResponse();
@@ -762,7 +763,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
         // sku部分
         StoreProductAttr spavAttr = new StoreProductAttr();
         spavAttr.setProductId(storeCombination.getId());
-        spavAttr.setType(Constants.PRODUCT_TYPE_PINGTUAN);
+        spavAttr.setType(ProductType.PRODUCT_TYPE_PINGTUAN);
         List<StoreProductAttr> attrList = storeProductAttrService.getByEntity(spavAttr);
         List<HashMap<String, Object>> skuAttrList = getSkuAttrList(attrList);
         detailResponse.setProductAttr(skuAttrList);
@@ -777,7 +778,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
 
         StoreProductAttrValue spavValue = new StoreProductAttrValue();
         spavValue.setProductId(storeCombination.getId());
-        spavValue.setType(Constants.PRODUCT_TYPE_PINGTUAN);
+        spavValue.setType(ProductType.PRODUCT_TYPE_PINGTUAN);
         List<StoreProductAttrValue> valueList = storeProductAttrValueService.getByEntity(spavValue);
         // H5 端用于生成skuList
         List<StoreProductAttrValueResponse> sPAVResponses = new ArrayList<>();
@@ -1100,7 +1101,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
                         .setNum(storeProductStockRequest.getNum())
                         .setOperationType("add")
                         .setProductId(storeProductStockRequest.getProductId())
-                        .setType(Constants.PRODUCT_TYPE_NORMAL)
+                        .setType(ProductType.PRODUCT_TYPE_NORMAL)
                         .setSuk(storeProductStockRequest.getSuk());
                 storeProductService.doProductStock(r);
             }

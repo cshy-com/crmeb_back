@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.ProductType;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.cart.CartNumRequest;
 import com.cshy.common.model.request.cart.CartRequest;
@@ -112,7 +113,7 @@ public class StoreCartServiceImpl extends ServiceImpl<StoreCartDao, StoreCart> i
 
             // 获取对应的商品规格信息(只会有一条信息)
             List<StoreProductAttrValue> attrValueList = storeProductAttrValueService.getListByProductIdAndAttrId(storeCart.getProductId(),
-                    storeCart.getProductAttrUnique(), Constants.PRODUCT_TYPE_NORMAL);
+                    storeCart.getProductAttrUnique(), ProductType.PRODUCT_TYPE_NORMAL);
             // 规格不存在即失效
             if (CollUtil.isEmpty(attrValueList)) {
                 cartInfoResponse.setAttrStatus(false);
@@ -170,7 +171,7 @@ public class StoreCartServiceImpl extends ServiceImpl<StoreCartDao, StoreCart> i
         if (ObjectUtil.isNull(product) || product.getIsDel() || !product.getIsShow()) {
             throw new CrmebException("未找到对应商品");
         }
-        List<StoreProductAttrValue> attrValues = storeProductAttrValueService.getListByProductIdAndAttrId(product.getId(), storeCartRequest.getProductAttrUnique(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttrValue> attrValues = storeProductAttrValueService.getListByProductIdAndAttrId(product.getId(), storeCartRequest.getProductAttrUnique(), ProductType.PRODUCT_TYPE_NORMAL);
         if (CollUtil.isEmpty(attrValues)) {
             throw new CrmebException("未找到对应的商品SKU");
         }

@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.cshy.common.constants.ProductType;
 import com.cshy.common.model.dto.user.UserVisitHistoryDto;
 import com.cshy.common.model.entity.product.StoreProductRelation;
 import com.cshy.common.model.entity.user.UserVisitHistory;
@@ -132,7 +133,7 @@ public class ProductServiceImpl implements ProductService {
             IndexProductResponse productResponse = new IndexProductResponse();
             List<Integer> activityList = CrmebUtil.stringToArrayInt(storeProduct.getActivity());
             // 活动类型默认：直接跳过
-            if (activityList.get(0).equals(Constants.PRODUCT_TYPE_NORMAL)) {
+            if (activityList.get(0).equals(ProductType.PRODUCT_TYPE_NORMAL)) {
                 BeanUtils.copyProperties(storeProduct, productResponse);
                 productResponseArrayList.add(productResponse);
                 continue;
@@ -142,25 +143,25 @@ public class ProductServiceImpl implements ProductService {
                     productUtils.getActivityByProduct(storeProduct.getId(), storeProduct.getActivity());
             if (CollUtil.isNotEmpty(activityByProduct)) {
                 for (Integer activity : activityList) {
-                    if (activity.equals(Constants.PRODUCT_TYPE_NORMAL)) {
+                    if (activity.equals(ProductType.PRODUCT_TYPE_NORMAL)) {
                         break;
                     }
-                    if (activity.equals(Constants.PRODUCT_TYPE_SECKILL)) {
-                        ProductActivityItemResponse itemResponse = activityByProduct.get(Constants.PRODUCT_TYPE_SECKILL);
+                    if (activity.equals(ProductType.PRODUCT_TYPE_SECKILL)) {
+                        ProductActivityItemResponse itemResponse = activityByProduct.get(ProductType.PRODUCT_TYPE_SECKILL);
                         if (ObjectUtil.isNotNull(itemResponse)) {
                             productResponse.setActivityH5(itemResponse);
                             break;
                         }
                     }
-                    if (activity.equals(Constants.PRODUCT_TYPE_BARGAIN)) {
-                        ProductActivityItemResponse itemResponse = activityByProduct.get(Constants.PRODUCT_TYPE_BARGAIN);
+                    if (activity.equals(ProductType.PRODUCT_TYPE_BARGAIN)) {
+                        ProductActivityItemResponse itemResponse = activityByProduct.get(ProductType.PRODUCT_TYPE_BARGAIN);
                         if (ObjectUtil.isNotNull(itemResponse)) {
                             productResponse.setActivityH5(itemResponse);
                             break;
                         }
                     }
-                    if (activity.equals(Constants.PRODUCT_TYPE_PINGTUAN)) {
-                        ProductActivityItemResponse itemResponse = activityByProduct.get(Constants.PRODUCT_TYPE_PINGTUAN);
+                    if (activity.equals(ProductType.PRODUCT_TYPE_PINGTUAN)) {
+                        ProductActivityItemResponse itemResponse = activityByProduct.get(ProductType.PRODUCT_TYPE_PINGTUAN);
                         if (ObjectUtil.isNotNull(itemResponse)) {
                             productResponse.setActivityH5(itemResponse);
                             break;
@@ -208,14 +209,14 @@ public class ProductServiceImpl implements ProductService {
 
 
         // 获取商品规格
-        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(storeProduct.getId(), ProductType.PRODUCT_TYPE_NORMAL);
 
         // 根据制式设置attr属性
         productDetailResponse.setProductAttr(attrList);
 
         // 根据制式设置sku属性
         HashMap<String, Object> skuMap = new HashMap<>();
-        List<StoreProductAttrValue> storeProductAttrValues = storeProductAttrValueService.getListByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttrValue> storeProductAttrValues = storeProductAttrValueService.getListByProductIdAndType(storeProduct.getId(), ProductType.PRODUCT_TYPE_NORMAL);
         for (StoreProductAttrValue storeProductAttrValue : storeProductAttrValues) {
             StoreProductAttrValueResponse atr = new StoreProductAttrValueResponse();
             BeanUtils.copyProperties(storeProductAttrValue, atr);
@@ -302,13 +303,13 @@ public class ProductServiceImpl implements ProductService {
         StoreProduct storeProduct = storeProductService.getH5Detail(id);
 
         // 获取商品规格
-        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(storeProduct.getId(), ProductType.PRODUCT_TYPE_NORMAL);
         // 根据制式设置attr属性
         productDetailResponse.setProductAttr(attrList);
 
         // 根据制式设置sku属性
         HashMap<String, Object> skuMap = new HashMap<>();
-        List<StoreProductAttrValue> storeProductAttrValues = storeProductAttrValueService.getListByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttrValue> storeProductAttrValues = storeProductAttrValueService.getListByProductIdAndType(storeProduct.getId(), ProductType.PRODUCT_TYPE_NORMAL);
         for (StoreProductAttrValue storeProductAttrValue : storeProductAttrValues) {
             StoreProductAttrValueResponse atr = new StoreProductAttrValueResponse();
             BeanUtils.copyProperties(storeProductAttrValue, atr);
@@ -413,7 +414,7 @@ public class ProductServiceImpl implements ProductService {
             IndexProductResponse productResponse = new IndexProductResponse();
             List<Integer> activityList = CrmebUtil.stringToArrayInt(storeProduct.getActivity());
             // 活动类型默认：直接跳过
-            if (activityList.get(0).equals(Constants.PRODUCT_TYPE_NORMAL)) {
+            if (activityList.get(0).equals(ProductType.PRODUCT_TYPE_NORMAL)) {
                 BeanUtils.copyProperties(storeProduct, productResponse);
                 productResponseArrayList.add(productResponse);
                 continue;
@@ -423,25 +424,25 @@ public class ProductServiceImpl implements ProductService {
                     productUtils.getActivityByProduct(storeProduct.getId(), storeProduct.getActivity());
             if (CollUtil.isNotEmpty(activityByProduct)) {
                 for (Integer activity : activityList) {
-                    if (activity.equals(Constants.PRODUCT_TYPE_NORMAL)) {
+                    if (activity.equals(ProductType.PRODUCT_TYPE_NORMAL)) {
                         break;
                     }
-                    if (activity.equals(Constants.PRODUCT_TYPE_SECKILL)) {
-                        ProductActivityItemResponse itemResponse = activityByProduct.get(Constants.PRODUCT_TYPE_SECKILL);
+                    if (activity.equals(ProductType.PRODUCT_TYPE_SECKILL)) {
+                        ProductActivityItemResponse itemResponse = activityByProduct.get(ProductType.PRODUCT_TYPE_SECKILL);
                         if (ObjectUtil.isNotNull(itemResponse)) {
                             productResponse.setActivityH5(itemResponse);
                             break;
                         }
                     }
-                    if (activity.equals(Constants.PRODUCT_TYPE_BARGAIN)) {
-                        ProductActivityItemResponse itemResponse = activityByProduct.get(Constants.PRODUCT_TYPE_BARGAIN);
+                    if (activity.equals(ProductType.PRODUCT_TYPE_BARGAIN)) {
+                        ProductActivityItemResponse itemResponse = activityByProduct.get(ProductType.PRODUCT_TYPE_BARGAIN);
                         if (ObjectUtil.isNotNull(itemResponse)) {
                             productResponse.setActivityH5(itemResponse);
                             break;
                         }
                     }
-                    if (activity.equals(Constants.PRODUCT_TYPE_PINGTUAN)) {
-                        ProductActivityItemResponse itemResponse = activityByProduct.get(Constants.PRODUCT_TYPE_PINGTUAN);
+                    if (activity.equals(ProductType.PRODUCT_TYPE_PINGTUAN)) {
+                        ProductActivityItemResponse itemResponse = activityByProduct.get(ProductType.PRODUCT_TYPE_PINGTUAN);
                         if (ObjectUtil.isNotNull(itemResponse)) {
                             productResponse.setActivityH5(itemResponse);
                             break;
@@ -491,7 +492,7 @@ public class ProductServiceImpl implements ProductService {
             IndexProductResponse productResponse = new IndexProductResponse();
             List<Integer> activityList = CrmebUtil.stringToArrayInt(storeProduct.getActivity());
             // 活动类型默认：直接跳过
-            if (activityList.get(0).equals(Constants.PRODUCT_TYPE_NORMAL)) {
+            if (activityList.get(0).equals(ProductType.PRODUCT_TYPE_NORMAL)) {
                 BeanUtils.copyProperties(storeProduct, productResponse);
                 productResponseArrayList.add(productResponse);
                 continue;
@@ -501,25 +502,25 @@ public class ProductServiceImpl implements ProductService {
                     productUtils.getActivityByProduct(storeProduct.getId(), storeProduct.getActivity());
             if (CollUtil.isNotEmpty(activityByProduct)) {
                 for (Integer activity : activityList) {
-                    if (activity.equals(Constants.PRODUCT_TYPE_NORMAL)) {
+                    if (activity.equals(ProductType.PRODUCT_TYPE_NORMAL)) {
                         break;
                     }
-                    if (activity.equals(Constants.PRODUCT_TYPE_SECKILL)) {
-                        ProductActivityItemResponse itemResponse = activityByProduct.get(Constants.PRODUCT_TYPE_SECKILL);
+                    if (activity.equals(ProductType.PRODUCT_TYPE_SECKILL)) {
+                        ProductActivityItemResponse itemResponse = activityByProduct.get(ProductType.PRODUCT_TYPE_SECKILL);
                         if (ObjectUtil.isNotNull(itemResponse)) {
                             productResponse.setActivityH5(itemResponse);
                             break;
                         }
                     }
-                    if (activity.equals(Constants.PRODUCT_TYPE_BARGAIN)) {
-                        ProductActivityItemResponse itemResponse = activityByProduct.get(Constants.PRODUCT_TYPE_BARGAIN);
+                    if (activity.equals(ProductType.PRODUCT_TYPE_BARGAIN)) {
+                        ProductActivityItemResponse itemResponse = activityByProduct.get(ProductType.PRODUCT_TYPE_BARGAIN);
                         if (ObjectUtil.isNotNull(itemResponse)) {
                             productResponse.setActivityH5(itemResponse);
                             break;
                         }
                     }
-                    if (activity.equals(Constants.PRODUCT_TYPE_PINGTUAN)) {
-                        ProductActivityItemResponse itemResponse = activityByProduct.get(Constants.PRODUCT_TYPE_PINGTUAN);
+                    if (activity.equals(ProductType.PRODUCT_TYPE_PINGTUAN)) {
+                        ProductActivityItemResponse itemResponse = activityByProduct.get(ProductType.PRODUCT_TYPE_PINGTUAN);
                         if (ObjectUtil.isNotNull(itemResponse)) {
                             productResponse.setActivityH5(itemResponse);
                             break;

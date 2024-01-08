@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.cshy.common.constants.ProductType;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.response.IndexInfoResponse;
 import com.cshy.common.model.response.IndexProductResponse;
@@ -141,7 +142,7 @@ public class IndexServiceImpl implements IndexService {
             IndexProductResponse productResponse = new IndexProductResponse();
             List<Integer> activityList = CrmebUtil.stringToArrayInt(storeProduct.getActivity());
             // 活动类型默认：直接跳过
-            if (activityList.get(0).equals(Constants.PRODUCT_TYPE_NORMAL)) {
+            if (activityList.get(0).equals(ProductType.PRODUCT_TYPE_NORMAL)) {
                 BeanUtils.copyProperties(storeProduct, productResponse);
                 productResponseArrayList.add(productResponse);
                 continue;
@@ -151,25 +152,25 @@ public class IndexServiceImpl implements IndexService {
                     productUtils.getActivityByProduct(storeProduct.getId(), storeProduct.getActivity());
             if (CollUtil.isNotEmpty(activityByProduct)) {
                 for (Integer activity : activityList) {
-                    if (activity.equals(Constants.PRODUCT_TYPE_NORMAL)) {
+                    if (activity.equals(ProductType.PRODUCT_TYPE_NORMAL)) {
                         break;
                     }
-                    if (activity.equals(Constants.PRODUCT_TYPE_SECKILL)) {
-                        ProductActivityItemResponse itemResponse = activityByProduct.get(Constants.PRODUCT_TYPE_SECKILL);
+                    if (activity.equals(ProductType.PRODUCT_TYPE_SECKILL)) {
+                        ProductActivityItemResponse itemResponse = activityByProduct.get(ProductType.PRODUCT_TYPE_SECKILL);
                         if (ObjectUtil.isNotNull(itemResponse)) {
                             productResponse.setActivityH5(itemResponse);
                             break;
                         }
                     }
-                    if (activity.equals(Constants.PRODUCT_TYPE_BARGAIN)) {
-                        ProductActivityItemResponse itemResponse = activityByProduct.get(Constants.PRODUCT_TYPE_BARGAIN);
+                    if (activity.equals(ProductType.PRODUCT_TYPE_BARGAIN)) {
+                        ProductActivityItemResponse itemResponse = activityByProduct.get(ProductType.PRODUCT_TYPE_BARGAIN);
                         if (ObjectUtil.isNotNull(itemResponse)) {
                             productResponse.setActivityH5(itemResponse);
                             break;
                         }
                     }
-                    if (activity.equals(Constants.PRODUCT_TYPE_PINGTUAN)) {
-                        ProductActivityItemResponse itemResponse = activityByProduct.get(Constants.PRODUCT_TYPE_PINGTUAN);
+                    if (activity.equals(ProductType.PRODUCT_TYPE_PINGTUAN)) {
+                        ProductActivityItemResponse itemResponse = activityByProduct.get(ProductType.PRODUCT_TYPE_PINGTUAN);
                         if (ObjectUtil.isNotNull(itemResponse)) {
                             productResponse.setActivityH5(itemResponse);
                             break;
