@@ -7,10 +7,6 @@ import io.jsonwebtoken.Claims;
 
  */
 public class Constants {
-    public static final long TOKEN_EXPRESS_MINUTES = (60 * 24); //3小时
-
-    public static final int HTTPSTATUS_CODE_SUCCESS = 200;
-
     //头部 token令牌key
     public static final String HEADER_AUTHORIZATION_KEY = "Authorization";
 
@@ -473,25 +469,6 @@ public class Constants {
     //微信消息模板 tempKey
     public static final String WE_CHAT_TEMP_KEY_FIRST = "first";
     public static final String WE_CHAT_TEMP_KEY_END = "remark";
-    // 公众号模板消息
-    public static final String WE_CHAT_TEMP_KEY_COMBINATION_SUCCESS = "OPENTM407456411";// 拼团成功
-    public static final String WE_CHAT_TEMP_KEY_BARGAIN_SUCCESS = "OPENTM410292733";// 砍价成功
-    public static final String WE_CHAT_TEMP_KEY_EXPRESS = "OPENTM200565259";// 订单发货提醒
-    public static final String WE_CHAT_TEMP_KEY_DELIVERY = "OPENTM207707249";// 订单配送通知
-    public static final String WE_CHAT_TEMP_KEY_ORDER_PAY = "OPENTM207791277";// 订单支付成功通知
-    public static final String WE_CHAT_TEMP_KEY_ORDER_RECEIVING = "OPENTM413386489";// 订单收货通知
-    public static final String WE_CHAT_TEMP_KEY_ORDER_REFUND = "OPENTM207791277";// 退款进度通知
-    public static final String WE_CHAT_PUBLIC_TEMP_KEY_RECHARGE = "OPENTM200565260";// 充值成功
-
-    // 小程序服务通知
-    public static final String WE_CHAT_PROGRAM_TEMP_KEY_COMBINATION_SUCCESS = "5164";// 拼团成功
-    public static final String WE_CHAT_PROGRAM_TEMP_KEY_BARGAIN_SUCCESS = "2920";// 砍价成功
-    public static final String WE_CHAT_PROGRAM_TEMP_KEY_EXPRESS = "467";// 订单发货提醒
-    public static final String WE_CHAT_PROGRAM_TEMP_KEY_DELIVERY = "14198";// 订单配送通知
-    public static final String WE_CHAT_PROGRAM_TEMP_KEY_ORDER_PAY = "516";// 订单支付成功通知
-    public static final String WE_CHAT_PROGRAM_TEMP_KEY_ORDER_RECEIVING = "9283";// 订单收货通知
-    public static final String WE_CHAT_PROGRAM_TEMP_KEY_RECHARGE = "OPENTM200565260";
-
 
     //CND  URL测试用
     public static String CND_URL = "https://wuht-1300909283.cos.ap-chengdu.myqcloud.com";

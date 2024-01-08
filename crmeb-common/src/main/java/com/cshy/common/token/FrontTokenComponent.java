@@ -8,6 +8,7 @@ import com.cshy.common.utils.RequestUtil;
 import com.cshy.common.model.vo.LoginUserVo;
 import com.cshy.common.constants.Constants;
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -28,13 +29,12 @@ public class FrontTokenComponent {
     @Resource
     private RedisUtil redisUtil;
 
+    @Value("${token.expireTime.front}")
+    private long expireTime;
+
     private static final Long MILLIS_MINUTE_TEN = 20 * 60 * 1000L;
 
     private static final Long MILLIS_MINUTE = 60 * 1000L;
-
-    // 令牌有效期（默认30分钟） todo 调试期改为5小时
-//    private static final int expireTime = 30;
-    private static final int expireTime = 5 * 60;
 
     /**
      * 获取用户身份信息
@@ -78,7 +78,7 @@ public class FrontTokenComponent {
      */
     public String createToken(User user) {
         String token = UUID.randomUUID().toString().replace("-", "");
-        redisUtil.set(getTokenKey(token), user.getUid(), Constants.TOKEN_EXPRESS_MINUTES, TimeUnit.MINUTES);
+        redisUtil.set(getTokenKey(token), user.getUid(), expireTime, TimeUnit.MINUTES);
         return token;
     }
 
@@ -183,7 +183,7 @@ public class FrontTokenComponent {
             boolean exists = redisUtil.exists(getTokenKey(token));
             if(exists){
                 Integer uid = redisUtil.get(getTokenKey(token));
-                redisUtil.set(getTokenKey(token), uid, Constants.TOKEN_EXPRESS_MINUTES, TimeUnit.MINUTES);
+                redisUtil.set(getTokenKey(token), uid, expireTime, TimeUnit.MINUTES);
             }else{
                 //判断路由，部分路由不管用户是否登录/token过期都可以访问
                 exists = checkRouter(RequestUtil.getUri(request));

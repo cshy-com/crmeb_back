@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.utils.RedisUtil;
 import com.cshy.common.model.vo.LoginUserVo;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -22,13 +23,13 @@ public class TokenComponent {
     @Resource
     private RedisUtil redisUtil;
 
+    @Value("${token.expireTime.admin}")
+    private long expireTime;
+
+
     private static final Long MILLIS_MINUTE_TEN = 20 * 60 * 1000L;
 
     private static final Long MILLIS_MINUTE = 60 * 1000L;
-
-    // 令牌有效期（默认30分钟） todo 调试期改为5小时
-//    private static final int expireTime = 30;
-    private static final int expireTime = 5 * 60;
 
     // Redis 存储的key
     private static final String TOKEN_REDIS = "TOKEN:ADMIN:";
