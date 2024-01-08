@@ -7,4 +7,5 @@ import com.cshy.common.model.query.giftCard.GiftCardTypeQuery;
 import com.cshy.common.model.vo.giftCard.GiftCardTypeVo;
 
 public interface GiftCardTypeService extends BaseService<GiftCardType, GiftCardTypeDto, GiftCardTypeQuery, GiftCardTypeVo> {
+    GiftCardType getById(String id, Boolean isDel);
 }

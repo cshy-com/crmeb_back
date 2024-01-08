@@ -1,6 +1,6 @@
 package com.cshy.admin.controller;
 
-import com.cshy.common.model.request.SystemAdminLoginRequest;
+import com.cshy.common.model.request.system.SystemAdminLoginRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.MenusResponse;
 import com.cshy.common.model.response.SystemAdminResponse;

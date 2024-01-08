@@ -6,7 +6,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.cshy.common.model.request.*;
-import com.cshy.common.model.request.*;
 import com.cshy.common.model.vo.MyRecord;
 import com.cshy.common.constants.OnePassConstants;
 import com.cshy.common.exception.CrmebException;
@@ -19,7 +18,7 @@ import com.cshy.common.model.vo.OnePassLogisticsQueryVo;
 import com.cshy.service.util.OnePassUtil;
 import com.cshy.service.service.ExpressService;
 import com.cshy.service.service.OnePassService;
-import com.cshy.service.service.SystemConfigService;
+import com.cshy.service.service.system.SystemConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -528,14 +527,6 @@ public class OnePassServiceImpl implements OnePassService {
         return list.contains(type);
     }
 
-    /**
-     * 更新sms配置信息
-     *
-     * @param account  账号
-     * @param password 密码
-     * @author Mr.Zhang
-     * @since 2020-04-16
-     */
     private void setConfigSmsInfo(String account, String password) {
         boolean accountResult = systemConfigService.updateOrSaveValueByName("sms_account", account);
         boolean tokenResult = systemConfigService.updateOrSaveValueByName("sms_token", password);

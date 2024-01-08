@@ -35,5 +35,6 @@ public class StoreOrderStatus implements Serializable {
     @ApiModelProperty(value = "操作时间")
     private Date createTime;
 
-
+    @ApiModelProperty(value = "是否后管操作 0 否 1 是")
+    private Integer isSysUser;
 }

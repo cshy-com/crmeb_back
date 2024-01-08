@@ -12,13 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 
-/**
- * 自定义权限不足处理程序
- *
- * @Author 指缝de阳光
- * @Date 2021/11/19 14:45
- * @Version 1.0
- */
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler, Serializable {
 

@@ -9,7 +9,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.SpreadOrderResponse;
 import com.cshy.common.model.response.SpreadUserResponse;
 import com.cshy.service.service.RetailShopService;
-import com.cshy.service.service.UserService;
+import com.cshy.service.service.user.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

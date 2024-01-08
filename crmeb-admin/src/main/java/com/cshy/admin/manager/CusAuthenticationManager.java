@@ -8,12 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
-/**
- * 自定义认证管理器
- * @Author 指缝de阳光
- * @Date 2021/11/17 15:23
- * @Version 1.0
- */
 @Component
 public class CusAuthenticationManager implements AuthenticationManager {
 

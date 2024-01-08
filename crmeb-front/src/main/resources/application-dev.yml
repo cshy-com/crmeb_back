@@ -6,7 +6,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://39.104.53.172:3306/crmeb?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
+    url: jdbc:mysql://39.104.53.172:3306/crmeb_dev?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT
     username: root
     password: haxihao.0
   redis:

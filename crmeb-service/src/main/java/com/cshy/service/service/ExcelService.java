@@ -1,9 +1,9 @@
 package com.cshy.service.service;
 
-import com.cshy.common.model.request.StoreBargainSearchRequest;
-import com.cshy.common.model.request.StoreCombinationSearchRequest;
-import com.cshy.common.model.request.StoreOrderSearchRequest;
-import com.cshy.common.model.request.StoreProductSearchRequest;
+import com.cshy.common.model.request.store.StoreBargainSearchRequest;
+import com.cshy.common.model.request.store.StoreCombinationSearchRequest;
+import com.cshy.common.model.request.store.StoreOrderSearchRequest;
+import com.cshy.common.model.request.store.StoreProductSearchRequest;
 
 /**
 * StoreProductService 接口

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.cshy.service.dao.StoreOrderDao">
+<mapper namespace="com.cshy.service.dao.store.StoreOrderDao">
 
     <select id="getTotalPrice" resultType="java.math.BigDecimal">
         select sum(pay_price) from s_order where ${where} and refund_status = 0
@@ -24,7 +24,7 @@
         </if>
         GROUP by DATE_FORMAT(o.`create_time`, '%Y-%m-%d') order by o.`create_time` desc limit #{ page },#{ limit };
     </select>
-    <select id="getOrderStatisticsPriceDetail" parameterType="com.cshy.common.model.request.StoreDateRangeSqlPram"
+    <select id="getOrderStatisticsPriceDetail" parameterType="com.cshy.common.model.request.store.StoreDateRangeSqlPram"
             resultType="com.cshy.common.model.response.StoreOrderStatisticsChartItemResponse">
         select sum(o.pay_price) as num,date_format(o.create_time, '%Y-%m-%d') as time
         from s_order o
@@ -34,7 +34,7 @@
         group by date_format(o.create_time, '%Y-%m-%d')
         order by o.create_time desc;
     </select>
-    <select id="getOrderStatisticsOrderCountDetail" parameterType="com.cshy.common.model.request.StoreDateRangeSqlPram"
+    <select id="getOrderStatisticsOrderCountDetail" parameterType="com.cshy.common.model.request.store.StoreDateRangeSqlPram"
             resultType="com.cshy.common.model.response.StoreOrderStatisticsChartItemResponse">
         select count(id) as num, date_format(o.create_time, '%Y-%m-%d') as time
         from s_order o

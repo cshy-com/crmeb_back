@@ -32,12 +32,6 @@ public class WeChatPushController {
     private RestTemplateUtil restTemplateUtil;
 
 
-    /**
-     * 新增后台管理员表
-     * @param message string message
-     * @author Mr.Zhang
-     * @since 2020-04-13
-     */
     @ApiOperation(value = "gitlab钩子")
     @RequestMapping(value = "/gitlab", method = RequestMethod.POST)
     @ApiImplicitParams({
@@ -110,12 +104,6 @@ public class WeChatPushController {
         return CommonResult.success(JSONObject.parseObject(result));
     }
 
-    /**
-     * 新增后台管理员表
-     * @param message string message
-     * @author Mr.Zhang
-     * @since 2020-04-13
-     */
     @ApiOperation(value = "消息推送")
     @RequestMapping(value = "/push", method = RequestMethod.GET)
     @ApiImplicitParams({

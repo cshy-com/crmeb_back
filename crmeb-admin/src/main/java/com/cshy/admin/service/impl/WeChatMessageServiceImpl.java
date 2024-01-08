@@ -10,9 +10,9 @@ import com.cshy.common.model.entity.article.Article;
 import com.cshy.admin.service.WeChatMessageService;
 import com.cshy.common.model.entity.wechat.WechatReply;
 import com.cshy.service.service.ArticleService;
-import com.cshy.service.service.SystemAttachmentService;
-import com.cshy.service.service.UserTokenService;
-import com.cshy.service.service.WechatReplyService;
+import com.cshy.service.service.system.SystemAttachmentService;
+import com.cshy.service.service.user.UserTokenService;
+import com.cshy.service.service.wechat.WechatReplyService;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -70,13 +70,6 @@ public class WeChatMessageServiceImpl implements WeChatMessageService {
     private WechatReply wechatReply;
 
 
-    /**
-     * 处理微信推送过来的消息，并且组装成需要发送的数据，二次处理
-     * @param request HttpServletRequest request请求
-     * @author Mr.Zhang
-     * @since 2020-06-03
-     * @return String
-     */
     @Override
     public String init(HttpServletRequest request) {
         Map<String, String> map = XmlUtil.xmlToMap(request);
@@ -104,12 +97,6 @@ public class WeChatMessageServiceImpl implements WeChatMessageService {
         return response;
     }
 
-    /**
-     * 匹配关键字并且组装xml数据
-     * @author Mr.Zhang
-     * @since 2020-06-03
-     * @return String
-     */
     private String setXml() {
         if(StringUtils.isBlank(getWechatReply().getType())){
             return "";
@@ -133,13 +120,6 @@ public class WeChatMessageServiceImpl implements WeChatMessageService {
         }
     }
 
-    /**
-     * 组装文章消息
-     * @param articleId Integer 文章id
-     * @author Mr.Zhang
-     * @since 2020-06-03
-     * @return MessageVoiceVo
-     */
     private String getNews(Integer articleId) {
         Article article = articleService.getById(articleId);
         if(null == article || article.getStatus() || article.getHide()){
@@ -163,12 +143,6 @@ public class WeChatMessageServiceImpl implements WeChatMessageService {
                 "</xml>\n";
     }
 
-
-    /**
-     * 处理不同的消息类型
-     * @author Mr.Zhang
-     * @since 2020-06-03
-     */
     private void getReplyByContent() {
         WechatReply wp = new WechatReply();
         switch (getMsgType()){

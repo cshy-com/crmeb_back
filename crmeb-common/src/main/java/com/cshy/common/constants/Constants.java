@@ -11,14 +11,6 @@ public class Constants {
 
     public static final int HTTPSTATUS_CODE_SUCCESS = 200;
 
-    public static final int NUM_ZERO = 0;
-    public static final int NUM_ONE = 1;
-    public static final int NUM_TWO = 2;
-    public static final int NUM_THREE = 3;
-    public static final int NUM_FIVE = 5;
-    public static final int NUM_SEVEN = 7;
-    public static final int NUM_TEN = 10;
-    public static final int NUM_ONE_HUNDRED = 100;
     //头部 token令牌key
     public static final String HEADER_AUTHORIZATION_KEY = "Authorization";
 
@@ -29,24 +21,6 @@ public class Constants {
      * 限流 redis key
      */
     public static final String RATE_LIMIT_KEY = "rate_limit:";
-
-    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final String DATE_FORMAT_UTC = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-    public static final String DATE_FORMAT_DATE = "yyyy-MM-dd";
-    public static final String DATE_FORMAT_YEAR = "yyyy";
-    public static final String DATE_FORMAT_MONTH_DATE = "MM-dd";
-    public static final String DATE_FORMAT_MONTH = "yyyy-MM";
-    public static final String DATE_TIME_FORMAT_NUM = "yyyyMMddHHmmss";
-    public static final String DATE_FORMAT_NUM = "yyyyMMdd";
-    public static final String DATE_FORMAT_START = "yyyy-MM-dd 00:00:00";
-    public static final String DATE_FORMAT_END = "yyyy-MM-dd 23:59:59";
-    public static final String DATE_FORMAT_MONTH_START = "yyyy-MM-01 00:00:00";
-    public static final String DATE_FORMAT_YEAR_START = "yyyy-01-01 00:00:00";
-    public static final String DATE_FORMAT_YEAR_END = "yyyy-12-31 23:59:59";
-    public static final String DATE_FORMAT_HHMMSS = "HH:mm:ss";
-    public static final String DATE_FORMAT_START_PEREND = "00:00:00";
-    public static final String DATE_FORMAT_END_PEREND = "23:59:59";
-    public static final String DATE_FORMAT_HHMM = "yyyy-MM-dd HH:mm";
 
     //后台管理员操作资金mark
     public static final String USER_BILL_OPERATE_LOG_TITLE = "{$title}{$operate}了{$value}{$founds}";
@@ -150,9 +124,6 @@ public class Constants {
     public static final String WE_CHAT_MESSAGE_KEY_PROGRAM = "we_chat_program_message_list";
     public static final String WE_CHAT_MESSAGE_INDUSTRY_KEY = "we_chat_message_industry";
 
-    //config表数据redis
-    public static final String CONFIG_LIST = "config_list"; //配置列表
-
     //物流缓存key
     public static final String EXPRESS_LIMIT = "express_limit"; //配置列表
 
@@ -185,6 +156,7 @@ public class Constants {
     public static final String CONFIG_KEY_PAY_WE_CHAT_APP_APP_ID = "pay_weixin_app_appid"; //公众号appId
     public static final String CONFIG_KEY_PAY_WE_CHAT_APP_MCH_ID = "pay_weixin_app_mchid"; //公众号配的商户号
     public static final String CONFIG_KEY_PAY_WE_CHAT_APP_APP_KEY = "pay_weixin_app_key"; //公众号支付key
+    public static final String SYS_CONFIG_KEY = "sys_config:";
 
     public static final String CONFIG_KEY_RECHARGE_MIN_AMOUNT = "store_user_min_recharge"; //最小充值金额
 //    public static final String CONFIG_KEY_PROGRAM_LOGO = "routine_logo"; //小程序logo
@@ -235,6 +207,12 @@ public class Constants {
 
     //验证码过期时间
     public static final String CONFIG_KEY_SMS_CODE_EXPIRE = "sms_code_expire";
+
+    //短信服务key
+    public static final String SMS_KEY = "sms_key";
+
+    //短信服务secret
+    public static final String SMS_SECRET = "sms_secret";
 
 
     //config配置的formId
@@ -372,21 +350,32 @@ public class Constants {
     public static final String ORDER_STATUS_COMPLETE = "complete"; //交易完成
     public static final String ORDER_STATUS_TOBE_WRITTEN_OFF = "toBeWrittenOff"; //待核销
     public static final String ORDER_STATUS_APPLY_REFUNDING = "applyRefund"; //申请退款
+    public static final String ORDER_STATUS_APPLY_REFUNDING_RETURN = "refundNReturn"; //申请退货退款
+    public static final String ORDER_STATUS_APPLY_WAIT_FOR_SHIP = "waitForShip"; //退货待发货
+    public static final String ORDER_STATUS_APPLY_SHIPPING = "shipping"; //退货已发货
     public static final String ORDER_STATUS_REFUNDING = "refunding"; //退款中
     public static final String ORDER_STATUS_REFUNDED = "refunded"; //已退款
     public static final String ORDER_STATUS_DELETED = "deleted"; //已删除
 
     public static final String ORDER_STATUS_STR_UNPAID = "未支付"; //未支付
-    public static final String ORDER_STATUS_STR_NOT_SHIPPED = "未发货"; //未发货
+    public static final String ORDER_STATUS_STR_NOT_SHIPPING = "未发货"; //未发货
+    public static final String ORDER_STATUS_STR_SHIPPING = "已发货"; //未发货
     public static final String ORDER_STATUS_STR_SPIKE = "待收货"; //待收货
     public static final String ORDER_STATUS_STR_BARGAIN = "待评价"; //已收货待评价
     public static final String ORDER_STATUS_STR_TAKE = "用户已收货"; //用户已收货
     public static final String ORDER_STATUS_STR_COMPLETE = "交易完成"; //交易完成
     public static final String ORDER_STATUS_STR_TOBE_WRITTEN_OFF = "待核销"; //待核销
     public static final String ORDER_STATUS_STR_APPLY_REFUNDING = "申请退款"; //申请退款
+    public static final String ORDER_STATUS_STR_APPLY_REFUNDING_RETURN = "申请退货退款"; //申请退款退货退款
     public static final String ORDER_STATUS_STR_REFUNDING = "退款中"; //退款中
     public static final String ORDER_STATUS_STR_REFUNDED = "已退款"; //已退款
     public static final String ORDER_STATUS_STR_DELETED = "已删除"; //已删除
+    public static final String ORDER_STATUS_STR_APPLY_WAIT_FOR_SHIP = "退货待发货"; //退货待发货
+    public static final String ORDER_STATUS_STR_APPLY_SHIPPING = "退货已发货"; //退货已发货
+    public static final String ORDER_STATUS_STR_AGREE_RETURN = "同意退货退款"; //同意退货退款
+    public static final String ORDER_STATUS_STR_AGREE_REFUND = "同意退款"; //同意退款
+
+    public static final String ORDER_STATUS_STR_REFUND_REVOKE = "撤销售后"; //撤销售后
 
     // H5 端订单状态
     public static final int ORDER_STATUS_H5_UNPAID = 0; // 未支付
@@ -398,6 +387,7 @@ public class Constants {
     public static final int ORDER_STATUS_H5_REFUNDING = -1; // 退款中
     public static final int ORDER_STATUS_H5_REFUNDED = -2; // 已退款
     public static final int ORDER_STATUS_H5_REFUND = -3; // 退款
+    public static final int ORDER_STATUS_H5_REFUND_PROCESSING = -4; // 待处理
 
     public static final int ORDER_STATUS_INT_PAID = 0; //已支付
     public static final int ORDER_STATUS_INT_SPIKE = 1; //待收货
@@ -418,6 +408,7 @@ public class Constants {
     public static final String PAY_TYPE_YUE = "yue"; //余额支付
     public static final String PAY_TYPE_OFFLINE = "offline"; //线下支付
     public static final String PAY_TYPE_ALI_PAY = "alipay"; //支付宝
+    public static final String PAY_TYPE_INTEGRAL = "integral"; //支付宝
 
     //支付客户端类型
     public static final String PAY_TYPE_WE_CHAT_FROM_H5 = "weixinh5"; //H5唤起微信支付
@@ -431,6 +422,7 @@ public class Constants {
 
     //支付方式
     public static final String PAY_TYPE_STR_WE_CHAT = "微信支付"; //微信支付
+    public static final String PAY_TYPE_STR_INTEGRAL = "积分支付"; //微信支付
     public static final String PAY_TYPE_STR_YUE = "余额支付"; //余额支付
     public static final String PAY_TYPE_STR_OFFLINE = "线下支付"; //线下支付
     public static final String PAY_TYPE_STR_ALI_PAY = "支付宝支付"; //支付宝
@@ -443,18 +435,18 @@ public class Constants {
 
 
     //订单操作类型
-    public static final String ORDER_STATUS_STR_SPIKE_KEY = "send"; //待收货 KEY
     public static final String ORDER_LOG_REFUND_PRICE = "refund_price"; //退款
     public static final String ORDER_LOG_EXPRESS = "express"; //快递
-    public static final String ORDER_LOG_DELIVERY = "delivery"; //送货
-    public static final String ORDER_LOG_DELIVERY_GOODS = "delivery_goods"; //送货
     public static final String ORDER_LOG_REFUND_REFUSE = "refund_refuse"; //不退款
-    public static final String ORDER_LOG_REFUND_APPLY = "apply_refund"; //
+    public static final String ORDER_LOG_REFUND_APPLY = "apply_refund"; //申请退款
     public static final String ORDER_LOG_PAY_SUCCESS = "pay_success"; //支付成功
     public static final String ORDER_LOG_DELIVERY_VI = "delivery_fictitious"; //虚拟发货
     public static final String ORDER_LOG_EDIT = "order_edit"; //编辑订单
-    public static final String ORDER_LOG_PAY_OFFLINE = "offline"; //线下付款订单
+    public static final String ORDER_LOG_RETURN_GOODS = "return_goods"; //退货中
+    public static final String ORDER_LOG_AGREE_RETURN = "agree_return"; //同意退货退款
+    public static final String ORDER_LOG_AGREE_REFUND = "agree_refund"; //同意退款
 
+    public static final String ORDER_LOG_REFUND_REVOKE = "refund_revoke"; //同意退款
 
     // 订单缓存
     public static final long ORDER_CASH_CONFIRM = (60);
@@ -464,8 +456,7 @@ public class Constants {
     public static final String ORDER_LOG_MESSAGE_REFUND_PRICE = "退款给用户{amount}元"; //退款
     public static final String ORDER_LOG_MESSAGE_EXPRESS = "已发货 快递公司：{deliveryName}, 快递单号：{deliveryCode}"; //快递
     public static final String ORDER_LOG_MESSAGE_DELIVERY = "已配送 发货人：{deliveryName}, 发货人电话：{deliveryCode}"; //送货
-    public static final String ORDER_LOG_MESSAGE_DELIVERY_FICTITIOUS = "已虚拟发货"; //已虚拟发货
-    public static final String ORDER_LOG_MESSAGE_REFUND_REFUSE = "不退款款因：{reason}"; //不退款款因
+    public static final String ORDER_LOG_MESSAGE_REFUND_REFUSE = "{reason}"; //不退款款因
     public static final String ORDER_LOG_MESSAGE_PAY_SUCCESS = "用户付款成功"; //用户付款成功
 
     public static final String ORDER_NO_PREFIX_WE_CHAT = "wx"; //微信平台下单订单号前缀
@@ -502,7 +493,6 @@ public class Constants {
     public static final String WE_CHAT_PROGRAM_TEMP_KEY_RECHARGE = "OPENTM200565260";
 
 
-
     //CND  URL测试用
     public static String CND_URL = "https://wuht-1300909283.cos.ap-chengdu.myqcloud.com";
 
@@ -513,6 +503,7 @@ public class Constants {
     public static String RESULT_ORDER_NOTFOUND = "订单号 ${orderCode} 未找到";
     public static String RESULT_ORDER_NOTFOUND_IN_ID = "订单id ${orderId} 未找到";
     public static String RESULT_ORDER_PAYED = "订单号 ${orderCode} 已支付";
+
     public static String RESULT_ORDER_EDIT_PRICE_SAME = "修改价格不能和支付价格相同 原价 ${oldPrice} 修改价 ${editPrice}";
     public static String RESULT_ORDER_EDIT_PRICE_SUCCESS = "订单号 ${orderNo} 修改价格 ${price} 成功";
     public static String RESULT_ORDER_EDIT_PRICE_LOGS = "订单价格 ${orderPrice} 修改实际支付金额为 ${price} 元";
@@ -598,108 +589,11 @@ public class Constants {
     public static final String HTTPS = "https://";
 
     /**
-     * 登录成功
+     * 阿里云短信模板列表查询
      */
-    public static final String LOGIN_SUCCESS = "Success";
-
-    /**
-     * 注销
-     */
-    public static final String LOGOUT = "Logout";
-
-    /**
-     * 成功
-     */
-    public static final String SUCCESS_MESSAGE = "成功";
-
-    /**
-     * 成功码
-     */
-    public static final Integer SUCCESS_CODE = 0;
-
-    /**
-     * 注册
-     */
-    public static final String REGISTER = "Register";
-
-    /**
-     * 登录失败
-     */
-    public static final String LOGIN_FAIL = "Error";
-
-    /**
-     * 验证码有效期（分钟）
-     */
-    public static final Integer CAPTCHA_EXPIRATION = 5;
-
-    /**
-     * 令牌
-     */
-    public static final String TOKEN = "token";
-
-    /**
-     * 令牌前缀
-     */
-    public static final String TOKEN_PREFIX = "Bearer ";
-
-    /**
-     * 令牌前缀
-     */
-    public static final String LOGIN_USER_KEY = "login_user_key";
-
-    /**
-     * 用户ID
-     */
-    public static final String JWT_USERID = "userid";
-
-    /**
-     * 用户名称
-     */
-    public static final String JWT_USERNAME = Claims.SUBJECT;
-
-    /**
-     * 用户头像
-     */
-    public static final String JWT_AVATAR = "avatar";
-
-    /**
-     * 创建时间
-     */
-    public static final String JWT_CREATED = "created";
-
-    /**
-     * 用户权限
-     */
-    public static final String JWT_AUTHORITIES = "authorities";
-
-    /**
-     * 资源映射路径 前缀
-     */
-    public static final String RESOURCE_PREFIX = "/profile";
-
-    /**
-     * RMI 远程方法调用
-     */
-    public static final String LOOKUP_RMI = "rmi:";
-
-    /**
-     * LDAP 远程方法调用
-     */
-    public static final String LOOKUP_LDAP = "ldap:";
-
-    /**
-     * LDAPS 远程方法调用
-     */
-    public static final String LOOKUP_LDAPS = "ldaps:";
-
-    /**
-     * 定时任务白名单配置（仅允许访问的包名，如其他需要可以自行添加）
-     */
-    public static final String[] JOB_WHITELIST_STR = { "com.ruoyi" };
-
-    /**
-     * 定时任务违规的字符
-     */
-    public static final String[] JOB_ERROR_STR = { "java.net.URL", "javax.naming.InitialContext", "org.yaml.snakeyaml",
-            "org.springframework", "org.apache", "com.ruoyi.common.utils.file", "com.ruoyi.common.config" };
+    public static final String AUDIT_STATE_INIT = "AUDIT_STATE_INIT"; //审核中
+    public static final String AUDIT_STATE_PASS = "AUDIT_STATE_PASS";// 审核通过。
+    public static final String AUDIT_STATE_NOT_PASS = "AUDIT_STATE_NOT_PASS";//审核未通过，请在返回参数Reason中查看审核未通过原因。
+    public static final String AUDIT_STATE_CANCEL = "AUDIT_STATE_CANCEL"; //取消审核。
+    public static final String AUDIT_SATE_CANCEL = "AUDIT_SATE_CANCEL";//取消审核。
 }

@@ -12,14 +12,23 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.*;
 import com.cshy.common.model.entity.user.*;
 import com.cshy.common.model.request.*;
+import com.cshy.common.model.request.user.UserExtractRequest;
+import com.cshy.common.model.request.user.UserRechargeRequest;
+import com.cshy.common.model.request.user.UserSpreadPeopleRequest;
+import com.cshy.common.model.request.wechat.WxBindingPhoneRequest;
 import com.cshy.common.model.response.*;
-import com.cshy.common.model.entity.user.*;
 import com.cshy.common.model.vo.*;
-import com.cshy.common.model.request.*;
-import com.cshy.common.model.response.*;
+import com.cshy.common.model.vo.system.SystemGroupDataRechargeConfigVo;
 import com.cshy.common.utils.*;
-import com.cshy.common.model.vo.*;
-import com.cshy.service.service.*;
+import com.cshy.service.service.store.StoreCouponService;
+import com.cshy.service.service.store.StoreCouponUserService;
+import com.cshy.service.service.store.StoreOrderService;
+import com.cshy.service.service.system.SystemConfigService;
+import com.cshy.service.service.system.SystemGroupDataService;
+import com.cshy.service.service.system.SystemUserLevelService;
+import com.cshy.service.service.user.*;
+import com.cshy.service.service.wechat.WeChatPayService;
+import com.cshy.service.service.wechat.WechatNewService;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.coupon.StoreCoupon;
@@ -32,7 +41,7 @@ import com.cshy.common.token.FrontTokenComponent;
 import com.cshy.common.token.WeChatOauthToken;
 import com.cshy.front.service.LoginService;
 import com.cshy.front.service.UserCenterService;
-import com.cshy.service.dao.UserDao;
+import com.cshy.service.dao.user.UserDao;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -323,7 +332,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
             userSpreadOrderItemChildResponse.setNickname(userMap.get(orderUid).getNickname());
             userSpreadOrderItemChildResponse.setType("返佣");
 
-            String month = DateUtil.dateToStr(record.getUpdateTime(), Constants.DATE_FORMAT_MONTH);
+            String month = DateUtil.dateToStr(record.getUpdateTime(), DateConstants.DATE_FORMAT_MONTH);
             if (monthList.contains(month)) {
                 //如果在已有的数据中找到当前月份数据则追加
                 for (UserSpreadOrderItemResponse userSpreadOrderItemResponse : userSpreadOrderItemResponseList) {
@@ -738,7 +747,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
         // 获取年-月
         Map<String, List<UserBill>> map = new HashMap<>();
         list.forEach(i -> {
-            String month = StrUtil.subPre(DateUtil.dateToStr(i.getCreateTime(), Constants.DATE_FORMAT), 7);
+            String month = StrUtil.subPre(DateUtil.dateToStr(i.getCreateTime(), DateConstants.DATE_FORMAT), 7);
             if (map.containsKey(month)) {
                 map.get(month).add(i);
             } else {
@@ -1008,9 +1017,9 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
             couponList.forEach(storeCoupon -> {
                 //是否有固定的使用时间
                 if (!storeCoupon.getIsFixedTime()) {
-                    String endTime = DateUtil.addDay(DateUtil.nowDate(Constants.DATE_FORMAT), storeCoupon.getDay(), Constants.DATE_FORMAT);
-                    storeCoupon.setUseEndTime(DateUtil.strToDate(endTime, Constants.DATE_FORMAT));
-                    storeCoupon.setUseStartTime(DateUtil.nowDateTimeReturnDate(Constants.DATE_FORMAT));
+                    String endTime = DateUtil.addDay(DateUtil.nowDate(DateConstants.DATE_FORMAT), storeCoupon.getDay(), DateConstants.DATE_FORMAT);
+                    storeCoupon.setUseEndTime(DateUtil.strToDate(endTime, DateConstants.DATE_FORMAT));
+                    storeCoupon.setUseStartTime(DateUtil.nowDateTimeReturnDate(DateConstants.DATE_FORMAT));
                 }
 
                 StoreCouponUser storeCouponUser = new StoreCouponUser();

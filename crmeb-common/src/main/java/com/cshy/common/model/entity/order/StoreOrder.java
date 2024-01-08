@@ -31,7 +31,7 @@ public class StoreOrder implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "订单号")
-    private String orderNo;
+    private String orderId;
 
     @ApiModelProperty(value = "用户id")
     private Integer uid;
@@ -42,8 +42,11 @@ public class StoreOrder implements Serializable {
     @ApiModelProperty(value = "用户电话")
     private String userMobile;
 
+    @ApiModelProperty(value = "地址")
+    private String address;
+
     @ApiModelProperty(value = "详细地址")
-    private String userAddress;
+    private String addressDetail;
 
     @ApiModelProperty(value = "运费金额")
     private BigDecimal freightPrice;
@@ -87,7 +90,7 @@ public class StoreOrder implements Serializable {
     @ApiModelProperty(value = "订单状态（0：待发货；1：待收货；2：已收货，待评价；3：已完成；）")
     private Integer status;
 
-    @ApiModelProperty(value = "0 未退款 1 申请中 2 已退款 3 退款中")
+    @ApiModelProperty(value = "0 未退款 1 申请中 2 已退款 3 退款中 4 退货待发货 5 退货已发货 6 退货退款被拒绝 7 退款被拒绝")
     private Integer refundStatus;
 
     @ApiModelProperty(value = "退款图片")
@@ -108,13 +111,13 @@ public class StoreOrder implements Serializable {
     @ApiModelProperty(value = "退款金额")
     private BigDecimal refundPrice;
 
-    @ApiModelProperty(value = "快递名称/送货人姓名")
+    @ApiModelProperty(value = "送货人姓名")
     private String deliveryName;
 
     @ApiModelProperty(value = "发货类型")
     private String deliveryType;
 
-    @ApiModelProperty(value = "快递单号/手机号")
+    @ApiModelProperty(value = "快递单号")
     private String trackingNo;
 
     @ApiModelProperty(value = "消费赚取积分")
@@ -202,4 +205,28 @@ public class StoreOrder implements Serializable {
 
     @ApiModelProperty(value = "退货物流单号")
     private String refundTrackingNo;
+
+    @ApiModelProperty(value = "退款方式 0 退款 1 退货退款")
+    private Integer refundType;
+
+    @ApiModelProperty(value = "退款收货状态 0 未收货 1 已收货")
+    private Integer refundReceivingStatus;
+
+    @ApiModelProperty(value = "退款联系手机号")
+    private String refundMobile;
+
+    @ApiModelProperty(value = "退货收件人")
+    private String returnName;
+
+    @ApiModelProperty(value = "退货收件地址")
+    private String returnAddress;
+
+    @ApiModelProperty(value = "退货收件电话")
+    private String returnMobile;
+
+    @ApiModelProperty(value = "退货留言")
+    private String returnRemark;
+
+    @ApiModelProperty(value = "退货图片")
+    private String returnImg;
 }

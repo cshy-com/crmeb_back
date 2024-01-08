@@ -4,8 +4,8 @@ import com.cshy.common.model.query.activity.ActivityQuery;
 import com.cshy.common.model.dto.activity.ActivityDto;
 import com.cshy.common.model.entity.activity.Activity;
 import com.cshy.common.model.entity.base.BaseService;
-import com.cshy.common.model.request.ActivityRequest;
-import com.cshy.common.model.request.ActivitySearchRequest;
+import com.cshy.common.model.request.activity.ActivityRequest;
+import com.cshy.common.model.request.activity.ActivitySearchRequest;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.vo.activity.ActivityVo;
 

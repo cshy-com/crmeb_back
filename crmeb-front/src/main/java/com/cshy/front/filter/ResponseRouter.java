@@ -2,7 +2,7 @@ package com.cshy.front.filter;
 
 import com.cshy.common.constants.Constants;
 import com.cshy.common.utils.SpringUtil;
-import com.cshy.service.service.SystemAttachmentService;
+import com.cshy.service.service.system.SystemAttachmentService;
 
 /**
  * response路径处理
@@ -25,7 +25,7 @@ public class ResponseRouter {
             data = SpringUtil.getBean(SystemAttachmentService.class).prefixImage(data);
         }
 
-        if (data.contains("file/") && !data.contains("https://www.bankservice.shop/file/")) {
+        if (data.contains("file/") && !data.contains("https://cshy.store/file/")) {
             data = SpringUtil.getBean(SystemAttachmentService.class).prefixFile(data);
         }
 

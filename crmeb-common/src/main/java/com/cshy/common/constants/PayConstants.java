@@ -8,9 +8,10 @@ public class PayConstants {
 
     //支付方式
     public static final String PAY_TYPE_WE_CHAT = "weixin"; //微信支付
-    public static final String PAY_TYPE_YUE = "yue"; //余额支付
-    public static final String PAY_TYPE_OFFLINE = "offline"; //线下支付
-    public static final String PAY_TYPE_ALI_PAY = "alipay"; //支付宝
+    public static final String PAY_TYPE_INTEGRAL = "integral"; //积分支付
+//    public static final String PAY_TYPE_YUE = "yue"; //余额支付
+//    public static final String PAY_TYPE_OFFLINE = "offline"; //线下支付
+//    public static final String PAY_TYPE_ALI_PAY = "alipay"; //支付宝
     public static final String PAY_TYPE_ZERO_PAY = "zeroPay"; // 零元付
 
     //支付渠道

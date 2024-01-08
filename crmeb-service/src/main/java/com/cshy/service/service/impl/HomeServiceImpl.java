@@ -1,13 +1,14 @@
 package com.cshy.service.service.impl;
 
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.NumConstants;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.response.HomeRateResponse;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.service.service.HomeService;
-import com.cshy.service.service.StoreOrderService;
-import com.cshy.service.service.UserService;
-import com.cshy.service.service.UserVisitRecordService;
+import com.cshy.service.service.store.StoreOrderService;
+import com.cshy.service.service.user.UserService;
+import com.cshy.service.service.user.UserVisitRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,26 +30,16 @@ public class HomeServiceImpl implements HomeService {
     @Autowired
     private UserVisitRecordService userVisitRecordService;
 
-    /**
-     * 用户曲线图
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     */
     @Override
     public Map<Object, Object> chartUser() {
         return dataFormat(userService.getAddUserCountGroupDate(Constants.SEARCH_DATE_LATELY_30), Constants.SEARCH_DATE_LATELY_30);
     }
 
-    /**
-     * 订单量趋势
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     */
     @Override
     public Map<String, Object> chartOrder() {
         Map<String, Object> map = new HashMap<>();
 
-        List<StoreOrder> list = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_LATELY_30, Constants.NUM_TEN);
+        List<StoreOrder> list = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_LATELY_30, NumConstants.NUM_TEN);
 
         map.put("quality",
                 dataFormat(getOrderCountGroupByDate(list), Constants.SEARCH_DATE_LATELY_30)
@@ -59,13 +50,6 @@ public class HomeServiceImpl implements HomeService {
         return map;
     }
 
-    /**
-     * 按开始结束时间查询每日新增订单数量
-     * @param list List<StoreOrder> 时间范围
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return HashMap<String, Object>
-     */
     private Map<Object, Object> getOrderCountGroupByDate(List<StoreOrder> list) {
         Map<Object, Object> map = new HashMap<>();
 
@@ -74,19 +58,12 @@ public class HomeServiceImpl implements HomeService {
         }
 
         for (StoreOrder storeOrder : list) {
-            map.put(storeOrder.getOrderNo(), storeOrder.getId());
+            map.put(storeOrder.getOrderId(), storeOrder.getId());
         }
 
         return map;
     }
 
-    /**
-     * 按开始结束时间查询每日新增订单销售额
-     * @param list List<StoreOrder> 时间范围
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return HashMap<String, Object>
-     */
     private Map<Object, Object> getOrderPriceGroupByDate(List<StoreOrder> list) {
         Map<Object, Object> map = new HashMap<>();
 
@@ -95,18 +72,12 @@ public class HomeServiceImpl implements HomeService {
         }
 
         for (StoreOrder storeOrder : list) {
-            map.put(storeOrder.getOrderNo(), storeOrder.getPayPrice());
+            map.put(storeOrder.getOrderId(), storeOrder.getPayPrice());
         }
 
         return map;
     }
 
-    /**
-     * 日期和数量格式化
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return Map<String, Integer>
-     */
     private Map<Object, Object> dataFormat(Map<Object, Object> countGroupDate, String dateLimit) {
         Map<Object, Object> map = new LinkedHashMap<>();
         List<String> listDate = DateUtil.getListDate(dateLimit);
@@ -143,12 +114,6 @@ public class HomeServiceImpl implements HomeService {
         return map;
     }
 
-    /**
-     * 日期和数量格式化
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return Map<String, Integer>
-     */
     private Map<Object, Object> dataFormatYear(Map<Object, Object> countGroupDate, String dateLimit) {
         Map<Object, Object> map = new LinkedHashMap<>();
         List<Object> listDate = new ArrayList<>();
@@ -185,65 +150,42 @@ public class HomeServiceImpl implements HomeService {
         return map;
     }
 
-    /**
-     * 用户购买统计
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     */
     @Override
     public Map<String, Integer> chartUserBuy() {
         Map<String, Integer> map = new HashMap<>();
         //未消费用户
-        map.put("zero", userService.getCountByPayCount(Constants.NUM_ZERO, Constants.NUM_ZERO));
+        map.put("zero", userService.getCountByPayCount(NumConstants.NUM_ZERO, NumConstants.NUM_ZERO));
 
         //消费一次用户
-        map.put("one", userService.getCountByPayCount(Constants.NUM_ONE, Constants.NUM_ONE));
+        map.put("one", userService.getCountByPayCount(NumConstants.NUM_ONE, NumConstants.NUM_ONE));
 
         //留存客户
-        map.put("history", userService.getCountByPayCount(Constants.NUM_TWO, Constants.NUM_THREE));
+        map.put("history", userService.getCountByPayCount(NumConstants.NUM_TWO, NumConstants.NUM_THREE));
 
         //回流客户
-        map.put("back", userService.getCountByPayCount(Constants.NUM_ONE, Constants.EXPORT_MAX_LIMIT));
+        map.put("back", userService.getCountByPayCount(NumConstants.NUM_ONE, Constants.EXPORT_MAX_LIMIT));
 
         return map;
     }
 
-    /**
-     * 周订单量趋势
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return Map<String, Object>
-     */
     @Override
     public Map<String, Object> chartOrderInWeek() {
-        return returnOrderDate(Constants.SEARCH_DATE_WEEK, Constants.SEARCH_DATE_PRE_WEEK, Constants.NUM_TEN);
+        return returnOrderDate(Constants.SEARCH_DATE_WEEK, Constants.SEARCH_DATE_PRE_WEEK, NumConstants.NUM_TEN);
 
 
     }
 
-    /**
-     * 月订单量趋势
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return Map<String, Object>
-     */
     @Override
     public Map<String, Object> chartOrderInMonth() {
-        return returnOrderDate(Constants.SEARCH_DATE_MONTH, Constants.SEARCH_DATE_PRE_MONTH, Constants.NUM_TEN);
+        return returnOrderDate(Constants.SEARCH_DATE_MONTH, Constants.SEARCH_DATE_PRE_MONTH, NumConstants.NUM_TEN);
     }
 
-    /**
-     * 年订单量趋势
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return Map<String, Object>
-     */
     @Override
     public Map<String, Object> chartOrderInYear() {
         Map<String, Object> map = new HashMap<>();
 
         //查询本年订单量
-        List<StoreOrder> list = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_YEAR, Constants.NUM_SEVEN);
+        List<StoreOrder> list = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_YEAR, NumConstants.NUM_SEVEN);
 
         map.put("quality",
                 dataFormatYear(getOrderCountGroupByDate(list), Constants.SEARCH_DATE_YEAR)
@@ -253,7 +195,7 @@ public class HomeServiceImpl implements HomeService {
         );
 
         //查询上年订单量
-        List<StoreOrder> preList = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_PRE_YEAR, Constants.NUM_SEVEN);
+        List<StoreOrder> preList = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_PRE_YEAR, NumConstants.NUM_SEVEN);
 
         map.put("preQuality",
                 dataFormatYear(getOrderCountGroupByDate(preList), Constants.SEARCH_DATE_PRE_YEAR)
@@ -290,12 +232,6 @@ public class HomeServiceImpl implements HomeService {
         return response;
     }
 
-    /**
-     * 组装订单统计返回数据
-     * @author Mr.Zhang
-     * @since 2020-05-16
-     * @return Map<String, Object>
-     */
     private Map<String, Object> returnOrderDate(String dateLimit, String preDateLimit, int leftTime) {
         Map<String, Object> map = new HashMap<>();
 

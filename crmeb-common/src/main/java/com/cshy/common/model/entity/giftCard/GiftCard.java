@@ -2,6 +2,7 @@ package com.cshy.common.model.entity.giftCard;
 
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.write.style.ContentRowHeight;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.cshy.common.model.entity.base.BaseModel;

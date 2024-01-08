@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.entity.express.ExpressDetail;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.express.Express;
-import com.cshy.common.model.request.ExpressSearchRequest;
-import com.cshy.common.model.request.ExpressUpdateRequest;
-import com.cshy.common.model.request.ExpressUpdateShowRequest;
+import com.cshy.common.model.request.express.ExpressSearchRequest;
+import com.cshy.common.model.request.express.ExpressUpdateRequest;
+import com.cshy.common.model.request.express.ExpressUpdateShowRequest;
 
 import java.util.List;
 
@@ -74,7 +74,7 @@ public interface ExpressService extends IService<Express> {
     /**
      * 查询快递信息
      */
-    ExpressDetail findExpressDetail(String trackingNo, Integer type);
+    ExpressDetail findExpressDetail(String trackingNo, Integer type, String mobile);
 
     void syncExpressStatus();
 }

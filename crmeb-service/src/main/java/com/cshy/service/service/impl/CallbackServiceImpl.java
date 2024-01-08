@@ -22,6 +22,13 @@ import com.cshy.common.model.vo.AttachVo;
 import com.cshy.common.model.vo.CallbackVo;
 import com.cshy.common.model.vo.MyRecord;
 import com.cshy.service.service.*;
+import com.cshy.service.service.store.StoreCombinationService;
+import com.cshy.service.service.store.StoreOrderService;
+import com.cshy.service.service.store.StorePinkService;
+import com.cshy.service.service.system.SystemConfigService;
+import com.cshy.service.service.user.UserRechargeService;
+import com.cshy.service.service.user.UserService;
+import com.cshy.service.service.wechat.WechatPayInfoService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,7 +199,7 @@ public class CallbackServiceImpl implements CallbackService {
                         storePink.setUid(user.getUid());
                         storePink.setAvatar(user.getAvatar());
                         storePink.setNickname(user.getNickname());
-                        storePink.setOrderId(storeOrder.getOrderNo());
+                        storePink.setOrderId(storeOrder.getOrderId());
                         storePink.setOrderIdKey(storeOrder.getId());
                         storePink.setTotalNum(storeOrder.getTotalNum());
                         storePink.setTotalPrice(storeOrder.getTotalPrice());
@@ -232,7 +239,7 @@ public class CallbackServiceImpl implements CallbackService {
                     sb.append("</xml>");
                     return sb.toString();
                 }
-                redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, storeOrder.getOrderNo());
+                redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, storeOrder.getOrderId());
             }
             // 充值
             if (Constants.SERVICE_PAY_TYPE_RECHARGE.equals(attachVo.getType())) {
@@ -287,7 +294,7 @@ public class CallbackServiceImpl implements CallbackService {
             return refundRecord.getStr("returnXml");
         }
         String outRefundNo = notifyRecord.getStr("out_refund_no");
-        StoreOrder storeOrder = storeOrderService.getByOderId(outRefundNo);
+        StoreOrder storeOrder = storeOrderService.getByOrderId(outRefundNo);
         if (ObjectUtil.isNull(storeOrder)) {
             logger.error("微信退款订单查询失败==>" + refundRecord.getColumns() + ", rawData==>" + xmlInfo + ", data==>" + notifyRecord);
             return refundRecord.getStr("returnXml");

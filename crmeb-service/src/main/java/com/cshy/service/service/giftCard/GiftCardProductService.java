@@ -12,4 +12,6 @@ public interface GiftCardProductService extends BaseService<GiftCardProduct, Gif
     void batchAdd(List<Integer> dtoList, String giftCardTypeId);
 
     void batchDeleteByIds(List<String> idList);
+
+    void restore(Integer id);
 }

@@ -11,14 +11,6 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
-/**
- * <p>
- * 系统权限表
- * </p>
- *
- * @author HZW
- * @since 2021-11-17
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)

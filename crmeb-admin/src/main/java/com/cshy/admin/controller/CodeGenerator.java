@@ -1,6 +1,6 @@
 package com.cshy.admin.controller;
 
-import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.common.utils.genutils.GenCodePageListUtils;
@@ -51,7 +51,7 @@ public class CodeGenerator {
         String contentLength = "Content-Length";
         String contentType = "application/octet-stream; charset=UTF-8;";
         String contentDisposition = "Content-Disposition";
-        String attachment = "attachment; filename=\"CRMEB-Java-Code-"+ DateUtil.dateToStr(new Date(), Constants.DATE_FORMAT_HHMM) +".zip\"";
+        String attachment = "attachment; filename=\"CRMEB-Java-Code-"+ DateUtil.dateToStr(new Date(), DateConstants.DATE_FORMAT_YEAR_START) +".zip\"";
 
         response.reset();
         response.addHeader(contentLength, data.length +"");

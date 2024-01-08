@@ -43,9 +43,6 @@ public class UserSign implements Serializable {
     @ApiModelProperty(value = "类型，1积分，2经验")
     private Integer type;
 
-    @ApiModelProperty(value = "签到日期")
-    private Date createDay;
-
     @ApiModelProperty(value = "添加时间")
     private Date createTime;
 

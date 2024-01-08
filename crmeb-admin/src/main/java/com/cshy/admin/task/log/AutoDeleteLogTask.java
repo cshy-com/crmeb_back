@@ -1,7 +1,7 @@
 package com.cshy.admin.task.log;
 
 import com.cshy.common.utils.DateUtil;
-import com.cshy.service.service.WechatExceptionsService;
+import com.cshy.service.service.wechat.WechatExceptionsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

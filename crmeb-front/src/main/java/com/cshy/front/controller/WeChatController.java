@@ -2,13 +2,13 @@ package com.cshy.front.controller;
 
 import com.cshy.common.model.entity.wechat.TemplateMessage;
 import com.cshy.common.model.request.RegisterThirdUserRequest;
-import com.cshy.common.model.request.WxBindingPhoneRequest;
+import com.cshy.common.model.request.wechat.WxBindingPhoneRequest;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.LoginResponse;
 import com.cshy.common.model.response.WeChatJsSdkConfigResponse;
 import com.cshy.front.service.UserCenterService;
-import com.cshy.service.service.SystemNotificationService;
-import com.cshy.service.service.WechatNewService;
+import com.cshy.service.service.system.SystemNotificationService;
+import com.cshy.service.service.wechat.WechatNewService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

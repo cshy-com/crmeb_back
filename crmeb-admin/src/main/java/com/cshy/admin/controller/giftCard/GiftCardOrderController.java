@@ -1,16 +1,13 @@
 package com.cshy.admin.controller.giftCard;
 
-import com.cshy.common.enums.SMSTemplateEnum;
 import com.cshy.common.model.Type;
 import com.cshy.common.model.dto.giftCard.GiftCardOrderDto;
 import com.cshy.common.model.entity.base.BasePage;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.query.giftCard.GiftCardOrderQuery;
 import com.cshy.common.model.response.CommonResult;
-import com.cshy.common.model.response.StoreOrderCountItemResponse;
 import com.cshy.common.model.vo.giftCard.GiftCardOrderVo;
-import com.cshy.common.token.FrontTokenComponent;
-import com.cshy.service.service.SmsService;
+import com.cshy.service.service.order.OrderService;
 import com.cshy.service.service.giftCard.GiftCardOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -18,9 +15,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +32,7 @@ public class GiftCardOrderController {
     @Autowired
     private GiftCardOrderService giftCardOrderService;
     @Autowired
-    private SmsService smsService;
+    private OrderService orderService;
 
     @ApiOperation(value = "分页列表")
     @RequestMapping(value = "/page", method = RequestMethod.POST)
@@ -87,17 +82,5 @@ public class GiftCardOrderController {
     @RequestMapping(value = "/status/num", method = RequestMethod.GET)
     public CommonResult<Map<String, Object>> getOrderStatusNum() {
         return CommonResult.success(giftCardOrderService.getOrderStatusNum());
-    }
-
-    @ApiOperation(value = "发货")
-    @RequestMapping(value = "/ship", method = RequestMethod.GET)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "0 普通订单 1 礼品卡订单"),
-            @ApiImplicitParam(name = "orderId", value = "订单号"),
-            @ApiImplicitParam(name = "trackingNo", value = "物流单号")
-    })
-    public CommonResult<String> ship(@RequestParam String orderId, @RequestParam String trackingNo, @RequestParam Integer type, HttpServletRequest request) {
-        giftCardOrderService.ship(orderId, trackingNo, type, request);
-        return CommonResult.success();
     }
 }

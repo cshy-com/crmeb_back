@@ -6,7 +6,7 @@ import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.UploadManager;
 import com.cshy.service.service.QiNiuService;
-import com.cshy.service.service.SystemAttachmentService;
+import com.cshy.service.service.system.SystemAttachmentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +29,6 @@ public class QiNiuServiceImpl implements QiNiuService {
     @Autowired
     private SystemAttachmentService systemAttachmentService;
 
-    /**
-     * 同步到七牛云
-     * @param cloudVo CloudVo
-     * @author Mr.Zhang
-     * @since 2020-05-06
-     */
     @Async
     @Override
     public void upload(UploadManager uploadManager, CloudVo cloudVo, String upToken, String webPth, String localFile, Integer id) {

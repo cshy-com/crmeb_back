@@ -1,7 +1,7 @@
 package com.cshy.admin.task.bargain;
 
 import com.cshy.common.utils.DateUtil;
-import com.cshy.service.service.StoreBargainService;
+import com.cshy.service.service.store.StoreBargainService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,6 +2,7 @@ package com.cshy.common.utils;
 
 import cn.hutool.core.util.RandomUtil;
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.exception.CrmebException;
 import org.apache.commons.io.FilenameUtils;
 
@@ -72,12 +73,6 @@ public class UploadUtil {
         UploadUtil.size = size;
     }
 
-    /**
-     * 根据文件的绝对路径创建一个文件对象.
-     * @return 返回创建的这个文件对象
-     * @author Mr.Zhang
-     * @since 2020-05-08
-     */
     public static File createFile(String filePath) throws IOException {
         // 获取文件的完整目录
         String fileDir = FilenameUtils.getFullPath(filePath);
@@ -99,12 +94,6 @@ public class UploadUtil {
         return file;
     }
 
-    /**
-     * 生成文件文件名
-     * @param fileName 文件名
-     * @author Mr.Zhang
-     * @since 2020-05-08
-     */
     public static String getDestPath(String fileName) {
         //规则：  子目录/年/月/日.后缀名
         return getServerPath() + fileName;
@@ -113,25 +102,14 @@ public class UploadUtil {
     public static String fileName(String extName){
         return CrmebUtil.getUuid() + RandomUtil.randomString(10) + "." + extName;
     }
-
-    /**
-     * 生成文件在的实际的路径
-     * @author Mr.Zhang
-     * @since 2020-05-08
-     */
     public static String getServerPath() {
         // 文件分隔符转化为当前系统的格式
         return FilenameUtils.separatorsToSystem( getRootPath() + getWebPath());
     }
 
-    /**
-     * web目录可访问的路径
-     * @author Mr.Zhang
-     * @since 2020-05-08
-     */
     public static String getWebPath() {
         // 文件分隔符转化为当前系统的格式
-        return getModelPath() + DateUtil.nowDate(Constants.DATE_FORMAT_DATE).replace("-", "/") + "/";
-//        return getType() + getModelPath() + DateUtil.nowDate(Constants.DATE_FORMAT_DATE).replace("-", "/") + "/";
+        return getModelPath() + DateUtil.nowDate(DateConstants.DATE_FORMAT_DATE).replace("-", "/") + "/";
+//        return getType() + getModelPath() + DateUtil.nowDate(DateFormatters.DATE_FORMAT_DATE).replace("-", "/") + "/";
     }
 }

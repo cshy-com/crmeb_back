@@ -2,11 +2,14 @@ package com.cshy.service.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.vo.CloudVo;
 import com.cshy.common.model.vo.FileResultVo;
 import com.cshy.common.model.vo.UploadCommonVo;
 import com.cshy.service.service.*;
+import com.cshy.service.service.system.SystemAttachmentService;
+import com.cshy.service.service.system.SystemConfigService;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -30,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 
 
@@ -129,7 +131,7 @@ public class UploadServiceImpl implements UploadService {
         // 创建目标文件的名称，规则：  子目录/年/月/日.后缀名
         // 文件分隔符转化为当前系统的格式
         // 文件分隔符转化为当前系统的格式
-        String webPath = uploadCommonVo.getType() + uploadCommonVo.getModelPath() + DateUtil.nowDate(Constants.DATE_FORMAT_DATE).replace("-", "/") + "/";
+        String webPath = uploadCommonVo.getType() + uploadCommonVo.getModelPath() + DateUtil.nowDate(DateConstants.DATE_FORMAT_DATE).replace("-", "/") + "/";
         String destPath = FilenameUtils.separatorsToSystem(uploadCommonVo.getRootPath() + webPath) + newFileName;
 //        String destPath = "E://home/file/" + newFileName;
         // 创建文件
@@ -268,12 +270,6 @@ public class UploadServiceImpl implements UploadService {
     }
 
 
-    public static final String upload(String baseDir, MultipartFile file, String[] allowedExtension) throws IOException {
-        String absPath = "https://www.bankservice.shop/home/file/xxxxx.png";
-        file.transferTo(Paths.get(absPath));
-        return "xxxxxx";
-    }
-
     /**
      * 文件长传
      * @param multipartFile 文件
@@ -344,7 +340,7 @@ public class UploadServiceImpl implements UploadService {
         //规则：  子目录/年/月/日.后缀名
         // 文件分隔符转化为当前系统的格式
         // 文件分隔符转化为当前系统的格式
-        String webPath = uploadCommonVo.getType() + uploadCommonVo.getModelPath() + DateUtil.nowDate(Constants.DATE_FORMAT_DATE).replace("-", "/") + "/";
+        String webPath = uploadCommonVo.getType() + uploadCommonVo.getModelPath() + DateUtil.nowDate(DateConstants.DATE_FORMAT_DATE).replace("-", "/") + "/";
         String destPath = FilenameUtils.separatorsToSystem(uploadCommonVo.getRootPath() + webPath) + newFileName;
         // 创建文件
         File file = UploadUtil.createFile(destPath);

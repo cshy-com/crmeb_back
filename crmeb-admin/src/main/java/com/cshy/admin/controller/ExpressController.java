@@ -5,9 +5,9 @@ import com.cshy.common.model.entity.express.ExpressDetail;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.ExpressUpdateRequest;
-import com.cshy.common.model.request.ExpressSearchRequest;
-import com.cshy.common.model.request.ExpressUpdateShowRequest;
+import com.cshy.common.model.request.express.ExpressUpdateRequest;
+import com.cshy.common.model.request.express.ExpressSearchRequest;
+import com.cshy.common.model.request.express.ExpressUpdateShowRequest;
 import com.cshy.service.service.ExpressService;
 import io.swagger.annotations.ApiImplicitParam;
 import lombok.extern.slf4j.Slf4j;
@@ -128,14 +128,13 @@ public class ExpressController {
     @ApiOperation(value = "查询快递信息")
     @RequestMapping(value = "/findExpressDetail", method = RequestMethod.GET)
     @ApiImplicitParam(name="trackingNo", value="快递单号（包括前缀）")
-    public CommonResult<ExpressDetail> findExpressDetail(@RequestParam(value = "trackingNo") String trackingNo, @RequestParam(value = "type") Integer type) {
-        return CommonResult.success(expressService.findExpressDetail(trackingNo, type));
+    public CommonResult<ExpressDetail> findExpressDetail(@RequestParam(value = "trackingNo") String trackingNo, @RequestParam(value = "type") Integer type, @RequestParam String userMobile) {
+        return CommonResult.success(expressService.findExpressDetail(trackingNo, type, userMobile));
     }
 
 //    @PreAuthorize("hasAuthority('admin:express:all')")
     @ApiOperation(value = "手动更新快递信息")
     @RequestMapping(value = "/syncExpressStatus", method = RequestMethod.GET)
-    @ApiImplicitParam(name="trackingNo", value="快递单号（包括前缀）")
     public CommonResult<String> syncExpressStatus() {
         expressService.syncExpressStatus();
         return CommonResult.success();

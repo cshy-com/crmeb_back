@@ -3,9 +3,8 @@ package com.cshy.front.service;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.ProductListRequest;
-import com.cshy.common.model.request.ProductRequest;
-import com.cshy.common.model.response.*;
+import com.cshy.common.model.request.product.ProductListRequest;
+import com.cshy.common.model.request.product.ProductRequest;
 import com.cshy.common.model.response.*;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.vo.CategoryTreeVo;
@@ -34,11 +33,12 @@ public interface ProductService {
 
     /**
      * 获取商品详情
-     * @param id 商品编号
-     * @param type normal-正常，void-视频
+     *
+     * @param id         商品编号
+     * @param type       normal-正常，void-视频
      * @return 商品详情信息
      */
-    ProductDetailResponse getDetail(Integer id, String type);
+    ProductDetailResponse getDetail(Integer id, String type, Integer isGiftCard);
 
     /**
      * 获取商品SKU详情

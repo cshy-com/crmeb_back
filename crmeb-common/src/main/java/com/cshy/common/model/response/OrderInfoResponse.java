@@ -20,27 +20,21 @@ import java.math.BigDecimal;
 public class OrderInfoResponse implements Serializable {
 
     private static final long serialVersionUID=1L;
-
-//    @ApiModelProperty(value = "订单id")
-//    private Integer orderId;
     @ApiModelProperty(value = "attrId")
     private Integer attrId;
 
     @ApiModelProperty(value = "商品ID")
     private Integer productId;
 
-//    @ApiModelProperty(value = "购买东西的详细信息")
-//    private StoreCartResponse info;
 
     @ApiModelProperty(value = "商品数量")
     private Integer cartNum;
 
-//    @ApiModelProperty(value = "唯一id")
-//    @TableField(value = "`unique`")
-//    private String unique;
-
     @ApiModelProperty(value = "商品图片")
     private String image;
+
+    @ApiModelProperty(value = "规格图片")
+    private String attrValueImage;
 
     @ApiModelProperty(value = "商品名称")
     private String storeName;
@@ -53,4 +47,7 @@ public class OrderInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "规格属性值")
     private String sku;
+
+    @ApiModelProperty(value = "原价")
+    private BigDecimal otPrice;
 }

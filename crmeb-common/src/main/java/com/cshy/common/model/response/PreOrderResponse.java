@@ -1,6 +1,6 @@
 package com.cshy.common.model.response;
 
-import com.cshy.common.model.vo.OrderInfoVo;
+import com.cshy.common.model.vo.order.OrderInfoVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -27,16 +27,16 @@ public class PreOrderResponse implements Serializable {
     @ApiModelProperty(value = "预下单订单号")
     private String preOrderNo;
 
-    @ApiModelProperty(value = "门店自提是否开启")
-    private String storeSelfMention;
+//    @ApiModelProperty(value = "门店自提是否开启")
+//    private String storeSelfMention;
 
-    @ApiModelProperty(value = "余额支付 1 开启 2 关闭")
-    private String yuePayStatus;
+//    @ApiModelProperty(value = "余额支付 1 开启 2 关闭")
+//    private String yuePayStatus;
 
     @ApiModelProperty(value = "微信支付 1 开启 0 关闭")
     private String payWeixinOpen;
 
-    @ApiModelProperty(value = "支付宝支付 1 开启 0 关闭")
-    private String aliPayStatus;
+//    @ApiModelProperty(value = "支付宝支付 1 开启 0 关闭")
+//    private String aliPayStatus;
 
 }

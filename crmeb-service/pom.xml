@@ -14,7 +14,7 @@
 
     <properties>
         <crmeb-common>0.0.1-SNAPSHOT</crmeb-common>
-        <aliyun.version>2.0.1</aliyun.version>
+        <aliyun.version>2.0.24</aliyun.version>
     </properties>
 
     <dependencies>

@@ -41,6 +41,9 @@ public class StoreProduct implements Serializable {
     @ApiModelProperty(value = "轮播图")
     private String sliderImage;
 
+    @ApiModelProperty(value = "商品编码")
+    private String code;
+
     @ApiModelProperty(value = "商品名称")
     private String storeName;
 
@@ -158,4 +161,8 @@ public class StoreProduct implements Serializable {
     @ApiModelProperty(value = "商品详情")
     @TableField(exist = false)
     private String content;
+
+    @ApiModelProperty(value = "收藏量")
+    @TableField(exist = false)
+    private Integer collectNum;
 }

@@ -3,9 +3,19 @@ package com.cshy.front.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.cshy.common.model.dto.user.UserVisitHistoryDto;
+import com.cshy.common.model.entity.product.StoreProductRelation;
+import com.cshy.common.model.entity.user.UserVisitHistory;
 import com.cshy.common.model.response.*;
-import com.cshy.common.model.response.*;
+import com.cshy.common.utils.StringUtils;
 import com.cshy.service.service.*;
+import com.cshy.service.service.store.*;
+import com.cshy.service.service.system.SystemConfigService;
+import com.cshy.service.service.system.SystemUserLevelService;
+import com.cshy.service.service.user.UserService;
+import com.cshy.service.service.user.UserVisitHistoryService;
+import com.cshy.service.service.user.UserVisitRecordService;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.constants.CategoryConstants;
 import com.cshy.common.constants.Constants;
@@ -13,13 +23,13 @@ import com.cshy.common.constants.SysConfigConstants;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttr;
 import com.cshy.common.model.entity.product.StoreProductAttrValue;
-import com.cshy.common.model.entity.record.UserVisitRecord;
+import com.cshy.common.model.entity.user.UserVisitRecord;
 import com.cshy.common.model.entity.system.SystemUserLevel;
 import com.cshy.common.model.entity.user.User;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.ProductListRequest;
-import com.cshy.common.model.request.ProductRequest;
+import com.cshy.common.model.request.product.ProductListRequest;
+import com.cshy.common.model.request.product.ProductRequest;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.utils.RedisUtil;
 import com.cshy.common.model.vo.CategoryTreeVo;
@@ -35,11 +45,11 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
-* IndexServiceImpl 接口实现
-
-*/
+ * IndexServiceImpl 接口实现
+ */
 @Service
 public class ProductServiceImpl implements ProductService {
 
@@ -82,14 +92,18 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private UserVisitRecordService userVisitRecordService;
 
+    @Autowired
+    private UserVisitHistoryService userVisitHistoryService;
+
     /**
      * 获取分类
+     *
      * @return List<CategoryTreeVo>
      */
     @Override
     public List<CategoryTreeVo> getCategory() {
         List<CategoryTreeVo> listTree = categoryService.getListTree(CategoryConstants.CATEGORY_TYPE_PRODUCT, 1, "");
-        for (int i = 0; i < listTree.size();) {
+        for (int i = 0; i < listTree.size(); ) {
             CategoryTreeVo categoryTreeVo = listTree.get(i);
             if (!categoryTreeVo.getPid().equals(0)) {
                 listTree.remove(i);
@@ -102,6 +116,7 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * 商品列表
+     *
      * @return CommonPage<IndexProductResponse>
      */
     @Override
@@ -163,12 +178,15 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * 获取商品详情
-     * @param id 商品编号
-     * @param type normal-正常，video-视频
+     *
+     * @param id         商品编号
+     * @param type       normal-正常，video-视频
+     * @param isGiftCard
+     * @param isOrder
      * @return 商品详情信息
      */
     @Override
-    public ProductDetailResponse getDetail(Integer id, String type) {
+    public ProductDetailResponse getDetail(Integer id, String type, Integer isGiftCard) {
         // 获取用户
         User user = userService.getInfo();
         SystemUserLevel userLevel = null;
@@ -182,10 +200,16 @@ public class ProductServiceImpl implements ProductService {
         if (ObjectUtil.isNotNull(userLevel)) {
             storeProduct.setVipPrice(storeProduct.getPrice());
         }
+        //查询收藏量
+        List<StoreProductRelation> productRelationList = storeProductRelationService.getList(id, "collect");
+        storeProduct.setCollectNum(productRelationList.size());
+
         productDetailResponse.setProductInfo(storeProduct);
 
+
         // 获取商品规格
-        List<StoreProductAttr> attrList = attrService.getListByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+
         // 根据制式设置attr属性
         productDetailResponse.setProductAttr(attrList);
 
@@ -207,7 +231,7 @@ public class ProductServiceImpl implements ProductService {
         if (ObjectUtil.isNotNull(user)) {
             // 查询用户是否收藏收藏
             user = userService.getInfo();
-            productDetailResponse.setUserCollect(storeProductRelationService.getLikeOrCollectByUser(user.getUid(), id,false).size() > 0);
+            productDetailResponse.setUserCollect(storeProductRelationService.getLikeOrCollectByUser(user.getUid(), id, false).size() > 0);
             // 判断是否开启分销
             String brokerageFuncStatus = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_BROKERAGE_FUNC_STATUS);
             if (brokerageFuncStatus.equals(Constants.COMMON_SWITCH_OPEN)) {// 分销开启
@@ -239,11 +263,28 @@ public class ProductServiceImpl implements ProductService {
             userVisitRecordService.save(visitRecord);
         }
 
+        // 创建用户浏览记录
+        if (userService.getUserId() > 0 && isGiftCard == 0) {
+            UserVisitHistoryDto userVisitHistoryDto = new UserVisitHistoryDto();
+            //如果存在记录 更新
+            UserVisitHistory userVisitHistory = userVisitHistoryService.getOne(new LambdaQueryWrapper<UserVisitHistory>().eq(UserVisitHistory::getProductId, id).eq(UserVisitHistory::getUserId, userService.getUserId()));
+            if (Objects.nonNull(userVisitHistory))
+                BeanUtils.copyProperties(userVisitHistory, userVisitHistoryDto);
+            userVisitHistoryDto.setUserId(userService.getUserId());
+            userVisitHistoryDto.setProductId(id);
+            userVisitHistoryDto.setCreateTime(DateUtil.now());
+            if (StringUtils.isNotBlank(userVisitHistoryDto.getId()))
+                userVisitHistoryService.update(userVisitHistoryDto);
+            else
+                userVisitHistoryService.add(userVisitHistoryDto);
+        }
+
         return productDetailResponse;
     }
 
     /**
      * 获取商品SKU详情
+     *
      * @param id 商品编号
      * @return 商品详情信息
      */
@@ -261,7 +302,7 @@ public class ProductServiceImpl implements ProductService {
         StoreProduct storeProduct = storeProductService.getH5Detail(id);
 
         // 获取商品规格
-        List<StoreProductAttr> attrList = attrService.getListByProductIdAndType(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
+        List<StoreProductAttr> attrList = attrService.getListByProductIdAndTypeNotDel(storeProduct.getId(), Constants.PRODUCT_TYPE_NORMAL);
         // 根据制式设置attr属性
         productDetailResponse.setProductAttr(attrList);
 
@@ -273,7 +314,7 @@ public class ProductServiceImpl implements ProductService {
             BeanUtils.copyProperties(storeProductAttrValue, atr);
             // 设置会员价
             if (ObjectUtil.isNotNull(userLevel)) {
-                BigDecimal vipPrice = atr.getPrice().multiply(new BigDecimal(userLevel.getDiscount())).divide(new BigDecimal(100), 2 ,BigDecimal.ROUND_HALF_UP);
+                BigDecimal vipPrice = atr.getPrice().multiply(new BigDecimal(userLevel.getDiscount())).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP);
                 atr.setVipPrice(vipPrice);
             }
             skuMap.put(atr.getSuk(), atr);
@@ -285,8 +326,9 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * 商品评论列表
-     * @param proId 商品编号
-     * @param type 评价等级|0=全部,1=好评,2=中评,3=差评
+     *
+     * @param proId            商品编号
+     * @param type             评价等级|0=全部,1=好评,2=中评,3=差评
      * @param pageParamRequest 分页参数
      * @return PageInfo<ProductReplyResponse>
      */
@@ -297,6 +339,7 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * 产品评价数量和好评度
+     *
      * @return StoreProductReplayCountResponse
      */
     @Override
@@ -313,9 +356,10 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * 获取商品佣金区间
-     * @param isSub 是否单独计算分佣
+     *
+     * @param isSub         是否单独计算分佣
      * @param attrValueList 商品属性列表
-     * @param isPromoter 是否推荐人
+     * @param isPromoter    是否推荐人
      * @return String 金额区间
      */
     private String getPacketPriceRange(Boolean isSub, List<StoreProductAttrValue> attrValueList, Boolean isPromoter) {
@@ -328,11 +372,11 @@ public class ProductServiceImpl implements ProductService {
         BigDecimal minPrice;
         // 获取佣金比例区间
         if (isSub) { // 是否单独分拥
-            maxPrice = attrValueList.stream().map(StoreProductAttrValue::getBrokerage).reduce(BigDecimal.ZERO,BigDecimal::max);
-            minPrice = attrValueList.stream().map(StoreProductAttrValue::getBrokerage).reduce(BigDecimal.ZERO,BigDecimal::min);
+            maxPrice = attrValueList.stream().map(StoreProductAttrValue::getBrokerage).reduce(BigDecimal.ZERO, BigDecimal::max);
+            minPrice = attrValueList.stream().map(StoreProductAttrValue::getBrokerage).reduce(BigDecimal.ZERO, BigDecimal::min);
         } else {
-            BigDecimal _maxPrice = attrValueList.stream().map(StoreProductAttrValue::getPrice).reduce(BigDecimal.ZERO,BigDecimal::max);
-            BigDecimal _minPrice = attrValueList.stream().map(StoreProductAttrValue::getPrice).reduce(BigDecimal.ZERO,BigDecimal::min);
+            BigDecimal _maxPrice = attrValueList.stream().map(StoreProductAttrValue::getPrice).reduce(BigDecimal.ZERO, BigDecimal::max);
+            BigDecimal _minPrice = attrValueList.stream().map(StoreProductAttrValue::getPrice).reduce(BigDecimal.ZERO, BigDecimal::min);
             maxPrice = BrokerRatio.multiply(_maxPrice).setScale(2, RoundingMode.HALF_UP);
             minPrice = BrokerRatio.multiply(_minPrice).setScale(2, RoundingMode.HALF_UP);
         }
@@ -352,6 +396,7 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * 获取热门推荐商品列表
+     *
      * @param pageRequest 分页参数
      * @return CommonPage<IndexProductResponse>
      */
@@ -414,6 +459,7 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * 商品详情评论
+     *
      * @param id 商品id
      * @return ProductDetailReplyResponse
      * 评论只有一条，图文
@@ -427,6 +473,7 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * 优选商品推荐
+     *
      * @return CommonPage<IndexProductResponse>
      */
     @Override
@@ -490,7 +537,8 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * 商品列表(个别分类模型使用)
-     * @param request 列表请求参数
+     *
+     * @param request          列表请求参数
      * @param pageParamRequest 分页参数
      * @return CommonPage
      */
@@ -522,6 +570,7 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * 获取商品排行榜
+     *
      * @return List
      */
     @Override

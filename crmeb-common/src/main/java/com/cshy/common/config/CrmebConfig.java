@@ -21,8 +21,6 @@ public class CrmebConfig {
     private boolean wechatJsApiDebug;
     // #微信js api是否是beta版本
     private boolean wechatJsApiBeta;
-    // #是否同步config表数据到redis
-    private boolean asyncConfig;
     // #是否同步小程序公共模板库
     private boolean asyncWeChatProgramTempList;
     // 本地图片路径配置
@@ -66,14 +64,6 @@ public class CrmebConfig {
 
     public void setWechatJsApiBeta(boolean wechatJsApiBeta) {
         this.wechatJsApiBeta = wechatJsApiBeta;
-    }
-
-    public boolean isAsyncConfig() {
-        return asyncConfig;
-    }
-
-    public void setAsyncConfig(boolean asyncConfig) {
-        this.asyncConfig = asyncConfig;
     }
 
     public boolean isAsyncWeChatProgramTempList() {

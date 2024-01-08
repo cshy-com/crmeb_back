@@ -2,7 +2,7 @@ package com.cshy.front.controller;
 
 
 import com.cshy.common.model.response.CommonResult;
-import com.cshy.service.service.SystemCityService;
+import com.cshy.service.service.system.SystemCityService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

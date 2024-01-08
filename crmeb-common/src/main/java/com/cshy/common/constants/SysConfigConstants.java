@@ -64,8 +64,8 @@ public class SysConfigConstants {
 
     /** 微信支付开关 */
     public static final String CONFIG_PAY_WEIXIN_OPEN  = "pay_weixin_open";
-    /** 余额支付状态 */
-    public static final String CONFIG_YUE_PAY_STATUS  = "yue_pay_status";
-    /** 支付宝支付状态 */
-    public static final String CONFIG_ALI_PAY_STATUS = "ali_pay_status";
+//    /** 余额支付状态 */
+//    public static final String CONFIG_YUE_PAY_STATUS  = "yue_pay_status";
+//    /** 支付宝支付状态 */
+//    public static final String CONFIG_ALI_PAY_STATUS = "ali_pay_status";
 }

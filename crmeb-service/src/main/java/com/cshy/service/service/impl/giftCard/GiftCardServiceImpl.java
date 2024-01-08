@@ -2,13 +2,12 @@ package com.cshy.service.service.impl.giftCard;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.img.ImgUtil;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
-import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.NoModelWriteData;
 import com.cshy.common.model.dto.giftCard.GiftCardDto;
@@ -18,23 +17,20 @@ import com.cshy.common.model.entity.giftCard.GiftCardOrder;
 import com.cshy.common.model.entity.giftCard.GiftCardProduct;
 import com.cshy.common.model.entity.giftCard.GiftCardType;
 import com.cshy.common.model.entity.product.StoreProduct;
-import com.cshy.common.model.entity.product.StoreProductAttr;
 import com.cshy.common.model.entity.product.StoreProductAttrValue;
 import com.cshy.common.model.entity.user.UserAddress;
 import com.cshy.common.model.query.giftCard.GiftCardQuery;
 import com.cshy.common.model.vo.giftCard.GiftCardVo;
 import com.cshy.common.utils.*;
 import com.cshy.service.dao.giftCard.GiftCardDao;
-import com.cshy.service.service.StoreProductAttrService;
-import com.cshy.service.service.StoreProductAttrValueService;
-import com.cshy.service.service.StoreProductService;
-import com.cshy.service.service.UserAddressService;
+import com.cshy.service.service.store.StoreProductAttrValueService;
+import com.cshy.service.service.store.StoreProductService;
+import com.cshy.service.service.user.UserAddressService;
 import com.cshy.service.service.giftCard.GiftCardOrderService;
 import com.cshy.service.service.giftCard.GiftCardProductService;
 import com.cshy.service.service.giftCard.GiftCardService;
 import com.cshy.service.service.giftCard.GiftCardTypeService;
 import com.google.common.collect.Lists;
-import io.swagger.annotations.ApiModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -44,7 +40,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -80,6 +75,9 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
 
     @Autowired
     private StoreProductAttrValueService storeProductAttrValueService;
+
+    @Autowired
+    private GiftCardDao giftCardDao;
 
     @Override
     public void batchAdd(GiftCardDto dto) {
@@ -186,10 +184,10 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
 
             //商品
             Integer productId = giftCardOrder.getProductId();
-            StoreProduct product = storeProductService.getH5Detail(productId);
+            StoreProduct product = storeProductService.getH5Detail(productId, true);
 
             //商品规格
-            StoreProductAttrValue attrValue = storeProductAttrValueService.getById(giftCardOrder.getAttrValueId());
+            StoreProductAttrValue attrValue = storeProductAttrValueService.getById(Integer.valueOf(giftCardOrder.getAttrValueId()), true);
             if (Objects.isNull(attrValue))
                 throw new CrmebException("商品规格有误，请联系管理员");
 
@@ -229,6 +227,14 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
 
         if (giftCard.getCardStatus() != 0)
             throw new CrmebException("礼品卡未生效，请联系客服");
+
+        String effectiveTime = DateUtil.dateToStr(giftCard.getEffectiveTime(), DateConstants.DATE_FORMAT_START);
+        String now = DateUtil.nowDate(DateConstants.DATE_FORMAT_START);
+
+        Date effectiveDate = DateUtil.strToDate(effectiveTime, DateConstants.DATE_FORMAT_START);
+        Date nowDate = DateUtil.strToDate(now, DateConstants.DATE_FORMAT_START);
+        if (effectiveDate.after(nowDate))
+            throw new CrmebException("该礼品卡未到可使用时间，生效时间为：" + effectiveTime);
         String encryptPassword = CrmebUtil.encryptPassword(secret, this.pickupSecretKey);
         if (encryptPassword.equals(giftCard.getPickupSecret()))
             return true;
@@ -239,20 +245,48 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
     public void syncStatus() {
         List<GiftCard> list = this.list();
         list.stream().forEach(giftCard -> {
-            if (Objects.nonNull(giftCard.getEffectiveTime())){
-                String effectiveTime = DateUtil.dateToStr(giftCard.getEffectiveTime(), Constants.DATE_FORMAT_START);
-                String now = DateUtil.nowDate(Constants.DATE_FORMAT_START);
+            if (Objects.nonNull(giftCard.getEffectiveTime())) {
+                String effectiveTime = DateUtil.dateToStr(giftCard.getEffectiveTime(), DateConstants.DATE_FORMAT_START);
+                String now = DateUtil.nowDate(DateConstants.DATE_FORMAT_START);
 
-                Date effectiveDate = DateUtil.strToDate(effectiveTime, Constants.DATE_FORMAT_START);
-                Date nowDate = DateUtil.strToDate(now, Constants.DATE_FORMAT_START);
-                if (effectiveDate.equals(nowDate) || effectiveDate.after(nowDate))
+                Date effectiveDate = DateUtil.strToDate(effectiveTime, DateConstants.DATE_FORMAT_START);
+                Date nowDate = DateUtil.strToDate(now, DateConstants.DATE_FORMAT_START);
+                if (effectiveDate.equals(nowDate) || effectiveDate.before(nowDate))
                     giftCard.setCardStatus(0);
-                if (effectiveDate.before(nowDate))
+                if (effectiveDate.after(nowDate))
                     giftCard.setCardStatus(1);
 
                 this.save(giftCard);
             }
         });
+    }
+
+    @Override
+    public GiftCard getById(String id, Boolean isDel) {
+        GiftCard giftCard = giftCardDao.getById(id, isDel);
+        return giftCard;
+    }
+
+    @Override
+    public String updateBatch(Map<String, Object> params) {
+        String giftCardTypeId = (String) params.get("giftCardTypeId");
+        String serialNoListStr = (String) params.get("serialNoList");
+        serialNoListStr = serialNoListStr.trim();
+        String[] snArr = serialNoListStr.split("\n");
+        List<String> errorSn = Lists.newArrayList();
+        Arrays.asList(snArr).forEach(sn -> {
+            GiftCard giftCard = this.getOne(new LambdaQueryWrapper<GiftCard>().eq(GiftCard::getSerialNo, sn));
+            if (Objects.nonNull(giftCard)){
+                giftCard.setGiftCardTypeId(giftCardTypeId);
+                this.updateById(giftCard);
+            }else {
+                errorSn.add(sn);
+            }
+        });
+        if (CollUtil.isNotEmpty(errorSn))
+            return "执行失败序列号：" + String.join(",", errorSn);
+        else
+            return "";
     }
 
     @Override

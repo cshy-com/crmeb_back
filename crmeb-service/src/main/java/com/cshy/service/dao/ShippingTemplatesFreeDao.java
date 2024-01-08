@@ -2,7 +2,7 @@ package com.cshy.service.dao;
 
 import com.cshy.common.model.entity.express.ShippingTemplatesFree;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.cshy.common.model.request.ShippingTemplatesFreeRequest;
+import com.cshy.common.model.request.shipping.ShippingTemplatesFreeRequest;
 
 import java.util.List;
 

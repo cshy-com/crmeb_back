@@ -12,7 +12,7 @@ public class CustomCellWriteHeightConfig extends AbstractRowHeightStyleStrategy 
     /**
      * 默认高度
      */
-    private static final Integer DEFAULT_HEIGHT = 300;
+    private static final Integer DEFAULT_HEIGHT = 1000;
 
     @Override
     protected void setHeadColumnHeight(Row row, int relativeRowIndex) {

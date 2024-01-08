@@ -10,7 +10,7 @@ import com.cshy.common.model.request.YlyPrintRequestGoods;
 import com.cshy.common.model.response.YlyAccessTokenResponse;
 import com.cshy.common.utils.RedisUtil;
 import com.cshy.service.util.yly.RequestMethod;
-import com.cshy.service.service.SystemConfigService;
+import com.cshy.service.service.system.SystemConfigService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

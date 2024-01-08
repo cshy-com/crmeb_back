@@ -22,4 +22,8 @@ public interface GiftCardService extends BaseService<GiftCard, GiftCardDto, Gift
     boolean checkSecret(String code, String secret);
 
     void syncStatus();
+
+    GiftCard getById(String id, Boolean isDel);
+
+    String updateBatch(Map<String, Object> params);
 }

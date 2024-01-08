@@ -12,7 +12,5 @@ import java.util.Map;
 public interface GiftCardOrderService extends BaseService<GiftCardOrder, GiftCardOrderDto, GiftCardOrderQuery, GiftCardOrderVo> {
     Map<String, Object> getOrderStatusNum();
 
-    void ship(String orderId, String trackingNo, Integer type, HttpServletRequest request);
-
     String addOrder(GiftCardOrderDto dto, HttpServletRequest request);
 }

@@ -1,10 +1,10 @@
 package com.cshy.admin.task.product;
 
 import com.cshy.common.utils.DateUtil;
-import com.cshy.service.service.StoreBargainService;
-import com.cshy.service.service.StoreCombinationService;
-import com.cshy.service.service.StoreProductService;
-import com.cshy.service.service.StoreSeckillService;
+import com.cshy.service.service.store.StoreBargainService;
+import com.cshy.service.service.store.StoreCombinationService;
+import com.cshy.service.service.store.StoreProductService;
+import com.cshy.service.service.store.StoreSeckillService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

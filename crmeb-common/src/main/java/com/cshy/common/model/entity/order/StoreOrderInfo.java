@@ -55,6 +55,9 @@ public class StoreOrderInfo implements Serializable {
     @ApiModelProperty(value = "商品图片")
     private String image;
 
+    @ApiModelProperty(value = "规格图片")
+    private String attrValueImage;
+
     @ApiModelProperty(value = "sku")
     private String sku;
 

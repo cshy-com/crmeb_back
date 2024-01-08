@@ -11,18 +11,22 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.model.entity.express.ExpressDetail;
 import com.cshy.common.model.entity.giftCard.GiftCardOrder;
+import com.cshy.common.model.entity.order.StoreOrder;
+import com.cshy.common.model.entity.user.UserAddress;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.constants.OnePassConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.utils.StringUtils;
 import com.cshy.service.service.giftCard.GiftCardOrderService;
+import com.cshy.service.service.store.StoreOrderService;
+import com.cshy.service.service.user.UserAddressService;
 import com.cshy.service.util.OnePassUtil;
 import com.github.pagehelper.PageHelper;
 import com.cshy.common.utils.RedisUtil;
 import com.cshy.common.model.entity.express.Express;
-import com.cshy.common.model.request.ExpressSearchRequest;
-import com.cshy.common.model.request.ExpressUpdateRequest;
-import com.cshy.common.model.request.ExpressUpdateShowRequest;
+import com.cshy.common.model.request.express.ExpressSearchRequest;
+import com.cshy.common.model.request.express.ExpressUpdateRequest;
+import com.cshy.common.model.request.express.ExpressUpdateShowRequest;
 import com.cshy.service.dao.ExpressDao;
 import com.cshy.service.service.ExpressService;
 import com.google.common.collect.Lists;
@@ -65,6 +69,12 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
 
     @Autowired
     private GiftCardOrderService giftCardOrderService;
+
+    @Autowired
+    private StoreOrderService storeOrderService;
+
+    @Autowired
+    private UserAddressService userAddressService;
 
     @Value("${express.host}")
     private String host;
@@ -217,10 +227,13 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
     }
 
     @Override
-    public ExpressDetail findExpressDetail(String trackingNo, Integer type) {
-        //查询缓存锁
-        redisUtil.exists(Constants.EXPRESS_LIMIT + ":" + "");
+    public ExpressDetail findExpressDetail(String trackingNo, Integer type, String mobile) {
         String urlSend = host + path + "?no=" + trackingNo + "&type=";
+        //顺丰需要特殊处理
+        if (trackingNo.contains("SF")) {
+            mobile = mobile.substring(mobile.length() - 4);
+            urlSend = host + path + "?no=" + trackingNo + ":" + mobile + "&type=";
+        }
         try {
             URL url = new URL(urlSend);
             HttpURLConnection httpURLCon = (HttpURLConnection) url.openConnection();
@@ -235,14 +248,20 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
                     throw new CrmebException((String) jsonObject.get("msg"));
                 ExpressDetail expressDetail = JSONObject.parseObject(result.toJSONString(), ExpressDetail.class);
                 if (type == 0) {
-                    //TODO 查询商城订单
+                    List<StoreOrder> storeOrderList = this.storeOrderService.list(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getTrackingNo, trackingNo));
+                    if (CollUtil.isNotEmpty(storeOrderList)) {
+                        storeOrderList.forEach(storeOrder -> {
+                            storeOrder.setStatus(transferOrderStatus(expressDetail.getDeliveryStatus()));
+                            this.storeOrderService.updateById(storeOrder);
+                        });
+                    }
                 } else if (type == 1) {
                     //查询礼品卡订单
-                    List<GiftCardOrder> giftCardOrderList = giftCardOrderService.list(new LambdaQueryWrapper<GiftCardOrder>().eq(GiftCardOrder::getTrackingNo, trackingNo));
+                    List<GiftCardOrder> giftCardOrderList = this.giftCardOrderService.list(new LambdaQueryWrapper<GiftCardOrder>().eq(GiftCardOrder::getTrackingNo, trackingNo));
                     if (CollUtil.isNotEmpty(giftCardOrderList)) {
                         giftCardOrderList.forEach(giftCardOrder -> {
                             giftCardOrder.setOrderStatus(transferOrderStatus(expressDetail.getDeliveryStatus()));
-                            giftCardOrderService.updateById(giftCardOrder);
+                            this.giftCardOrderService.updateById(giftCardOrder);
                         });
                     }
                 }
@@ -276,19 +295,30 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            throw new CrmebException(e.getMessage());
+            return null;
         }
     }
 
     @Override
     public void syncExpressStatus() {
-        //TODO 查询商城订单并更新物流状态
+        //查询商城订单并更新物流状态
+        List<StoreOrder> storeOrderList = this.storeOrderService.list(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getStatus, Constants.ORDER_STATUS_INT_SPIKE));
+        logger.info("正在同步礼品卡订单数据， 共{}条", storeOrderList.size());
+        storeOrderList.stream().filter(giftCardOrder -> StringUtils.isNotBlank(giftCardOrder.getTrackingNo())).forEach(storeOrder -> {
+            try {
+                this.findExpressDetail(storeOrder.getTrackingNo(), 0, storeOrder.getUserMobile());
+            } catch (Exception e) {
+                if (!e.getMessage().equals("没有信息"))
+                    throw new RuntimeException(e);
+            }
+        });
         //查询礼品卡订单并更新状态
         List<GiftCardOrder> giftCardOrderList = this.giftCardOrderService.list(new LambdaQueryWrapper<GiftCardOrder>()
                 .in(GiftCardOrder::getOrderStatus, Lists.newArrayList(1, 2)));
         logger.info("正在同步礼品卡订单数据， 共{}条", giftCardOrderList.size());
         giftCardOrderList.stream().filter(giftCardOrder -> StringUtils.isNotBlank(giftCardOrder.getTrackingNo())).forEach(giftCardOrder -> {
-            this.findExpressDetail(giftCardOrder.getTrackingNo(), 1);
+            UserAddress userAddress = userAddressService.getById(giftCardOrder.getAddressId(), true);
+            this.findExpressDetail(giftCardOrder.getTrackingNo(), 1, userAddress.getPhone());
         });
     }
 
@@ -297,11 +327,11 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
             case "0":
             case "1":
             case "2":
-                return 1;
+                return Constants.ORDER_STATUS_INT_SPIKE;
             case "3":
-                return 2;
+                return Constants.ORDER_STATUS_INT_BARGAIN;
         }
-        return 0;
+        return Constants.ORDER_STATUS_INT_PAID;
     }
 
     /**

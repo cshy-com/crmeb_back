@@ -1,7 +1,7 @@
 package com.cshy.common.model.response;
 
 import com.cshy.common.model.entity.order.StoreOrder;
-import com.cshy.common.model.vo.StoreOrderInfoOldVo;
+import com.cshy.common.model.vo.order.StoreOrderInfoOldVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -96,4 +96,13 @@ public class OrderDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单")
     private Integer type;
+
+    @ApiModelProperty(value = "退款金额")
+    private BigDecimal refundPrice;
+
+    @ApiModelProperty(value = "用户电话")
+    private String userMobile;
+
+    @ApiModelProperty(value = "物流单号")
+    private String trackingNo;
 }
