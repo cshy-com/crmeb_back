@@ -368,7 +368,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
     @Override
     @Transactional(rollbackFor = {RuntimeException.class, Error.class, CrmebException.class})
     public OrderPayResultResponse recharge(UserRechargeRequest request) {
-        request.setPayType(Constants.PAY_TYPE_WE_CHAT);
+        request.setPayType(PayType.PAY_TYPE_WE_CHAT);
 
         //验证金额是否为最低金额
         String rechargeMinAmountStr = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_RECHARGE_MIN_AMOUNT);

@@ -1191,7 +1191,7 @@ public class OrderServiceImpl implements OrderService {
         if (!orderUtils.checkPayType(request.getPayType()))
             throw new CrmebException("暂不支持该支付方式，请刷新页面或者联系管理员");
 
-        if (request.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
+        if (request.getPayType().equals(PayType.PAY_TYPE_WE_CHAT)) {
             // 检测支付渠道
             if (StrUtil.isBlank(request.getPayChannel())) throw new CrmebException("支付渠道不能为空!");
             if (!OrderUtils.checkPayChannel(request.getPayChannel())) throw new CrmebException("支付渠道不存在!");
@@ -1301,7 +1301,7 @@ public class OrderServiceImpl implements OrderService {
 
         // 支付渠道 默认：余额支付
         int isChannel = 3;
-        if (request.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
+        if (request.getPayType().equals(PayType.PAY_TYPE_WE_CHAT)) {
             switch (request.getPayChannel()) {
                 case PayConstants.PAY_CHANNEL_WE_CHAT_H5:// H5
                     isChannel = 2;
@@ -1320,7 +1320,7 @@ public class OrderServiceImpl implements OrderService {
                     break;
             }
         }
-//        if (request.getPayType().equals(PayConstants.PAY_TYPE_ALI_PAY)) {
+//        if (request.getPayType().equals(PayType.PAY_TYPE_ALI_PAY)) {
 //            isChannel = 6;
 //            if (request.getPayChannel().equals(PayConstants.PAY_CHANNEL_ALI_APP_PAY)) {
 //                isChannel = 7;

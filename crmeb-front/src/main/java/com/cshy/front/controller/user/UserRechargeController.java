@@ -1,6 +1,7 @@
 package com.cshy.front.controller.user;
 
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.PayType;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.user.UserRechargeRequest;
@@ -50,7 +51,7 @@ public class UserRechargeController {
     @ApiOperation(value = "小程序充值")
     @RequestMapping(value = "/routine", method = RequestMethod.POST)
     public CommonResult<Map<String, Object>> routineRecharge(HttpServletRequest httpServletRequest, @RequestBody @Validated UserRechargeRequest request) {
-        request.setFromType(Constants.PAY_TYPE_WE_CHAT_FROM_PROGRAM);
+        request.setFromType(PayType.PAY_TYPE_WE_CHAT_FROM_PROGRAM);
         request.setClientIp(CrmebUtil.getClientIp(httpServletRequest));
         OrderPayResultResponse recharge = userCenterService.recharge(request);
         Map<String, Object> map = new HashMap<>();

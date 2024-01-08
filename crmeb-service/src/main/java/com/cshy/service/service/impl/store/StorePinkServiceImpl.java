@@ -6,15 +6,12 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.DateConstants;
-import com.cshy.common.constants.NotifyConstants;
+import com.cshy.common.constants.*;
 import com.cshy.common.model.entity.system.SystemNotification;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.order.OrderRefundApplyRequest;
 import com.cshy.common.model.vo.MyRecord;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.UserConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.service.service.*;
 import com.cshy.service.service.order.OrderService;
@@ -280,7 +277,7 @@ public class StorePinkServiceImpl extends ServiceImpl<StorePinkDao, StorePink> i
      * @param user 拼团用户
      */
     private void pushMessageOrder(MyRecord record, User user, SystemNotification notification) {
-        if (!record.getStr("payType").equals(Constants.PAY_TYPE_WE_CHAT)) {
+        if (!record.getStr("payType").equals(PayType.PAY_TYPE_WE_CHAT)) {
             return ;
         }
         if (record.getInt("isChannel").equals(2)) {

@@ -346,7 +346,7 @@ public class OrderPayServiceImpl implements OrderPayService {
      * @param user 用户
      */
     private void pushMessagePink(MyRecord record, User user, SystemNotification notification) {
-        if (!record.getStr("payType").equals(Constants.PAY_TYPE_WE_CHAT)) {
+        if (!record.getStr("payType").equals(PayType.PAY_TYPE_WE_CHAT)) {
             return ;
         }
         if (record.getInt("isChannel").equals(2)) {
@@ -652,7 +652,7 @@ public class OrderPayServiceImpl implements OrderPayService {
             if (storeOrder.getPaid()) {
                 throw new CrmebException("订单已支付");
             }
-            if (storeOrder.getPayType().equals(Constants.PAY_TYPE_INTEGRAL) && storeOrder.getPayPrice().compareTo(new BigDecimal(0)) != 0){
+            if (storeOrder.getPayType().equals(PayType.PAY_TYPE_INTEGRAL) && storeOrder.getPayPrice().compareTo(new BigDecimal(0)) != 0){
                 throw new CrmebException("积分不足，请选择其他支付方式");
             }
             User user = userService.getById(storeOrder.getUid());
@@ -663,13 +663,13 @@ public class OrderPayServiceImpl implements OrderPayService {
                 // 根据支付类型进行校验,更换支付类型
                 storeOrder.setPayType(orderPayRequest.getPayType());
                 // 余额支付
-//            if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_YUE)) {
+//            if (orderPayRequest.getPayType().equals(PayType.PAY_TYPE_YUE)) {
 //                if (user.getNowMoney().compareTo(storeOrder.getPayPrice()) < 0) {
 //                    throw new CrmebException("用户余额不足");
 //                }
 //                storeOrder.setPaymentChannel(3);
 //            }
-                if (orderPayRequest.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
+                if (orderPayRequest.getPayType().equals(PayType.PAY_TYPE_WE_CHAT)) {
                     switch (orderPayRequest.getPayChannel()){
                         case PayConstants.PAY_CHANNEL_WE_CHAT_H5:// H5
                             storeOrder.setPaymentChannel(2);
@@ -698,7 +698,7 @@ public class OrderPayServiceImpl implements OrderPayService {
             response.setPayType(storeOrder.getPayType());
 
             // 微信支付，调用微信预下单，返回拉起微信支付需要的信息
-            if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
+            if (storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT)) {
                 // 预下单
                 Map<String, String> unifiedorder = unifiedorder(storeOrder, ip);
                 response.setStatus(true);
@@ -724,13 +724,13 @@ public class OrderPayServiceImpl implements OrderPayService {
                 return;
             }
 //         余额支付
-            if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_INTEGRAL)) {
+            if (storeOrder.getPayType().equals(PayType.PAY_TYPE_INTEGRAL)) {
                 Boolean balancePay = balancePay(storeOrder);
                 response.setStatus(balancePay);
                 responseList.add(response);
                 return;
             }
-//        if (storeOrder.getPayType().equals(PayConstants.PAY_TYPE_OFFLINE)) {
+//        if (storeOrder.getPayType().equals(PayType.PAY_TYPE_OFFLINE)) {
 //            throw new CrmebException("暂时不支持线下支付");
 //        }
             response.setStatus(false);
@@ -945,7 +945,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         }
         UserToken userToken;
         HashMap<String, String> temMap = new HashMap<>();
-        if (!storeOrder.getPayType().equals(Constants.PAY_TYPE_WE_CHAT)) {
+        if (!storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT)) {
             return;
         }
         // 公众号

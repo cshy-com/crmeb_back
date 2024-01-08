@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.constants.NumConstants;
+import com.cshy.common.constants.PayType;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -447,7 +448,7 @@ public class CrmebUtil {
      */
     public static String getOrderNoPrefix(String payType){
         switch (payType){
-            case Constants.PAY_TYPE_WE_CHAT:
+            case PayType.PAY_TYPE_WE_CHAT:
                 return Constants.ORDER_NO_PREFIX_WE_CHAT;
                 //其他平台
             default:

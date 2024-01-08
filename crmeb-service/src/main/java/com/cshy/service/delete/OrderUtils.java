@@ -3,6 +3,7 @@ package com.cshy.service.delete;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.constants.PayConstants;
+import com.cshy.common.constants.PayType;
 import com.cshy.common.constants.SysConfigConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.order.StoreOrder;
@@ -60,17 +61,17 @@ public class OrderUtils {
         boolean result = false;
         payType = payType.toLowerCase();
         switch (payType){
-            case PayConstants.PAY_TYPE_WE_CHAT:
+            case PayType.PAY_TYPE_WE_CHAT:
                 result = "1".equals(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_PAY_WEIXIN_OPEN));
                 break;
-            case PayConstants.PAY_TYPE_INTEGRAL:
+            case PayType.PAY_TYPE_INTEGRAL:
                 //TODO 积分支付开关
                 result = true;
                 break;
-//            case PayConstants.PAY_TYPE_YUE:
+//            case PayType.PAY_TYPE_YUE:
 //                result = ("1".equals(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_YUE_PAY_STATUS)));
 //                break;
-//            case PayConstants.PAY_TYPE_ALI_PAY:
+//            case PayType.PAY_TYPE_ALI_PAY:
 //                result = ("1".equals(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_ALI_PAY_STATUS)));
 //                break;
         }
@@ -102,19 +103,19 @@ public class OrderUtils {
     public String getOrderPayTypeStr(String payType){
         String payTypeStr = null;
         switch (payType){
-            case Constants.PAY_TYPE_WE_CHAT:
+            case PayType.PAY_TYPE_WE_CHAT:
                 payTypeStr = "微信支付";
                 break;
-            case Constants.PAY_TYPE_YUE:
+            case PayType.PAY_TYPE_YUE:
                 payTypeStr = "余额支付";
                 break;
-            case Constants.PAY_TYPE_OFFLINE:
+            case PayType.PAY_TYPE_OFFLINE:
                 payTypeStr = "线下支付";
                 break;
-            case Constants.PAY_TYPE_ALI_PAY:
+            case PayType.PAY_TYPE_ALI_PAY:
                 payTypeStr = "支付宝支付";
                 break;
-            case Constants.PAY_TYPE_INTEGRAL:
+            case PayType.PAY_TYPE_INTEGRAL:
                 payTypeStr = "积分支付";
                 break;
             default:

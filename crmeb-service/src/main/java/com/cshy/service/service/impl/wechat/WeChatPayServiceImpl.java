@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.constants.PayConstants;
+import com.cshy.common.constants.PayType;
 import com.cshy.common.constants.TaskConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.combination.StoreCombination;
@@ -122,7 +123,7 @@ public class WeChatPayServiceImpl implements WeChatPayService {
             if (storeOrder.getIsDel()) {
                 throw new CrmebException("订单已被删除");
             }
-            if (!storeOrder.getPayType().equals(PayConstants.PAY_TYPE_WE_CHAT)) {
+            if (!storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT)) {
                 throw new CrmebException("不是微信支付类型订单，请重新选择支付方式");
             }
 

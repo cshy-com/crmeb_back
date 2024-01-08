@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.DateConstants;
+import com.cshy.common.constants.*;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.store.*;
 import com.cshy.common.model.request.system.SystemWriteOffOrderSearchRequest;
@@ -25,9 +25,6 @@ import com.cshy.service.service.user.*;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.NotifyConstants;
-import com.cshy.common.constants.UserConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.combination.StorePink;
 import com.cshy.common.model.entity.express.Express;
@@ -535,7 +532,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         User user = userService.getById(storeOrder.getUid());
 
         //退款
-        if (storeOrder.getPayType().equals(Constants.PAY_TYPE_WE_CHAT) && request.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+        if (storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT) && request.getAmount().compareTo(BigDecimal.ZERO) > 0) {
             try {
                 storeOrderRefundService.refund(request, storeOrder);
             } catch (Exception e) {
@@ -552,7 +549,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
             updateById(storeOrder);
             storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_AGREE_REFUND, Constants.ORDER_STATUS_STR_AGREE_REFUND, 1);
 
-            if (storeOrder.getPayType().equals(Constants.PAY_TYPE_INTEGRAL)) {
+            if (storeOrder.getPayType().equals(PayType.PAY_TYPE_INTEGRAL)) {
                 //新增日志
                 request.setOrderId(storeOrder.getId());
                 userBillService.saveRefundBill(request, user);
@@ -563,7 +560,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
                 // 退款task
                 redisUtil.lPush(Constants.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER, storeOrder.getId());
             }
-            if (storeOrder.getPayType().equals(Constants.PAY_TYPE_WE_CHAT) && request.getAmount().compareTo(BigDecimal.ZERO) == 0) {
+            if (storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT) && request.getAmount().compareTo(BigDecimal.ZERO) == 0) {
                 //新增日志
                 userBillService.saveRefundBill(request, user);
 
@@ -571,7 +568,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
                 redisUtil.lPush(Constants.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER, storeOrder.getId());
             }
 
-//            if (storeOrder.getPayType().equals(Constants.PAY_TYPE_INTEGRAL)) {
+//            if (storeOrder.getPayType().equals(PayType.PAY_TYPE_INTEGRAL)) {
 //                //新增日志
 //                UserIntegralRecord userIntegralRecord = new UserIntegralRecord();
 //                userIntegralRecord.setIntegral(storeOrder.getUseIntegral());
@@ -1141,9 +1138,9 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         // 订单金额
         itemResponse.setAmount(getAmount(dateLimit, ""));
         // 微信支付金额
-        itemResponse.setWeChatAmount(getAmount(dateLimit, Constants.PAY_TYPE_WE_CHAT));
+        itemResponse.setWeChatAmount(getAmount(dateLimit, PayType.PAY_TYPE_WE_CHAT));
         // 余额支付金额
-        itemResponse.setYueAmount(getAmount(dateLimit, Constants.PAY_TYPE_YUE));
+        itemResponse.setYueAmount(getAmount(dateLimit, PayType.PAY_TYPE_YUE));
         return itemResponse;
     }
 
@@ -1626,7 +1623,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         if (storeOrder.getPaymentChannel().equals(2)) {
             return;
         }
-        if (!storeOrder.getPayType().equals(Constants.PAY_TYPE_WE_CHAT)) {
+        if (!storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT)) {
             return;
         }
         UserToken userToken;
@@ -1792,7 +1789,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         if (storeOrder.getPaymentChannel().equals(2)) {
             return;
         }
-        if (!storeOrder.getPayType().equals(Constants.PAY_TYPE_WE_CHAT)) {
+        if (!storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT)) {
             return;
         }
         SystemNotification notification = systemNotificationService.getByMark(NotifyConstants.FULFILLMENT_ORDER_MARK);
@@ -2237,16 +2234,16 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
      */
     private String getPayType(String payType) {
         switch (payType) {
-            case Constants.PAY_TYPE_WE_CHAT:
-                return Constants.PAY_TYPE_STR_WE_CHAT;
-            case Constants.PAY_TYPE_YUE:
-                return Constants.PAY_TYPE_STR_YUE;
-            case Constants.PAY_TYPE_ALI_PAY:
-                return Constants.PAY_TYPE_STR_ALI_PAY;
-            case Constants.PAY_TYPE_INTEGRAL:
-                return Constants.PAY_TYPE_STR_INTEGRAL;
+            case PayType.PAY_TYPE_WE_CHAT:
+                return PayType.PAY_TYPE_STR_WE_CHAT;
+            case PayType.PAY_TYPE_YUE:
+                return PayType.PAY_TYPE_STR_YUE;
+            case PayType.PAY_TYPE_ALI_PAY:
+                return PayType.PAY_TYPE_STR_ALI_PAY;
+            case PayType.PAY_TYPE_INTEGRAL:
+                return PayType.PAY_TYPE_STR_INTEGRAL;
             default:
-                return Constants.PAY_TYPE_STR_OTHER;
+                return PayType.PAY_TYPE_STR_OTHER;
         }
     }
 

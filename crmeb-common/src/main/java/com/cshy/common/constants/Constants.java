@@ -376,36 +376,12 @@ public class Constants {
 
     public static final String ORDER_STATUS_CACHE_CREATE_ORDER = "cache_key_create_order";
 
-    //支付方式
-    public static final String PAY_TYPE_WE_CHAT = "weixin"; //微信支付
-    public static final String PAY_TYPE_YUE = "yue"; //余额支付
-    public static final String PAY_TYPE_OFFLINE = "offline"; //线下支付
-    public static final String PAY_TYPE_ALI_PAY = "alipay"; //支付宝
-    public static final String PAY_TYPE_INTEGRAL = "integral"; //支付宝
-
-    //支付客户端类型
-    public static final String PAY_TYPE_WE_CHAT_FROM_H5 = "weixinh5"; //H5唤起微信支付
-    public static final String PAY_TYPE_WE_CHAT_FROM_PUBLIC = "public"; //公众号
-    public static final String PAY_TYPE_WE_CHAT_FROM_PROGRAM = "routine"; //小程序
-
     //后台微信登录类型
     public static final String ADMIN_LOGIN_TYPE_WE_CHAT_FROM_PUBLIC = "admin_public"; //公众号
-
-
-
-    //支付方式
-    public static final String PAY_TYPE_STR_WE_CHAT = "微信支付"; //微信支付
-    public static final String PAY_TYPE_STR_INTEGRAL = "积分支付"; //微信支付
-    public static final String PAY_TYPE_STR_YUE = "余额支付"; //余额支付
-    public static final String PAY_TYPE_STR_OFFLINE = "线下支付"; //线下支付
-    public static final String PAY_TYPE_STR_ALI_PAY = "支付宝支付"; //支付宝
-    public static final String PAY_TYPE_STR_OTHER = "其他支付"; //其他支付
 
     //需要支付的业务类型
     public static final String SERVICE_PAY_TYPE_ORDER = "order"; //订单
     public static final String SERVICE_PAY_TYPE_RECHARGE = "recharge"; //充值
-
-
 
     //订单操作类型
     public static final String ORDER_LOG_REFUND_PRICE = "refund_price"; //退款
@@ -418,7 +394,6 @@ public class Constants {
     public static final String ORDER_LOG_RETURN_GOODS = "return_goods"; //退货中
     public static final String ORDER_LOG_AGREE_RETURN = "agree_return"; //同意退货退款
     public static final String ORDER_LOG_AGREE_REFUND = "agree_refund"; //同意退款
-
     public static final String ORDER_LOG_REFUND_REVOKE = "refund_revoke"; //同意退款
 
     // 订单缓存
@@ -526,19 +501,4 @@ public class Constants {
      * GBK 字符集
      */
     public static final String GBK = "GBK";
-
-    /**
-     * www主域
-     */
-    public static final String WWW = "www.";
-
-    /**
-     * http请求
-     */
-    public static final String HTTP = "http://";
-
-    /**
-     * https请求
-     */
-    public static final String HTTPS = "https://";
 }

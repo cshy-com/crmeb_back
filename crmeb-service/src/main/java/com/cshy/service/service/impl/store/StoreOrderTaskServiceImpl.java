@@ -488,7 +488,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
         if (storeOrder.getPaymentChannel().equals(2)) {
             return;
         }
-        if (!storeOrder.getPayType().equals(Constants.PAY_TYPE_WE_CHAT)) {
+        if (!storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT)) {
             return;
         }
         UserToken userToken;
