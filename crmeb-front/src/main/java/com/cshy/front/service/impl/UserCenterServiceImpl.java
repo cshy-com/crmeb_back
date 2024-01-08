@@ -432,7 +432,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
         // 通过code获取获取公众号授权信息
         WeChatOauthToken oauthToken = wechatNewService.getOauth2AccessToken(code);
         //检测是否存在
-        UserToken userToken = userTokenService.getByOpenidAndType(oauthToken.getOpenId(),  Constants.THIRD_LOGIN_TOKEN_TYPE_PUBLIC);
+        UserToken userToken = userTokenService.getByOpenidAndType(oauthToken.getOpenId(),  TokenType.THIRD_LOGIN_TOKEN_TYPE_PUBLIC);
         LoginResponse loginResponse = new LoginResponse();
         if (ObjectUtil.isNotNull(userToken)) {// 已存在，正常登录
             User user = userService.getById(userToken.getUid());
@@ -506,7 +506,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
         System.out.println("小程序登陆成功 = " + JSON.toJSONString(response));
 
         //检测是否存在
-        UserToken userToken = userTokenService.getByOpenidAndType(response.getOpenId(), Constants.THIRD_LOGIN_TOKEN_TYPE_PROGRAM);
+        UserToken userToken = userTokenService.getByOpenidAndType(response.getOpenId(), TokenType.THIRD_LOGIN_TOKEN_TYPE_PROGRAM);
         LoginResponse loginResponse = new LoginResponse();
         if (ObjectUtil.isNotNull(userToken)) {// 已存在，正常登录
             User user = userService.getById(userToken.getUid());
@@ -798,10 +798,10 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
             int type = 0;
             switch (request.getType()) {
                 case "public":
-                    type = Constants.THIRD_LOGIN_TOKEN_TYPE_PUBLIC;
+                    type = TokenType.THIRD_LOGIN_TOKEN_TYPE_PUBLIC;
                     break;
                 case "routine":
-                    type = Constants.THIRD_LOGIN_TOKEN_TYPE_PROGRAM;
+                    type = TokenType.THIRD_LOGIN_TOKEN_TYPE_PROGRAM;
                     break;
             }
 
@@ -828,10 +828,10 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
             }
             switch (request.getType()) {
                 case "public":
-                    userTokenService.bind(registerThirdUserRequest.getOpenId(), Constants.THIRD_LOGIN_TOKEN_TYPE_PUBLIC, finalUser.getUid());
+                    userTokenService.bind(registerThirdUserRequest.getOpenId(), TokenType.THIRD_LOGIN_TOKEN_TYPE_PUBLIC, finalUser.getUid());
                     break;
                 case "routine":
-                    userTokenService.bind(registerThirdUserRequest.getOpenId(), Constants.THIRD_LOGIN_TOKEN_TYPE_PROGRAM, finalUser.getUid());
+                    userTokenService.bind(registerThirdUserRequest.getOpenId(), TokenType.THIRD_LOGIN_TOKEN_TYPE_PROGRAM, finalUser.getUid());
                     break;
             }
             return Boolean.TRUE;

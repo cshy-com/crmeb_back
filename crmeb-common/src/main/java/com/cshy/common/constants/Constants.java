@@ -215,17 +215,6 @@ public class Constants {
     public static final int CONFIG_FORM_ID_INDEX = 133; //首页配置
     public static final int CONFIG_FORM_ID_PUBLIC = 65; //公众号配置
 
-
-    //第三方登录token类型
-    public static final int THIRD_LOGIN_TOKEN_TYPE_PUBLIC  = 1; //公众号
-    public static final int THIRD_LOGIN_TOKEN_TYPE_PROGRAM  = 2; //小程序
-    public static final int THIRD_LOGIN_TOKEN_TYPE_UNION_ID  = 3; //unionid
-    public static final int THIRD_ADMIN_LOGIN_TOKEN_TYPE_PUBLIC  = 4; //后台登录公众号
-    public static final int THIRD_LOGIN_TOKEN_TYPE_IOS_WX  = 5; //ios 微信
-    public static final int THIRD_LOGIN_TOKEN_TYPE_ANDROID_WX = 6; //android微信
-    public static final int THIRD_LOGIN_TOKEN_TYPE_IOS  = 7; //ios
-
-
     // 商品类型 活动类型 0=商品，1=秒杀，2=砍价，3=拼团 attrResult表用到
     public static final Integer PRODUCT_TYPE_NORMAL = 0;
     public static final String PRODUCT_TYPE_NORMAL_STR = "默认";
