@@ -5,7 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.model.entity.system.SystemCity;
 import com.cshy.common.model.request.system.SystemCityRequest;
 import com.cshy.common.model.request.system.SystemCitySearchRequest;
@@ -46,7 +46,7 @@ public class SystemCityServiceImpl extends ServiceImpl<SystemCityDao, SystemCity
      */
     @Override
     public Object getList(SystemCitySearchRequest request) {
-        Object list = redisUtil.hmGet(Constants.CITY_LIST, request.getParentId().toString());
+        Object list = redisUtil.hmGet(RedisKey.CITY_LIST, request.getParentId().toString());
         if (ObjectUtil.isNull(list)) {
             //城市数据，异步同步到redis，第一次拿不到数据，去数据库读取
             list = getList(request.getParentId());
@@ -99,11 +99,11 @@ public class SystemCityServiceImpl extends ServiceImpl<SystemCityDao, SystemCity
      */
     @Override
     public List<SystemCityTreeVo> getListTree() {
-        List<SystemCityTreeVo> cityList = redisUtil.get(Constants.CITY_LIST_TREE);
+        List<SystemCityTreeVo> cityList = redisUtil.get(RedisKey.CITY_LIST_TREE);
         if (CollUtil.isEmpty(cityList)) {
             systemCityAsyncService.setListTree();
         }
-        return redisUtil.get(Constants.CITY_LIST_TREE);
+        return redisUtil.get(RedisKey.CITY_LIST_TREE);
     }
 
     /**
@@ -112,7 +112,7 @@ public class SystemCityServiceImpl extends ServiceImpl<SystemCityDao, SystemCity
      */
     @Override
     public List<Integer> getCityIdList() {
-        Object data = redisUtil.get(Constants.CITY_LIST_LEVEL_1);
+        Object data = redisUtil.get(RedisKey.CITY_LIST_LEVEL_1);
         List<Integer> collect;
         if (data == null || "".equals(data)) {
             LambdaQueryWrapper<SystemCity> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -121,7 +121,7 @@ public class SystemCityServiceImpl extends ServiceImpl<SystemCityDao, SystemCity
             lambdaQueryWrapper.eq(SystemCity::getIsShow, true);
             List<SystemCity> systemCityList = dao.selectList(lambdaQueryWrapper);
             collect = systemCityList.stream().map(SystemCity::getCityId).distinct().collect(Collectors.toList());
-            redisUtil.set(Constants.CITY_LIST_LEVEL_1, collect, 10L, TimeUnit.MINUTES);
+            redisUtil.set(RedisKey.CITY_LIST_LEVEL_1, collect, 10L, TimeUnit.MINUTES);
         } else {
             collect = (List<Integer>) data;
         }

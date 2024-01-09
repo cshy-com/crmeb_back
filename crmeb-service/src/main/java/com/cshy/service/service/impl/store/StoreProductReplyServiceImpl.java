@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.RedisKey;
+import com.cshy.common.constants.StoreOrderStatusConstants;
 import com.cshy.service.service.store.StoreOrderInfoService;
 import com.cshy.service.service.store.StoreOrderService;
 import com.cshy.service.service.store.StoreProductReplyService;
@@ -430,9 +432,9 @@ public class StoreProductReplyServiceImpl extends ServiceImpl<StoreProductReplyD
 
         if (replyCount.equals(count)) {
             //全部商品都已评价
-            storeOrder.setStatus(Constants.ORDER_STATUS_INT_COMPLETE);
+            storeOrder.setStatus(StoreOrderStatusConstants.ORDER_STATUS_INT_COMPLETE);
             storeOrderService.updateById(storeOrder);
-            redisUtil.lPush(Constants.ORDER_TASK_REDIS_KEY_AFTER_COMPLETE_BY_USER, storeOrder.getId());
+            redisUtil.lPush(RedisKey.ORDER_TASK_REDIS_KEY_AFTER_COMPLETE_BY_USER, storeOrder.getId());
         }
     }
 

@@ -1,8 +1,8 @@
 package com.cshy.service.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.cshy.common.constants.Constants;
 import com.cshy.common.constants.DateConstants;
+import com.cshy.common.constants.UploadConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.vo.CloudVo;
 import com.cshy.common.model.vo.FileResultVo;
@@ -80,9 +80,9 @@ public class UploadServiceImpl implements UploadService {
         String rootPath = crmebConfig.getImagePath().replace(" ", "").replace("//", "/");
         UploadUtil.setModelPath(model);
         String modelPath = "public/" + model + "/";
-        String extStr = systemConfigService.getValueByKey(Constants.UPLOAD_IMAGE_EXT_STR_CONFIG_KEY);
-        int size = Integer.parseInt(systemConfigService.getValueByKey(Constants.UPLOAD_IMAGE_MAX_SIZE_CONFIG_KEY));
-        String type = Constants.UPLOAD_TYPE_IMAGE + "/";
+        String extStr = systemConfigService.getValueByKey(UploadConstants.UPLOAD_IMAGE_EXT_STR_CONFIG_KEY);
+        int size = Integer.parseInt(systemConfigService.getValueByKey(UploadConstants.UPLOAD_IMAGE_MAX_SIZE_CONFIG_KEY));
+        String type = UploadConstants.UPLOAD_TYPE_IMAGE + "/";
 
         UploadCommonVo uploadCommonVo = new UploadCommonVo();
         uploadCommonVo.setRootPath(rootPath);
@@ -283,9 +283,9 @@ public class UploadServiceImpl implements UploadService {
         String rootPath = (crmebConfig.getImagePath() + "/").replace(" ", "").replace("//", "/");
         UploadUtil.setModelPath(model);
         String modelPath = "public/" + model + "/";
-        String extStr = systemConfigService.getValueByKey(Constants.UPLOAD_FILE_EXT_STR_CONFIG_KEY);
-        int size = Integer.parseInt(systemConfigService.getValueByKey(Constants.UPLOAD_FILE_MAX_SIZE_CONFIG_KEY));
-        String type = Constants.UPLOAD_TYPE_FILE + "/";
+        String extStr = systemConfigService.getValueByKey(UploadConstants.UPLOAD_FILE_EXT_STR_CONFIG_KEY);
+        int size = Integer.parseInt(systemConfigService.getValueByKey(UploadConstants.UPLOAD_FILE_MAX_SIZE_CONFIG_KEY));
+        String type = UploadConstants.UPLOAD_TYPE_FILE + "/";
 
         UploadCommonVo uploadCommonVo = new UploadCommonVo();
         uploadCommonVo.setRootPath(rootPath);

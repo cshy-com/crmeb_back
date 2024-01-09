@@ -3,6 +3,7 @@ package com.cshy.service.service.impl.system;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.UploadConstants;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.model.request.system.SystemAttachmentMoveRequest;
@@ -74,9 +75,9 @@ public class SystemAttachmentServiceImpl extends ServiceImpl<SystemAttachmentDao
     @Override
     public String prefixImage(String path) {
         // 如果那些域名不需要加，则跳过
-        if (path.contains(getCdnUrl() + "/"+ Constants.UPLOAD_TYPE_IMAGE+"/"))
+        if (path.contains(getCdnUrl() + "/"+ UploadConstants.UPLOAD_TYPE_IMAGE+"/"))
             return path;
-        return path.replace(Constants.UPLOAD_TYPE_IMAGE+"/", getCdnUrl() + "/"+ Constants.UPLOAD_TYPE_IMAGE+"/");
+        return path.replace(UploadConstants.UPLOAD_TYPE_IMAGE+"/", getCdnUrl() + "/"+ UploadConstants.UPLOAD_TYPE_IMAGE+"/");
     }
 
     /**

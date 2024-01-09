@@ -7,7 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.system.SystemNotification;
 import com.cshy.common.model.entity.wechat.TemplateMessage;
@@ -56,7 +56,7 @@ public class TemplateMessageServiceImpl extends ServiceImpl<TemplateMessageDao, 
      */
     @Override
     public void consumePublic() {
-        String redisKey = Constants.WE_CHAT_MESSAGE_KEY_PUBLIC;
+        String redisKey = RedisKey.WE_CHAT_MESSAGE_KEY_PUBLIC;
         Long size = redisUtil.getListSize(redisKey);
         logger.info("TemplateMessageServiceImpl.consumePublic | size:" + size);
         if(size < 1){
@@ -86,7 +86,7 @@ public class TemplateMessageServiceImpl extends ServiceImpl<TemplateMessageDao, 
      */
     @Override
     public void consumeProgram() {
-        String redisKey = Constants.WE_CHAT_MESSAGE_KEY_PROGRAM;
+        String redisKey = RedisKey.WE_CHAT_MESSAGE_KEY_PROGRAM;
         Long size = redisUtil.getListSize(redisKey);
         logger.info("TemplateMessageServiceImpl.consumeProgram | size:" + size);
         if(size < 1){
@@ -133,7 +133,7 @@ public class TemplateMessageServiceImpl extends ServiceImpl<TemplateMessageDao, 
 
         templateMessageVo.setData(hashMap);
         templateMessageVo.setTouser(openId);
-        redisUtil.lPush(Constants.WE_CHAT_MESSAGE_KEY_PUBLIC, JSONObject.toJSONString(templateMessageVo));
+        redisUtil.lPush(RedisKey.WE_CHAT_MESSAGE_KEY_PUBLIC, JSONObject.toJSONString(templateMessageVo));
     }
 
     /**
@@ -158,7 +158,7 @@ public class TemplateMessageServiceImpl extends ServiceImpl<TemplateMessageDao, 
 
         programTemplateMessageVo.setData(hashMap);
         programTemplateMessageVo.setTouser(openId);
-        redisUtil.lPush(Constants.WE_CHAT_MESSAGE_KEY_PROGRAM, JSONObject.toJSONString(programTemplateMessageVo));
+        redisUtil.lPush(RedisKey.WE_CHAT_MESSAGE_KEY_PROGRAM, JSONObject.toJSONString(programTemplateMessageVo));
     }
 
     /**

@@ -5,6 +5,9 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.MsgConstants;
+import com.cshy.common.constants.RedisKey;
+import com.cshy.common.constants.StoreOrderStatusConstants;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.model.request.store.StoreOrderStatusSearchRequest;
@@ -56,44 +59,44 @@ public class StoreOrderStatusServiceImpl extends ServiceImpl<StoreOrderStatusDao
         storeOrderStatuses.forEach(storeOrderStatus -> {
             String type;
             switch (storeOrderStatus.getChangeType()){
-                case Constants.ORDER_LOG_REFUND_REFUSE:
+                case StoreOrderStatusConstants.ORDER_LOG_REFUND_REFUSE:
                     if (storeOrder.getRefundType().equals(0))
                         type = "退款被拒绝";
                     else
                         type = "退货退款被拒绝";
                     break;
-                case Constants.ORDER_LOG_PAY_SUCCESS:
+                case StoreOrderStatusConstants.ORDER_LOG_PAY_SUCCESS:
                     type = "支付成功";
                     break;
-                case Constants.ORDER_LOG_EXPRESS:
+                case StoreOrderStatusConstants.ORDER_LOG_EXPRESS:
                     type = "已发货";
                     break;
-                case Constants.ORDER_LOG_EDIT:
+                case StoreOrderStatusConstants.ORDER_LOG_EDIT:
                     type = "编辑订单";
                     break;
-                case Constants.ORDER_LOG_REFUND_PRICE:
+                case StoreOrderStatusConstants.ORDER_LOG_REFUND_PRICE:
                     type = "退款";
                     break;
-                case Constants.ORDER_STATUS_CACHE_CREATE_ORDER:
+                case StoreOrderStatusConstants.ORDER_STATUS_CACHE_CREATE_ORDER:
                     type = "订单生成";
                     break;
-                case Constants.ORDER_LOG_RETURN_GOODS:
+                case StoreOrderStatusConstants.ORDER_LOG_RETURN_GOODS:
                     type = "退货中";
                     break;
-                case Constants.ORDER_LOG_REFUND_APPLY:
+                case StoreOrderStatusConstants.ORDER_LOG_REFUND_APPLY:
                     if (storeOrder.getRefundType().equals(0))
                         type = "申请退款";
                     else
                         type = "申请退货退款";
                     storeOrderStatus.setChangeMessage(storeOrderStatus.getChangeMessage() + "，原因：" + storeOrder.getRefundReasonWapExplain());
                     break;
-                case Constants.ORDER_LOG_AGREE_RETURN:
+                case StoreOrderStatusConstants.ORDER_LOG_AGREE_RETURN:
                     type = "平台同意退货退款";
                     break;
-                case Constants.ORDER_LOG_AGREE_REFUND:
+                case StoreOrderStatusConstants.ORDER_LOG_AGREE_REFUND:
                     type = "平台同意退款";
                     break;
-                case Constants.ORDER_LOG_REFUND_REVOKE:
+                case StoreOrderStatusConstants.ORDER_LOG_REFUND_REVOKE:
                     type = "用户撤销售后";
                     break;
                 default:
@@ -114,13 +117,13 @@ public class StoreOrderStatusServiceImpl extends ServiceImpl<StoreOrderStatusDao
     @Override
     public Boolean saveRefund(Integer orderId, BigDecimal amount, String message) {
         //此处更新订单状态
-        String changeMessage = Constants.ORDER_LOG_MESSAGE_REFUND_PRICE.replace("{amount}", amount.toString());
+        String changeMessage = MsgConstants.ORDER_LOG_MESSAGE_REFUND_PRICE.replace("{amount}", amount.toString());
         if(StringUtils.isNotBlank(message)){
             changeMessage += message;
         }
         StoreOrderStatus storeOrderStatus = new StoreOrderStatus();
         storeOrderStatus.setOid(orderId);
-        storeOrderStatus.setChangeType(Constants.ORDER_LOG_REFUND_PRICE);
+        storeOrderStatus.setChangeType(StoreOrderStatusConstants.ORDER_LOG_REFUND_PRICE);
         storeOrderStatus.setChangeMessage(changeMessage);
         storeOrderStatus.setIsSysUser(1);
         return save(storeOrderStatus);

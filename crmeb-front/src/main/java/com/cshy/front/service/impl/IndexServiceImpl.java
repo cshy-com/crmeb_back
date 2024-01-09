@@ -4,16 +4,13 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.cshy.common.constants.ProductType;
+import com.cshy.common.constants.*;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.response.IndexInfoResponse;
 import com.cshy.common.model.response.IndexProductResponse;
 import com.cshy.common.model.response.ProductActivityItemResponse;
 import com.cshy.common.model.vo.MyRecord;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.SysConfigConstants;
-import com.cshy.common.constants.SysGroupDataConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.model.entity.user.UserVisitRecord;
@@ -67,17 +64,17 @@ public class IndexServiceImpl implements IndexService {
     @Override
     public IndexInfoResponse getIndexInfo() {
         IndexInfoResponse indexInfoResponse = new IndexInfoResponse();
-        indexInfoResponse.setBanner(systemGroupDataService.getListMapByGid(Constants.GROUP_DATA_ID_INDEX_BANNER)); //首页banner滚动图
-        indexInfoResponse.setMenus(systemGroupDataService.getListMapByGid(Constants.GROUP_DATA_ID_INDEX_MENU)); //导航模块
-        indexInfoResponse.setRoll(systemGroupDataService.getListMapByGid(Constants.GROUP_DATA_ID_INDEX_NEWS_BANNER)); //首页滚动新闻
+        indexInfoResponse.setBanner(systemGroupDataService.getListMapByGid(SysFormConstants.GROUP_DATA_ID_INDEX_BANNER)); //首页banner滚动图
+        indexInfoResponse.setMenus(systemGroupDataService.getListMapByGid(SysFormConstants.GROUP_DATA_ID_INDEX_MENU)); //导航模块
+        indexInfoResponse.setRoll(systemGroupDataService.getListMapByGid(SysFormConstants.GROUP_DATA_ID_INDEX_NEWS_BANNER)); //首页滚动新闻
 
-        indexInfoResponse.setLogoUrl(systemConfigService.getValueByKey(Constants.CONFIG_KEY_SITE_LOGO));// 企业logo地址
+        indexInfoResponse.setLogoUrl(systemConfigService.getValueByKey(RedisKey.CONFIG_KEY_SITE_LOGO));// 企业logo地址
         indexInfoResponse.setYzfUrl(systemConfigService.getValueByKey(Constants.CONFIG_KEY_YZF_H5_URL));// 云智服H5 url
         indexInfoResponse.setConsumerHotline(systemConfigService.getValueByKey(Constants.CONFIG_KEY_CONSUMER_HOTLINE));// 客服电话
         indexInfoResponse.setTelephoneServiceSwitch(systemConfigService.getValueByKey(Constants.CONFIG_KEY_TELEPHONE_SERVICE_SWITCH));// 客服电话服务
         indexInfoResponse.setCategoryPageConfig(systemConfigService.getValueByKey(Constants.CONFIG_CATEGORY_CONFIG));// 商品分类页配置
         indexInfoResponse.setIsShowCategory(systemConfigService.getValueByKey(Constants.CONFIG_IS_SHOW_CATEGORY));// 是否隐藏一级分类
-        indexInfoResponse.setExplosiveMoney(systemGroupDataService.getListMapByGid(Constants.GROUP_DATA_ID_INDEX_EX_BANNER));//首页超值爆款
+        indexInfoResponse.setExplosiveMoney(systemGroupDataService.getListMapByGid(SysFormConstants.GROUP_DATA_ID_INDEX_EX_BANNER));//首页超值爆款
         indexInfoResponse.setHomePageSaleListStyle(systemConfigService.getValueByKey(Constants.CONFIG_IS_PRODUCT_LIST_STYLE));// 首页商品列表模板配置
         indexInfoResponse.setSubscribe(false);
         User user = userService.getInfo();
@@ -110,13 +107,13 @@ public class IndexServiceImpl implements IndexService {
     @Override
     public HashMap<String, String> getShareConfig() {
         HashMap<String, String> map = new HashMap<>();
-        HashMap<String, String> info = systemConfigService.info(Constants.CONFIG_FORM_ID_PUBLIC);
+        HashMap<String, String> info = systemConfigService.info(SysFormConstants.CONFIG_FORM_ID_PUBLIC);
         if(info == null) {
             throw new CrmebException("请配置公众号分享信息！");
         }
-        map.put("img", info.get(SysConfigConstants.CONFIG_KEY_ADMIN_WECHAT_SHARE_IMAGE));
-        map.put("title", info.get(SysConfigConstants.CONFIG_KEY_ADMIN_WECHAT_SHARE_TITLE));
-        map.put("synopsis", info.get(SysConfigConstants.CONFIG_KEY_ADMIN_WECHAT_SHARE_SYNOSIS));
+        map.put("img", info.get(RedisKey.CONFIG_KEY_ADMIN_WECHAT_SHARE_IMAGE));
+        map.put("title", info.get(RedisKey.CONFIG_KEY_ADMIN_WECHAT_SHARE_TITLE));
+        map.put("synopsis", info.get(RedisKey.CONFIG_KEY_ADMIN_WECHAT_SHARE_SYNOSIS));
         return map;
     }
 

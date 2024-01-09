@@ -1,8 +1,8 @@
 package com.cshy.service.service.impl.store;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.Constants;
 import com.cshy.common.constants.PayConstants;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.model.request.store.StoreOrderRefundRequest;
 import com.cshy.common.utils.RestTemplateUtil;
 import com.cshy.common.utils.WxPayUtil;
@@ -50,28 +50,28 @@ public class StoreOrderRefundServiceImpl extends ServiceImpl<StoreOrderDao, Stor
         String signKey = "";
         String path = "";
         if (storeOrder.getPaymentChannel() == 0) {// 公众号
-            appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
-            mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
+            appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
+            mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
 //            path = systemConfigService.getValueByKeyException("pay_routine_client_p12");
             path = systemConfigService.getValueByKeyException("pay_weixin_certificate_path");
         }
         if (storeOrder.getPaymentChannel() == 1) {// 小程序
-            appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_APP_ID);
-            mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_MCH_ID);
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_APP_KEY);
+            appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_APP_ID);
+            mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_MCH_ID);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_APP_KEY);
 //            path = systemConfigService.getValueByKeyException("pay_mini_client_p12");
             path = systemConfigService.getValueByKeyException("pay_routine_certificate_path");
         }
         if (storeOrder.getPaymentChannel() == 2) {// H5, 使用公众号的
-            appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
-            mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
+            appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
+            mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
 //            path = systemConfigService.getValueByKeyException("pay_mini_client_p12");
             path = systemConfigService.getValueByKeyException("pay_weixin_certificate_path");
         }
 
-        String apiDomain = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_API_URL);
+        String apiDomain = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_API_URL);
 
         //统一下单数据
         WxRefundVo wxRefundVo = new WxRefundVo();

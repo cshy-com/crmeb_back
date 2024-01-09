@@ -223,18 +223,6 @@ public class OrderController {
         return CommonResult.success(orderService.getRefundReason());
     }
 
-    /**
-     * 根据订单号查询物流信息
-     *
-     * @param orderId 订单号
-     * @return 物流信息
-     */
-    @ApiOperation(value = "物流信息查询")
-    @RequestMapping(value = "/express/{orderId}", method = RequestMethod.GET)
-    public CommonResult<Object> getExpressInfo(@PathVariable String orderId) {
-        return CommonResult.success(orderService.expressOrder(orderId));
-    }
-
     @ApiOperation(value = "待评价商品信息查询")
     @RequestMapping(value = "/product", method = RequestMethod.POST)
     public CommonResult<OrderProductReplyResponse> getOrderProductForReply(@Validated @RequestBody GetProductReply request) {

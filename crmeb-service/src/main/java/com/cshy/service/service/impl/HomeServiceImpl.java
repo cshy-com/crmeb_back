@@ -1,6 +1,7 @@
 package com.cshy.service.service.impl;
 
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.DateConstants;
 import com.cshy.common.constants.NumConstants;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.response.HomeRateResponse;
@@ -32,20 +33,20 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     public Map<Object, Object> chartUser() {
-        return dataFormat(userService.getAddUserCountGroupDate(Constants.SEARCH_DATE_LATELY_30), Constants.SEARCH_DATE_LATELY_30);
+        return dataFormat(userService.getAddUserCountGroupDate(DateConstants.SEARCH_DATE_LATELY_30), DateConstants.SEARCH_DATE_LATELY_30);
     }
 
     @Override
     public Map<String, Object> chartOrder() {
         Map<String, Object> map = new HashMap<>();
 
-        List<StoreOrder> list = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_LATELY_30, NumConstants.NUM_TEN);
+        List<StoreOrder> list = storeOrderService.getOrderGroupByDate(DateConstants.SEARCH_DATE_LATELY_30, NumConstants.NUM_TEN);
 
         map.put("quality",
-                dataFormat(getOrderCountGroupByDate(list), Constants.SEARCH_DATE_LATELY_30)
+                dataFormat(getOrderCountGroupByDate(list), DateConstants.SEARCH_DATE_LATELY_30)
         );
         map.put("price",
-                dataFormat(getOrderPriceGroupByDate(list), Constants.SEARCH_DATE_LATELY_30)
+                dataFormat(getOrderPriceGroupByDate(list), DateConstants.SEARCH_DATE_LATELY_30)
         );
         return map;
     }
@@ -95,13 +96,13 @@ public class HomeServiceImpl implements HomeService {
             //周格式化
             switch(dateLimit) {
                 //格式化周
-                case Constants.SEARCH_DATE_WEEK:
-                case Constants.SEARCH_DATE_PRE_WEEK:
+                case DateConstants.SEARCH_DATE_WEEK:
+                case DateConstants.SEARCH_DATE_PRE_WEEK:
                     key = weekList[i];
                     break;
                     //格式化月
-                case Constants.SEARCH_DATE_PRE_MONTH:
-                case Constants.SEARCH_DATE_MONTH:
+                case DateConstants.SEARCH_DATE_PRE_MONTH:
+                case DateConstants.SEARCH_DATE_MONTH:
                     key = i + 1 + "";
                     break;
                     //默认显示两位日期
@@ -118,11 +119,11 @@ public class HomeServiceImpl implements HomeService {
         Map<Object, Object> map = new LinkedHashMap<>();
         List<Object> listDate = new ArrayList<>();
         String year = "";
-        if (dateLimit.equals(Constants.SEARCH_DATE_YEAR)) {
+        if (dateLimit.equals(DateConstants.SEARCH_DATE_YEAR)) {
             year = DateUtil.nowYear();
         }
 
-        if (dateLimit.equals(Constants.SEARCH_DATE_PRE_YEAR)) {
+        if (dateLimit.equals(DateConstants.SEARCH_DATE_PRE_YEAR)) {
             year = DateUtil.lastYear();
         }
 
@@ -170,14 +171,14 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     public Map<String, Object> chartOrderInWeek() {
-        return returnOrderDate(Constants.SEARCH_DATE_WEEK, Constants.SEARCH_DATE_PRE_WEEK, NumConstants.NUM_TEN);
+        return returnOrderDate(DateConstants.SEARCH_DATE_WEEK, DateConstants.SEARCH_DATE_PRE_WEEK, NumConstants.NUM_TEN);
 
 
     }
 
     @Override
     public Map<String, Object> chartOrderInMonth() {
-        return returnOrderDate(Constants.SEARCH_DATE_MONTH, Constants.SEARCH_DATE_PRE_MONTH, NumConstants.NUM_TEN);
+        return returnOrderDate(DateConstants.SEARCH_DATE_MONTH, DateConstants.SEARCH_DATE_PRE_MONTH, NumConstants.NUM_TEN);
     }
 
     @Override
@@ -185,23 +186,23 @@ public class HomeServiceImpl implements HomeService {
         Map<String, Object> map = new HashMap<>();
 
         //查询本年订单量
-        List<StoreOrder> list = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_YEAR, NumConstants.NUM_SEVEN);
+        List<StoreOrder> list = storeOrderService.getOrderGroupByDate(DateConstants.SEARCH_DATE_YEAR, NumConstants.NUM_SEVEN);
 
         map.put("quality",
-                dataFormatYear(getOrderCountGroupByDate(list), Constants.SEARCH_DATE_YEAR)
+                dataFormatYear(getOrderCountGroupByDate(list), DateConstants.SEARCH_DATE_YEAR)
         );
         map.put("price",
-                dataFormatYear(getOrderPriceGroupByDate(list), Constants.SEARCH_DATE_YEAR)
+                dataFormatYear(getOrderPriceGroupByDate(list), DateConstants.SEARCH_DATE_YEAR)
         );
 
         //查询上年订单量
-        List<StoreOrder> preList = storeOrderService.getOrderGroupByDate(Constants.SEARCH_DATE_PRE_YEAR, NumConstants.NUM_SEVEN);
+        List<StoreOrder> preList = storeOrderService.getOrderGroupByDate(DateConstants.SEARCH_DATE_PRE_YEAR, NumConstants.NUM_SEVEN);
 
         map.put("preQuality",
-                dataFormatYear(getOrderCountGroupByDate(preList), Constants.SEARCH_DATE_PRE_YEAR)
+                dataFormatYear(getOrderCountGroupByDate(preList), DateConstants.SEARCH_DATE_PRE_YEAR)
         );
         map.put("prePrice",
-                dataFormatYear(getOrderPriceGroupByDate(preList), Constants.SEARCH_DATE_PRE_YEAR)
+                dataFormatYear(getOrderPriceGroupByDate(preList), DateConstants.SEARCH_DATE_PRE_YEAR)
         );
 
         return map;

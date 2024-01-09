@@ -7,9 +7,7 @@ import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.symmetric.DES;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.cshy.common.constants.Constants;
 import com.cshy.common.constants.NumConstants;
-import com.cshy.common.constants.PayType;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -439,21 +437,6 @@ public class CrmebUtil {
      */
     public static String getOrderNo(String payType){
         return payType + randomCount(11111, 99999) + System.currentTimeMillis() + randomCount(11111, 99999);
-    }
-
-    /**
-     * 订单号生成
-     * @param payType String 支付类型
-     * @return 生成的随机码
-     */
-    public static String getOrderNoPrefix(String payType){
-        switch (payType){
-            case PayType.PAY_TYPE_WE_CHAT:
-                return Constants.ORDER_NO_PREFIX_WE_CHAT;
-                //其他平台
-            default:
-                return Constants.ORDER_NO_PREFIX_H5;
-        }
     }
 
     /**

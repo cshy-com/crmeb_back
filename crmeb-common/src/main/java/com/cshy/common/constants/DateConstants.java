@@ -18,4 +18,16 @@ public class DateConstants {
     public static final String DATE_FORMAT_START_PEREND = "00:00:00";
     public static final String DATE_FORMAT_END_PEREND = "23:59:59";
     public static final String DATE_FORMAT_HHMM = "yyyy-MM-dd HH:mm";
+
+    //日期类型
+    public static final String SEARCH_DATE_DAY = "today"; //今天
+    public static final String SEARCH_DATE_YESTERDAY = "yesterday"; //昨天
+    public static final String SEARCH_DATE_LATELY_7 = "lately7"; //最近7天
+    public static final String SEARCH_DATE_LATELY_30 = "lately30"; //最近30天
+    public static final String SEARCH_DATE_WEEK = "week"; //本周
+    public static final String SEARCH_DATE_PRE_WEEK = "preWeek"; //上周
+    public static final String SEARCH_DATE_MONTH = "month"; //本月
+    public static final String SEARCH_DATE_PRE_MONTH = "preMonth"; //上月
+    public static final String SEARCH_DATE_YEAR = "year"; //年
+    public static final String SEARCH_DATE_PRE_YEAR = "preYear"; //上一年
 }

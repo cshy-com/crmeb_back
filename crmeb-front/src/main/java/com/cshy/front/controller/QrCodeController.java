@@ -1,8 +1,8 @@
 package com.cshy.front.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.cshy.common.constants.MsgConstants;
 import com.cshy.common.model.response.CommonResult;
-import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.front.service.QrCodeService;
 import io.swagger.annotations.Api;
@@ -58,7 +58,7 @@ public class QrCodeController {
             @RequestParam int width,
             @RequestParam int height) {
         if((width < 50 || height < 50) && (width > 500 || height > 500) && text.length() >= 999){
-            throw new CrmebException(Constants.RESULT_QRCODE_PRAMERROR);
+            throw new CrmebException(MsgConstants.RESULT_QRCODE_PRAMERROR);
         }
         return CommonResult.success(qrCodeService.base64String(text, width,height));
     }

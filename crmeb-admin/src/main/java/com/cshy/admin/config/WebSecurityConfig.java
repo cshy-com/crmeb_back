@@ -4,7 +4,7 @@ import com.cshy.admin.filter.JwtAuthenticationTokenFilter;
 import com.cshy.admin.manager.AuthenticationEntryPointImpl;
 import com.cshy.admin.manager.CustomAccessDeniedHandler;
 import com.cshy.admin.manager.CustomAuthenticationProvider;
-import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.UploadConstants;
 import com.cshy.service.service.impl.user.UserDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -104,7 +104,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/admin/login", "/api/admin/validate/code/get").permitAll()
                 .antMatchers("/api/admin/getLoginPic").permitAll()
                 // 放行资源路径
-                .antMatchers("/" + Constants.UPLOAD_TYPE_IMAGE + "/**").anonymous()
+                .antMatchers("/" + UploadConstants.UPLOAD_TYPE_IMAGE + "/**").anonymous()
                 // 放行图片、文件上传
                 .antMatchers("/api/admin/upload/image").permitAll()
                 .antMatchers("/api/admin/upload/file").permitAll()

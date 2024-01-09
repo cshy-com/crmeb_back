@@ -1,6 +1,6 @@
 package com.cshy.front.filter;
 
-import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.UploadConstants;
 import com.cshy.common.utils.SpringUtil;
 import com.cshy.service.service.system.SystemAttachmentService;
 
@@ -21,7 +21,7 @@ public class ResponseRouter {
         }
 
         //根据需要处理返回值
-        if (data.contains(Constants.UPLOAD_TYPE_IMAGE+"/") && !data.contains("data:image/png;base64")) {
+        if (data.contains(UploadConstants.UPLOAD_TYPE_IMAGE+"/") && !data.contains("data:image/png;base64")) {
             data = SpringUtil.getBean(SystemAttachmentService.class).prefixImage(data);
         }
 

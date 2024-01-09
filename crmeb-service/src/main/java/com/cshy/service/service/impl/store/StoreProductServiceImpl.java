@@ -16,7 +16,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.constants.ProductType;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.exception.CrmebException;
+import com.cshy.common.model.Order;
 import com.cshy.common.model.entity.category.Category;
 import com.cshy.common.model.entity.coupon.StoreCoupon;
 import com.cshy.common.model.entity.giftCard.GiftCardProduct;
@@ -799,7 +801,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
      */
     @Override
     public void consumeProductStock() {
-        String redisKey = Constants.PRODUCT_STOCK_UPDATE;
+        String redisKey = RedisKey.PRODUCT_STOCK_UPDATE;
         Long size = redisUtil.getListSize(redisKey);
         logger.info("StoreProductServiceImpl.doProductStock | size:" + size);
         if (size < 1) {
@@ -1232,14 +1234,14 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
 
         // 排序部分
         if (StrUtil.isNotBlank(request.getSalesOrder())) {
-            if (request.getSalesOrder().equals(Constants.SORT_DESC)) {
+            if (request.getSalesOrder().equals(Order.DESC)) {
                 lqw.last(" order by (sales + ficti) desc, sort desc, id desc");
             } else {
                 lqw.last(" order by (sales + ficti) asc, sort asc, id asc");
             }
         } else {
             if (StrUtil.isNotBlank(request.getPriceOrder())) {
-                if (request.getPriceOrder().equals(Constants.SORT_DESC)) {
+                if (request.getPriceOrder().equals(Order.DESC)) {
                     lqw.orderByDesc(StoreProduct::getPrice);
                 } else {
                     lqw.orderByAsc(StoreProduct::getPrice);

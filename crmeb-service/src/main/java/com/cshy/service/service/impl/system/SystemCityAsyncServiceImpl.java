@@ -3,7 +3,7 @@ package com.cshy.service.service.impl.system;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.utils.RedisUtil;
 import com.cshy.common.model.entity.system.SystemCity;
 import com.cshy.common.model.vo.system.SystemCityTreeVo;
@@ -70,7 +70,7 @@ public class SystemCityAsyncServiceImpl extends ServiceImpl<SystemCityDao, Syste
                 list.add(tree);
             }
         }
-        redisUtil.set(Constants.CITY_LIST_TREE, list);
+        redisUtil.set(RedisKey.CITY_LIST_TREE, list);
     }
 
     /**
@@ -82,7 +82,7 @@ public class SystemCityAsyncServiceImpl extends ServiceImpl<SystemCityDao, Syste
         lambdaQueryWrapper.in(SystemCity::getIsShow, true);
         List<SystemCity> systemCityList = dao.selectList(lambdaQueryWrapper);
         if (systemCityList != null && systemCityList.size() > 0) {
-            redisUtil.hmSet(Constants.CITY_LIST, pid.toString(), systemCityList);
+            redisUtil.hmSet(RedisKey.CITY_LIST, pid.toString(), systemCityList);
         }
     }
 

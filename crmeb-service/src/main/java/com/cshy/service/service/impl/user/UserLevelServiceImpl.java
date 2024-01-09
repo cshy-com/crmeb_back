@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.DateConstants;
+import com.cshy.common.constants.MsgConstants;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.constants.Constants;
 import com.github.pagehelper.PageHelper;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.common.model.entity.system.SystemUserLevel;
@@ -106,7 +106,7 @@ public class UserLevelServiceImpl extends ServiceImpl<UserLevelDao, UserLevel> i
         newLevel.setDiscount(userLevelConfig.getDiscount());
 
         Date date = DateUtil.nowDateTimeReturnDate(DateConstants.DATE_FORMAT);
-        String mark = Constants.USER_LEVEL_UP_LOG_MARK.replace("【{$userName}】", user.getNickname()).
+        String mark = MsgConstants.USER_LEVEL_UP_LOG_MARK.replace("【{$userName}】", user.getNickname()).
                 replace("{$date}", DateUtil.dateToStr(date, DateConstants.DATE_FORMAT)).
                 replace("{$levelName}", userLevelConfig.getName());
         newLevel.setMark(mark);
@@ -162,7 +162,7 @@ public class UserLevelServiceImpl extends ServiceImpl<UserLevelDao, UserLevel> i
         newLevel.setDiscount(userLevelConfig.getDiscount());
 
         Date date = DateUtil.nowDateTimeReturnDate(DateConstants.DATE_FORMAT);
-        String mark = Constants.USER_LEVEL_OPERATE_LOG_MARK.replace("【{$userName}】", user.getNickname()).
+        String mark = MsgConstants.USER_LEVEL_OPERATE_LOG_MARK.replace("【{$userName}】", user.getNickname()).
                 replace("{$date}", DateUtil.dateToStr(date, DateConstants.DATE_FORMAT)).
                 replace("{$levelName}", userLevelConfig.getName());
         newLevel.setMark(mark);

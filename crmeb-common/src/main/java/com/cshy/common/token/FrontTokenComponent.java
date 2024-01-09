@@ -2,6 +2,7 @@ package com.cshy.common.token;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.model.entity.user.User;
 import com.cshy.common.utils.RedisUtil;
 import com.cshy.common.utils.RequestUtil;
@@ -117,14 +118,14 @@ public class FrontTokenComponent {
      */
     public String getToken(HttpServletRequest request) {
         String token = request.getHeader(Constants.HEADER_AUTHORIZATION_KEY);
-        if (StrUtil.isNotEmpty(token) && token.startsWith(Constants.USER_TOKEN_REDIS_KEY_PREFIX)) {
-            token = token.replace(Constants.USER_TOKEN_REDIS_KEY_PREFIX, "");
+        if (StrUtil.isNotEmpty(token) && token.startsWith(RedisKey.USER_TOKEN_REDIS_KEY_PREFIX)) {
+            token = token.replace(RedisKey.USER_TOKEN_REDIS_KEY_PREFIX, "");
         }
         return token;
     }
 
     private String getTokenKey(String uuid) {
-        return Constants.USER_TOKEN_REDIS_KEY_PREFIX + uuid;
+        return RedisKey.USER_TOKEN_REDIS_KEY_PREFIX + uuid;
     }
 
     /**

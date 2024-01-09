@@ -625,7 +625,7 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
      */
     @Override
     public void consumeProductStock() {
-        String redisKey = Constants.PRODUCT_BARGAIN_STOCK_UPDATE;
+        String redisKey = RedisKey.PRODUCT_BARGAIN_STOCK_UPDATE;
         Long size = redisUtil.getListSize(redisKey);
         logger.info("StoreBargainServiceImpl.consumeProductStock | size:" + size);
         if (size < 1) {

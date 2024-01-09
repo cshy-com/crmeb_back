@@ -130,7 +130,7 @@ public class UserBrokerageRecordServiceImpl extends ServiceImpl<UserBrokerageRec
         LambdaQueryWrapper<UserBrokerageRecord> lqw = new LambdaQueryWrapper<>();
         lqw.select(UserBrokerageRecord::getPrice);
         lqw.eq(UserBrokerageRecord::getUid, uid);
-        dateLimitUtilVo dateLimit = DateUtil.getDateLimit(Constants.SEARCH_DATE_YESTERDAY);
+        dateLimitUtilVo dateLimit = DateUtil.getDateLimit(DateConstants.SEARCH_DATE_YESTERDAY);
         lqw.between(UserBrokerageRecord::getUpdateTime, dateLimit.getStartTime(), dateLimit.getEndTime());
         lqw.eq(UserBrokerageRecord::getType, 1);
         lqw.eq(UserBrokerageRecord::getLinkType, "order");

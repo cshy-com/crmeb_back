@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.UploadConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.article.Article;
 import com.cshy.common.model.entity.category.Category;
@@ -154,7 +154,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleDao, Article> impleme
     @Override
     public List<Article> getBannerList() {
         // 根据配置控制banner的数量
-        String articleBannerLimitString = systemConfigService.getValueByKey(Constants.ARTICLE_BANNER_LIMIT);
+        String articleBannerLimitString = systemConfigService.getValueByKey(UploadConstants.ARTICLE_BANNER_LIMIT);
         int articleBannerLimit = Integer.parseInt(articleBannerLimitString);
 
         LambdaQueryWrapper<Article> lambdaQueryWrapper = Wrappers.lambdaQuery();

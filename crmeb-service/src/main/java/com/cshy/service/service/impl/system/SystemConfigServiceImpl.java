@@ -1,15 +1,13 @@
 package com.cshy.service.service.impl.system;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.config.CrmebConfig;
-import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.exception.CrmebException;
-import com.cshy.common.model.request.system.SystemConfigAdminRequest;
 import com.cshy.common.model.request.system.SystemFormCheckRequest;
 import com.cshy.common.model.request.system.SystemFormItemCheckRequest;
 import com.cshy.common.utils.RedisUtil;
@@ -20,7 +18,6 @@ import com.cshy.service.service.system.SystemAttachmentService;
 import com.cshy.service.service.system.SystemConfigService;
 import com.cshy.service.service.system.SystemFormTempService;
 import com.google.common.collect.Lists;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +47,7 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
     @Autowired
     CrmebConfig crmebConfig;
 
-    private static final String redisKey = Constants.SYS_CONFIG_KEY;
+    private static final String redisKey = RedisKey.SYS_CONFIG_KEY;
 
     /**
      * 项目启动时，初始化参数到缓存

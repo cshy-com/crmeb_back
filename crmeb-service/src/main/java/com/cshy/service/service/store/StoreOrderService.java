@@ -99,13 +99,6 @@ public interface StoreOrderService extends IService<StoreOrder> {
     StoreOrder getInfoByEntity(StoreOrder storeOrder);
 
     /**
-     * 获取订单快递信息
-     * @param orderNo 订单编号
-     * @return LogisticsResultVo
-     */
-    LogisticsResultVo getLogisticsInfo(String orderNo);
-
-    /**
      * 根据时间参数统计订单价格
      * @param dateLimit 时间区间
      * @param type 1=price 2=订单量

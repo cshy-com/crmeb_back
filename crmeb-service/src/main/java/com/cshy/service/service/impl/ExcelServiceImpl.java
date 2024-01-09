@@ -3,6 +3,7 @@ package com.cshy.service.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.cshy.common.config.CrmebConfig;
 import com.cshy.common.constants.DateConstants;
+import com.cshy.common.constants.UploadConstants;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
@@ -92,7 +93,7 @@ public class ExcelServiceImpl implements ExcelService {
         }).collect(Collectors.toList());
 
         // 上传设置
-        ExportUtil.setUpload(crmebConfig.getImagePath(), Constants.UPLOAD_MODEL_PATH_EXCEL, Constants.UPLOAD_TYPE_FILE);
+        ExportUtil.setUpload(crmebConfig.getImagePath(), UploadConstants.UPLOAD_MODEL_PATH_EXCEL, UploadConstants.UPLOAD_TYPE_FILE);
 
         // 文件名
         String fileName = "砍价".concat(DateUtil.nowDateTime(DateConstants.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
@@ -136,7 +137,7 @@ public class ExcelServiceImpl implements ExcelService {
         }).collect(Collectors.toList());
 
         // 上传设置
-        ExportUtil.setUpload(crmebConfig.getImagePath(), Constants.UPLOAD_MODEL_PATH_EXCEL, Constants.UPLOAD_TYPE_FILE);
+        ExportUtil.setUpload(crmebConfig.getImagePath(), UploadConstants.UPLOAD_MODEL_PATH_EXCEL, UploadConstants.UPLOAD_TYPE_FILE);
 
         // 文件名
         String fileName = "拼团".concat(DateUtil.nowDateTime(DateConstants.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
@@ -202,7 +203,7 @@ public class ExcelServiceImpl implements ExcelService {
          * ===============================
          */
         // 上传设置
-        ExportUtil.setUpload(crmebConfig.getImagePath(), Constants.UPLOAD_MODEL_PATH_EXCEL, Constants.UPLOAD_TYPE_FILE);
+        ExportUtil.setUpload(crmebConfig.getImagePath(), UploadConstants.UPLOAD_MODEL_PATH_EXCEL, UploadConstants.UPLOAD_TYPE_FILE);
 
         // 文件名
         String fileName = "商品导出_".concat(DateUtil.nowDateTime(DateConstants.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");
@@ -257,7 +258,7 @@ public class ExcelServiceImpl implements ExcelService {
           ===============================
          */
         // 上传设置
-        ExportUtil.setUpload(crmebConfig.getImagePath(), Constants.UPLOAD_MODEL_PATH_EXCEL, Constants.UPLOAD_TYPE_FILE);
+        ExportUtil.setUpload(crmebConfig.getImagePath(), UploadConstants.UPLOAD_MODEL_PATH_EXCEL, UploadConstants.UPLOAD_TYPE_FILE);
 
         // 文件名
         String fileName = "订单导出_".concat(DateUtil.nowDateTime(DateConstants.DATE_TIME_FORMAT_NUM)).concat(CrmebUtil.randomCount(111111111, 999999999).toString()).concat(".xlsx");

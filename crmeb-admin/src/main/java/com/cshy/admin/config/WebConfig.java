@@ -3,7 +3,7 @@ package com.cshy.admin.config;
 //import com.cshy.admin.filter.ResponseFilter;
 import com.cshy.admin.filter.ResponseFilter;
 import com.cshy.common.config.CrmebConfig;
-import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.UploadConstants;
 import com.cshy.common.interceptor.SwaggerInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -85,8 +85,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/META-INF/resources/");
 
         /** 本地文件上传路径 */
-        registry.addResourceHandler(Constants.UPLOAD_TYPE_IMAGE + "/**")
-                .addResourceLocations("file:" + crmebConfig.getImagePath() + "/" + Constants.UPLOAD_TYPE_IMAGE + "/");
+        registry.addResourceHandler(UploadConstants.UPLOAD_TYPE_IMAGE + "/**")
+                .addResourceLocations("file:" + crmebConfig.getImagePath() + "/" + UploadConstants.UPLOAD_TYPE_IMAGE + "/");
     }
 
     @Bean

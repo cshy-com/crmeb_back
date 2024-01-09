@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.constants.TaskConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.combination.StoreCombination;
@@ -307,7 +308,7 @@ public class CallbackServiceImpl implements CallbackService {
         boolean update = storeOrderService.updateById(storeOrder);
         if (update) {
             // 退款task
-            redisUtil.lPush(Constants.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER, storeOrder.getId());
+            redisUtil.lPush(RedisKey.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER, storeOrder.getId());
         } else {
             logger.warn("微信退款订单更新失败==>" + refundRecord.getColumns() + ", rawData==>" + xmlInfo + ", data==>" + notifyRecord);
         }
@@ -373,21 +374,21 @@ public class CallbackServiceImpl implements CallbackService {
     }
 
     private String getSignKey(String appid) {
-        String publicAppid = systemConfigService.getValueByKey(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
-        String miniAppid = systemConfigService.getValueByKey(Constants.CONFIG_KEY_PAY_ROUTINE_APP_ID);
-        String appAppid = systemConfigService.getValueByKey(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_APP_ID);
+        String publicAppid = systemConfigService.getValueByKey(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
+        String miniAppid = systemConfigService.getValueByKey(RedisKey.CONFIG_KEY_PAY_ROUTINE_APP_ID);
+        String appAppid = systemConfigService.getValueByKey(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_APP_ID);
         String signKey = "";
         if (StrUtil.isBlank(publicAppid) && StrUtil.isBlank(miniAppid) && StrUtil.isBlank(appAppid)) {
             throw new CrmebException("pay_weixin_appid或pay_routine_appid不能都为空");
         }
         if (StrUtil.isNotBlank(publicAppid) && appid.equals(publicAppid)) {
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
         }
         if (StrUtil.isNotBlank(miniAppid) && appid.equals(miniAppid)) {
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_APP_KEY);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_APP_KEY);
         }
         if (StrUtil.isNotBlank(appAppid) && appid.equals(appAppid)) {
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_APP_KEY);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_APP_KEY);
         }
         return signKey;
     }

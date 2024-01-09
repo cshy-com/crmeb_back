@@ -195,7 +195,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         int integral;
         // 下单赠送积分
         //赠送积分比例
-        String integralStr = systemConfigService.getValueByKey(Constants.CONFIG_KEY_INTEGRAL_RATE_ORDER_GIVE);
+        String integralStr = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_RATE_ORDER_GIVE);
         if (StrUtil.isNotBlank(integralStr) && storeOrder.getPayPrice().compareTo(BigDecimal.ZERO) > 0) {
             BigDecimal integralBig = new BigDecimal(integralStr);
             integral = integralBig.multiply(storeOrder.getPayPrice()).setScale(0, BigDecimal.ROUND_DOWN).intValue();
@@ -245,7 +245,7 @@ public class OrderPayServiceImpl implements OrderPayService {
 
         Boolean execute = transactionTemplate.execute(e -> {
             //订单日志
-            storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_PAY_SUCCESS, Constants.ORDER_LOG_MESSAGE_PAY_SUCCESS, 0);
+            storeOrderStatusService.createLog(storeOrder.getId(), StoreOrderStatusConstants.ORDER_LOG_PAY_SUCCESS, MsgConstants.ORDER_LOG_MESSAGE_PAY_SUCCESS, 0);
 
             // 用户信息变更
             userService.updateById(user);
@@ -392,7 +392,7 @@ public class OrderPayServiceImpl implements OrderPayService {
      */
     private List<UserBrokerageRecord> assignCommission(StoreOrder storeOrder) {
         // 检测商城是否开启分销功能
-        String isOpen = systemConfigService.getValueByKey(Constants.CONFIG_KEY_STORE_BROKERAGE_IS_OPEN);
+        String isOpen = systemConfigService.getValueByKey(RedisKey.CONFIG_KEY_STORE_BROKERAGE_IS_OPEN);
         if(StrUtil.isBlank(isOpen) || "0".equals(isOpen)){
             return CollUtil.newArrayList();
         }
@@ -412,7 +412,7 @@ public class OrderPayServiceImpl implements OrderPayService {
             return CollUtil.newArrayList();
         }
         // 获取佣金冻结期
-        String fronzenTime = systemConfigService.getValueByKey(Constants.CONFIG_KEY_STORE_BROKERAGE_EXTRACT_TIME);
+        String fronzenTime = systemConfigService.getValueByKey(RedisKey.CONFIG_KEY_STORE_BROKERAGE_EXTRACT_TIME);
 
         // 生成佣金记录
         List<UserBrokerageRecord> brokerageRecordList = spreadRecordList.stream().map(record -> {
@@ -452,10 +452,10 @@ public class OrderPayServiceImpl implements OrderPayService {
         Integer index = record.getInt("index");
         String key = "";
         if (index == 1) {
-            key = Constants.CONFIG_KEY_STORE_BROKERAGE_RATE_ONE;
+            key = RedisKey.CONFIG_KEY_STORE_BROKERAGE_RATE_ONE;
         }
         if (index == 2) {
-            key = Constants.CONFIG_KEY_STORE_BROKERAGE_RATE_TWO;
+            key = RedisKey.CONFIG_KEY_STORE_BROKERAGE_RATE_TWO;
         }
         String rate = systemConfigService.getValueByKey(key);
         if(StringUtils.isBlank(rate)){
@@ -514,7 +514,7 @@ public class OrderPayServiceImpl implements OrderPayService {
             return recordList;
         }
         // 判断分销模式
-        String model = systemConfigService.getValueByKey(Constants.CONFIG_KEY_STORE_BROKERAGE_MODEL);
+        String model = systemConfigService.getValueByKey(RedisKey.CONFIG_KEY_STORE_BROKERAGE_MODEL);
         if (StrUtil.isNotBlank(model) && "1".equals(model) && !spreadUser.getIsPromoter()) {
             // 指定分销模式下：不是推广员不参与分销
             return recordList;
@@ -780,19 +780,19 @@ public class OrderPayServiceImpl implements OrderPayService {
         String mchId = "";
         String signKey = "";
         if (storeOrder.getPaymentChannel() == 0) {// 公众号
-            appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
-            mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
+            appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
+            mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
         }
         if (storeOrder.getPaymentChannel() == 1) {// 小程序
-            appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_APP_ID);
-            mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_MCH_ID);
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_APP_KEY);
+            appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_APP_ID);
+            mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_MCH_ID);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_APP_KEY);
         }
         if (storeOrder.getPaymentChannel() == 2) {// H5,使用公众号的
-            appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
-            mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
+            appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
+            mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
         }
         // 获取微信预下单对象
         CreateOrderRequestVo unifiedorderVo = getUnifiedorderVo(storeOrder, userToken.getToken(), ip, appId, mchId, signKey);
@@ -824,8 +824,8 @@ public class OrderPayServiceImpl implements OrderPayService {
     private CreateOrderRequestVo getUnifiedorderVo(StoreOrder storeOrder, String openid, String ip, String appId, String mchId, String signKey) {
 
         // 获取域名
-        String domain = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_SITE_URL);
-        String apiDomain = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_API_URL);
+        String domain = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_SITE_URL);
+        String apiDomain = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_API_URL);
 
         AttachVo attachVo = new AttachVo(Constants.SERVICE_PAY_TYPE_ORDER, storeOrder.getUid());
         CreateOrderRequestVo vo = new CreateOrderRequestVo();
@@ -834,7 +834,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         vo.setMch_id(mchId);
         vo.setNonce_str(WxPayUtil.getNonceStr());
         vo.setSign_type(PayConstants.WX_PAY_SIGN_TYPE_MD5);
-        String siteName = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_SITE_NAME);
+        String siteName = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_SITE_NAME);
         // 因商品名称在微信侧超长更换为网站名称
         vo.setBody(siteName);
         vo.setAttach(JSONObject.toJSONString(attachVo));
@@ -852,7 +852,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         CreateOrderH5SceneInfoVo createOrderH5SceneInfoVo = new CreateOrderH5SceneInfoVo(
                 new CreateOrderH5SceneInfoDetailVo(
                         domain,
-                        systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_SITE_NAME)
+                        systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_SITE_NAME)
                 )
         );
         vo.setScene_info(JSONObject.toJSONString(createOrderH5SceneInfoVo));
@@ -927,7 +927,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         }
         integralRecord.setStatus(IntegralRecordConstants.INTEGRAL_RECORD_STATUS_CREATE);
         // 获取积分冻结期
-        String fronzenTime = systemConfigService.getValueByKey(Constants.CONFIG_KEY_STORE_INTEGRAL_EXTRACT_TIME);
+        String fronzenTime = systemConfigService.getValueByKey(RedisKey.CONFIG_KEY_STORE_INTEGRAL_EXTRACT_TIME);
         integralRecord.setFrozenTime(Integer.valueOf(Optional.ofNullable(fronzenTime).orElse("0")));
         integralRecord.setCreateTime(DateUtil.nowDateTime());
         return integralRecord;

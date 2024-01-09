@@ -4,9 +4,7 @@ package com.cshy.service.service.impl.order;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.DateConstants;
-import com.cshy.common.constants.TaskConstants;
+import com.cshy.common.constants.*;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.entity.order.StoreOrderStatus;
@@ -65,7 +63,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
 
     @Override
     public void cancelByUser() {
-        String redisKey = Constants.ORDER_TASK_REDIS_KEY_AFTER_CANCEL_BY_USER;
+        String redisKey = RedisKey.ORDER_TASK_REDIS_KEY_AFTER_CANCEL_BY_USER;
         Long size = redisUtil.getListSize(redisKey);
         logger.info("OrderTaskServiceImpl.cancelByUser | size:" + size);
         if (size < 1) {
@@ -96,7 +94,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
 
     @Override
     public void refundApply() {
-        String redisKey = Constants.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER;
+        String redisKey = RedisKey.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER;
         Long size = redisUtil.getListSize(redisKey);
         logger.info("OrderTaskServiceImpl.refundApply | size:" + size);
         if (size < 1) {
@@ -126,7 +124,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
 
     @Override
     public void complete() {
-        String redisKey = Constants.ORDER_TASK_REDIS_KEY_AFTER_COMPLETE_BY_USER;
+        String redisKey = RedisKey.ORDER_TASK_REDIS_KEY_AFTER_COMPLETE_BY_USER;
         Long size = redisUtil.getListSize(redisKey);
         logger.info("OrderTaskServiceImpl.complete | size:" + size);
         if (size < 1) {
@@ -315,14 +313,14 @@ public class OrderTaskServiceImpl implements OrderTaskService {
                 reply.setCreateTime(DateUtil.nowDateTime());
                 replyList.add(reply);
             }
-            order.setStatus(Constants.ORDER_STATUS_INT_COMPLETE);
+            order.setStatus(StoreOrderStatusConstants.ORDER_STATUS_INT_COMPLETE);
             Boolean execute = transactionTemplate.execute(e -> {
                 storeOrderService.updateById(order);
                 storeProductReplyService.saveBatch(replyList);
                 return Boolean.TRUE;
             });
             if (execute) {
-                redisUtil.lPush(Constants.ORDER_TASK_REDIS_KEY_AFTER_COMPLETE_BY_USER, order.getId());
+                redisUtil.lPush(RedisKey.ORDER_TASK_REDIS_KEY_AFTER_COMPLETE_BY_USER, order.getId());
             } else {
                 logger.error("订单自动完成：更新数据库失败，orderId = " + order.getId());
             }

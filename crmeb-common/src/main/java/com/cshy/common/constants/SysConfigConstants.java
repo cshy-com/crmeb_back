@@ -5,22 +5,6 @@ package com.cshy.common.constants;
 
  */
 public class SysConfigConstants {
-
-    //后台首页登录图片
-    /** 登录页LOGO */
-    public static final String CONFIG_KEY_ADMIN_LOGIN_LOGO_LEFT_TOP = "site_logo_lefttop";
-    public static final String CONFIG_KEY_ADMIN_LOGIN_LOGO_LOGIN = "site_logo_login";
-    /** 登录页背景图 */
-    public static final String CONFIG_KEY_ADMIN_LOGIN_BACKGROUND_IMAGE = "admin_login_bg_pic";
-
-    /** 微信分享图片（公众号） */
-    public static final String CONFIG_KEY_ADMIN_WECHAT_SHARE_IMAGE = "wechat_share_img";
-    /** 微信分享标题（公众号） */
-    public static final String CONFIG_KEY_ADMIN_WECHAT_SHARE_TITLE = "wechat_share_title";
-    /** 微信分享简介（公众号） */
-    public static final String CONFIG_KEY_ADMIN_WECHAT_SHARE_SYNOSIS = "wechat_share_synopsis";
-
-
     /** 是否启用分销 */
     public static final String CONFIG_KEY_BROKERAGE_FUNC_STATUS = "brokerage_func_status";
     /** 分销模式 :1-指定分销，2-人人分销 */
@@ -45,9 +29,9 @@ public class SysConfigConstants {
     /** 是否开启门店自提 */
     public static final String CONFIG_KEY_STORE_SELF_MENTION = "store_self_mention";
     /** 腾讯地图key */
-    public static final String CONFIG_SITE_TENG_XUN_MAP_KEY = "tengxun_map_key";
+    public static final String CONFIG_SITE_TENCENT_MAP_KEY = "tencent_map_key";
     /** 退款理由 */
-    public static final String CONFIG_KEY_STOR_REASON = "stor_reason";
+    public static final String CONFIG_KEY_STORE_REASON = "store_reason";
     /** 提现最低金额 */
     public static final String CONFIG_EXTRACT_MIN_PRICE = "user_extract_min_price";
     /** 提现冻结时间 */

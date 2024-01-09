@@ -23,7 +23,7 @@ public class StoreNearResponse implements Serializable {
     private static final long serialVersionUID=1L;
 
     @ApiModelProperty(value = "腾讯地图key")
-    private String tengXunMapKey;
+    private String tencentMapKey;
 
     @ApiModelProperty(value = "附近的门店列表", required = true)
     private List<SystemStoreNearVo> list;

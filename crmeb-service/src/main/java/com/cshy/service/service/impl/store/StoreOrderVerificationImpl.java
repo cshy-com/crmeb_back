@@ -2,9 +2,7 @@ package com.cshy.service.service.impl.store;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.DateConstants;
-import com.cshy.common.constants.TaskConstants;
+import com.cshy.common.constants.*;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.entity.system.SystemAdmin;
@@ -170,7 +168,7 @@ public class StoreOrderVerificationImpl implements StoreOrderVerification {
         // 添加核销人员后执行核销操作
         StoreOrder storeOrder = new StoreOrder();
         BeanUtils.copyProperties(existOrder,storeOrder);
-        storeOrder.setStatus(Constants.ORDER_STATUS_INT_BARGAIN);
+        storeOrder.setStatus(StoreOrderStatusConstants.ORDER_STATUS_INT_BARGAIN);
         storeOrder.setClerkId(currentAdmin.getId());
         boolean saveStatus = dao.updateById(storeOrder) > 0;
 
@@ -193,8 +191,8 @@ public class StoreOrderVerificationImpl implements StoreOrderVerification {
         StoreOrderVerificationConfirmResponse response = new StoreOrderVerificationConfirmResponse();
         StoreOrder storeOrderPram = new StoreOrder().setVerifyCode(vCode).setPaid(true).setRefundStatus(0);
         StoreOrder existOrder = storeOrderService.getByEntityOne(storeOrderPram);
-        if(null == existOrder) throw new CrmebException(Constants.RESULT_VERIFICATION_ORDER_NOT_FUND.replace("${vCode}",vCode));
-        if(existOrder.getStatus() > 0) throw new CrmebException(Constants.RESULT_VERIFICATION_ORDER_VED.replace("${vCode}",vCode));
+        if(null == existOrder) throw new CrmebException(MsgConstants.RESULT_VERIFICATION_ORDER_NOT_FUND.replace("${vCode}",vCode));
+        if(existOrder.getStatus() > 0) throw new CrmebException(MsgConstants.RESULT_VERIFICATION_ORDER_VED.replace("${vCode}",vCode));
         BeanUtils.copyProperties(existOrder, response);
         response.setStoreOrderInfoVos(storeOrderInfoService.getOrderListByOrderId(existOrder.getId()));
         return response;

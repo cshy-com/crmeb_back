@@ -17,8 +17,6 @@ import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.entity.order.StoreOrderInfo;
 import com.cshy.common.model.entity.product.StoreProductAttrValue;
 import com.cshy.common.model.entity.seckill.StoreSeckill;
-import com.cshy.common.model.entity.sms.SmsTemplate;
-import com.cshy.common.model.entity.system.SystemAdmin;
 import com.cshy.common.model.entity.system.SystemNotification;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.service.delete.OrderUtils;
@@ -458,7 +456,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
 
         Boolean execute = transactionTemplate.execute(e -> {
             // 日志
-            storeOrderStatusService.createLog(storeOrder.getId(), "user_take_delivery", Constants.ORDER_STATUS_STR_TAKE, 0);
+            storeOrderStatusService.createLog(storeOrder.getId(), "user_take_delivery", StoreOrderStatusConstants.ORDER_STATUS_STR_TAKE, 0);
             // 分佣-佣金进入冻结期
             if (CollUtil.isNotEmpty(recordList)) {
                 userBrokerageRecordService.updateBatchById(recordList);

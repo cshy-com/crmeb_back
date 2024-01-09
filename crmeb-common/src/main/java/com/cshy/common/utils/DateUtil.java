@@ -442,40 +442,40 @@ public final class DateUtil {
 
         if(!StringUtils.isBlank(data)){
             switch (data){
-                case Constants.SEARCH_DATE_DAY:
+                case DateConstants.SEARCH_DATE_DAY:
                     startTime = day;
                     break;
-                case Constants.SEARCH_DATE_YESTERDAY:
+                case DateConstants.SEARCH_DATE_YESTERDAY:
                     startTime = DateUtil.addDay(day, -1, DateConstants.DATE_FORMAT_START);
                     endTime = DateUtil.addDay(end, -1, DateConstants.DATE_FORMAT_END);
                     break;
-                case Constants.SEARCH_DATE_LATELY_7:
+                case DateConstants.SEARCH_DATE_LATELY_7:
                     startTime = DateUtil.addDay(day, -6, DateConstants.DATE_FORMAT_START);
                     break;
-                case Constants.SEARCH_DATE_WEEK:
+                case DateConstants.SEARCH_DATE_WEEK:
                     startTime = getWeekStartDay();
                     endTime = getWeekEndDay();
                     break;
-                case Constants.SEARCH_DATE_PRE_WEEK:
+                case DateConstants.SEARCH_DATE_PRE_WEEK:
                     startTime = getLastWeekStartDay();
                     endTime = getLastWeekEndDay();
                     break;
-                case Constants.SEARCH_DATE_LATELY_30:
+                case DateConstants.SEARCH_DATE_LATELY_30:
                     startTime = DateUtil.addDay(day, -30, DateConstants.DATE_FORMAT_START);
                     break;
-                case Constants.SEARCH_DATE_MONTH:
+                case DateConstants.SEARCH_DATE_MONTH:
                     startTime = DateUtil.nowDateTime(DateConstants.DATE_FORMAT_MONTH_START);
                     endTime = getMonthEndDay();
                     break;
-                case Constants.SEARCH_DATE_PRE_MONTH:
+                case DateConstants.SEARCH_DATE_PRE_MONTH:
                     startTime = getLastMonthStartDay();
                     endTime = getLastMonthEndDay();
                     break;
-                case Constants.SEARCH_DATE_YEAR:
+                case DateConstants.SEARCH_DATE_YEAR:
                     startTime = DateUtil.nowDateTime(DateConstants.DATE_FORMAT_YEAR_START);
                     endTime = DateUtil.nowDateTime(DateConstants.DATE_FORMAT_YEAR_START);
                     break;
-                case Constants.SEARCH_DATE_PRE_YEAR:
+                case DateConstants.SEARCH_DATE_PRE_YEAR:
                     startTime = getLastYearStartDay();
                     endTime = getLastYearEndDay();
                     break;
@@ -483,12 +483,12 @@ public final class DateUtil {
                     List<String> list = CrmebUtil.stringToArrayStr(data);
                     if(list.size() == 1){
                         throw new CrmebException("选择时间参数格式错误，请在 " +
-                                Constants.SEARCH_DATE_DAY + "|" +
-                                Constants.SEARCH_DATE_YESTERDAY + "|" +
-                                Constants.SEARCH_DATE_LATELY_7 + "|" +
-                                Constants.SEARCH_DATE_LATELY_30 + "|" +
-                                Constants.SEARCH_DATE_MONTH + "|" +
-                                Constants.SEARCH_DATE_YEAR + "|自定义时间范围（格式：yyyy-MM-dd HH:mm:ss，两个时间范围用逗号分割）");
+                                DateConstants.SEARCH_DATE_DAY + "|" +
+                                DateConstants.SEARCH_DATE_YESTERDAY + "|" +
+                                DateConstants.SEARCH_DATE_LATELY_7 + "|" +
+                                DateConstants.SEARCH_DATE_LATELY_30 + "|" +
+                                DateConstants.SEARCH_DATE_MONTH + "|" +
+                                DateConstants.SEARCH_DATE_YEAR + "|自定义时间范围（格式：yyyy-MM-dd HH:mm:ss，两个时间范围用逗号分割）");
                     }
                     startTime = list.get(0);
                     endTime = list.get(1);
@@ -606,7 +606,7 @@ public final class DateUtil {
     }
 
     public static void main(String[] args) {
-        dateLimitUtilVo dateLimit = getDateLimit(Constants.SEARCH_DATE_LATELY_7);
+        dateLimitUtilVo dateLimit = getDateLimit(DateConstants.SEARCH_DATE_LATELY_7);
         System.out.println(dateLimit.getStartTime());
         System.out.println(dateLimit.getEndTime());
     }

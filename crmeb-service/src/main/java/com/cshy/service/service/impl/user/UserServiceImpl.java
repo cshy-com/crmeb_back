@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.*;
+import com.cshy.common.model.Order;
 import com.cshy.common.model.entity.user.*;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.store.StoreCouponUserSearchRequest;
@@ -651,9 +652,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         if (StringUtils.isNotBlank(sortKey)) {
             map.put("sortKey", sortKey);
         }
-        map.put("sortValue", Constants.SORT_DESC);
-        if (isAsc.toLowerCase().equals(Constants.SORT_ASC)) {
-            map.put("sortValue", Constants.SORT_ASC);
+        map.put("sortValue", Order.DESC);
+        if (isAsc.toLowerCase().equals(Order.ASC)) {
+            map.put("sortValue", Order.ASC);
         }
 
         return userDao.getSpreadPeopleList(map);
@@ -697,7 +698,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         user.setAccount(phone);
         user.setPwd(CommonUtil.createPwd(phone));
         user.setPhone(phone);
-        user.setUserType(Constants.USER_LOGIN_TYPE_H5);
+        user.setUserType(LoginConstants.USER_LOGIN_TYPE_H5);
         user.setNickname("微信用户" + phone);
         user.setAvatar(systemConfigService.getValueByKey(Constants.USER_DEFAULT_AVATAR_CONFIG_KEY));
         Date nowDate = DateUtil.nowDateTime();
@@ -772,7 +773,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         user.setAccount(phone);
         user.setPwd(CommonUtil.createPwd(phone));
         user.setPhone(phone);
-        user.setUserType(Constants.USER_LOGIN_TYPE_H5);
+        user.setUserType(LoginConstants.USER_LOGIN_TYPE_H5);
         user.setNickname("微信用户" + phone);
         user.setAvatar(systemConfigService.getValueByKey(Constants.USER_DEFAULT_AVATAR_CONFIG_KEY));
         Date nowDate = DateUtil.nowDateTime();
@@ -929,7 +930,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             return false;
         }
         // 判断分销功能是否启用
-        String isOpen = systemConfigService.getValueByKey(Constants.CONFIG_KEY_STORE_BROKERAGE_IS_OPEN);
+        String isOpen = systemConfigService.getValueByKey(RedisKey.CONFIG_KEY_STORE_BROKERAGE_IS_OPEN);
         if (StrUtil.isBlank(isOpen) || isOpen.equals("0")) {
             return false;
         }
@@ -1032,9 +1033,9 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         topDetail.setUser(currentUser);
         topDetail.setBalance(currentUser.getNowMoney());
         topDetail.setIntegralCount(currentUser.getIntegral());
-        topDetail.setMothConsumeCount(storeOrderService.getSumPayPriceByUidAndDate(userId, Constants.SEARCH_DATE_MONTH));
+        topDetail.setMothConsumeCount(storeOrderService.getSumPayPriceByUidAndDate(userId, DateConstants.SEARCH_DATE_MONTH));
         topDetail.setAllConsumeCount(storeOrderService.getSumPayPriceByUid(userId));
-        topDetail.setMothOrderCount(storeOrderService.getOrderCountByUidAndDate(userId, Constants.SEARCH_DATE_MONTH));
+        topDetail.setMothOrderCount(storeOrderService.getOrderCountByUidAndDate(userId, DateConstants.SEARCH_DATE_MONTH));
         topDetail.setAllOrderCount(storeOrderService.getOrderCountByUid(userId));
         return topDetail;
     }
@@ -1053,13 +1054,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         user.setNickname(thirdUserRequest.getNickName());
         String avatar = null;
         switch (thirdUserRequest.getType()) {
-            case Constants.USER_LOGIN_TYPE_PUBLIC:
+            case LoginConstants.USER_LOGIN_TYPE_PUBLIC:
                 avatar = thirdUserRequest.getHeadimgurl();
                 break;
-            case Constants.USER_LOGIN_TYPE_PROGRAM:
-            case Constants.USER_LOGIN_TYPE_H5:
-            case Constants.USER_LOGIN_TYPE_IOS_WX:
-            case Constants.USER_LOGIN_TYPE_ANDROID_WX:
+            case LoginConstants.USER_LOGIN_TYPE_PROGRAM:
+            case LoginConstants.USER_LOGIN_TYPE_H5:
+            case LoginConstants.USER_LOGIN_TYPE_IOS_WX:
+            case LoginConstants.USER_LOGIN_TYPE_ANDROID_WX:
                 avatar = thirdUserRequest.getAvatar();
                 break;
         }

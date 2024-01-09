@@ -27,7 +27,6 @@ import com.cshy.common.model.entity.bargain.StoreBargainUser;
 import com.cshy.common.model.entity.cat.StoreCart;
 import com.cshy.common.model.entity.combination.StoreCombination;
 import com.cshy.common.model.entity.coupon.StoreCouponUser;
-import com.cshy.common.model.entity.express.Express;
 import com.cshy.common.model.entity.express.ShippingTemplates;
 import com.cshy.common.model.entity.express.ShippingTemplatesFree;
 import com.cshy.common.model.entity.express.ShippingTemplatesRegion;
@@ -131,9 +130,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private SystemAttachmentService systemAttachmentService;
-
-    @Autowired
-    private LogisticService logisticsService;
 
     @Autowired
     private StoreSeckillService storeSeckillService;
@@ -265,11 +261,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Boolean take(Integer id) {
         StoreOrder storeOrder = orderUtils.getInfoById(id);
-        if (!storeOrder.getStatus().equals(Constants.ORDER_STATUS_INT_SPIKE)) {
+        if (!storeOrder.getStatus().equals(StoreOrderStatusConstants.ORDER_STATUS_INT_SPIKE)) {
             throw new CrmebException("订单状态错误");
         }
         //已收货，待评价
-        storeOrder.setStatus(Constants.ORDER_STATUS_INT_BARGAIN);
+        storeOrder.setStatus(StoreOrderStatusConstants.ORDER_STATUS_INT_BARGAIN);
         boolean result = storeOrderService.updateById(storeOrder);
         if (result) {
             //后续操作放入redis
@@ -292,7 +288,7 @@ public class OrderServiceImpl implements OrderService {
         boolean result = storeOrderService.updateById(storeOrder);
 
         //后续操作放入redis
-        redisUtil.lPush(Constants.ORDER_TASK_REDIS_KEY_AFTER_CANCEL_BY_USER, id);
+        redisUtil.lPush(RedisKey.ORDER_TASK_REDIS_KEY_AFTER_CANCEL_BY_USER, id);
         return result;
     }
 
@@ -337,7 +333,7 @@ public class OrderServiceImpl implements OrderService {
 
         Boolean execute = transactionTemplate.execute(e -> {
             storeOrderService.updateById(existStoreOrder);
-            storeOrderStatusService.createLog(existStoreOrder.getId(), Constants.ORDER_LOG_REFUND_APPLY, request.getText(), 0);
+            storeOrderStatusService.createLog(existStoreOrder.getId(), StoreOrderStatusConstants.ORDER_LOG_REFUND_APPLY, request.getText(), 0);
             return Boolean.TRUE;
         });
 
@@ -572,7 +568,7 @@ public class OrderServiceImpl implements OrderService {
         systemStorePram.setId(storeOrder.getStoreId());
         storeOrderDetailResponse.setSystemStore(systemStoreService.getByCondition(systemStorePram));
         // 腾讯云地图key
-        storeOrderDetailResponse.setMapKey(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_SITE_TENG_XUN_MAP_KEY));
+        storeOrderDetailResponse.setMapKey(systemConfigService.getValueByKey(SysConfigConstants.CONFIG_SITE_TENCENT_MAP_KEY));
 
         BeanUtils.copyProperties(storeOrder, storeOrderDetailResponse);
         storeOrderDetailResponse.setStatusPic(orderStatusVo.getStr("statusPic"));
@@ -624,23 +620,23 @@ public class OrderServiceImpl implements OrderService {
             record.set("msg", "商家未发货,请耐心等待");
         } else if (storeOrder.getStatus() == 1) { // 待收货处理
             // 待收货
-            if (null != storeOrder.getDeliveryType() && storeOrder.getDeliveryType().equals(Constants.ORDER_LOG_EXPRESS)) {
+            if (null != storeOrder.getDeliveryType() && storeOrder.getDeliveryType().equals(StoreOrderStatusConstants.ORDER_LOG_EXPRESS)) {
                 StoreOrderStatus storeOrderStatus = new StoreOrderStatus();
                 storeOrderStatus.setOid(storeOrder.getId());
-                storeOrderStatus.setChangeType(Constants.ORDER_LOG_EXPRESS);
+                storeOrderStatus.setChangeType(StoreOrderStatusConstants.ORDER_LOG_EXPRESS);
                 List<StoreOrderStatus> sOrderStatusResults = storeOrderStatusService.getByEntity(storeOrderStatus);
                 if (sOrderStatusResults.size() > 0) {
                     record.set("type", 2);
                     record.set("title", "待收货");
                     record.set("msg", "商家已发货,请耐心等待");
-                    Optional<StoreOrderStatus> first = sOrderStatusResults.stream().filter(orderStatus -> orderStatus.getChangeType().equals(Constants.ORDER_LOG_EXPRESS)).findFirst();
+                    Optional<StoreOrderStatus> first = sOrderStatusResults.stream().filter(orderStatus -> orderStatus.getChangeType().equals(StoreOrderStatusConstants.ORDER_LOG_EXPRESS)).findFirst();
                     if (first.isPresent())
                         record.set("time", DateUtil.dateToStr(first.get().getCreateTime(), DateConstants.DATE_FORMAT));
                 }
             } else {
                 StoreOrderStatus storeOrderStatus = new StoreOrderStatus();
                 storeOrderStatus.setOid(storeOrder.getId());
-                storeOrderStatus.setChangeType(Constants.ORDER_LOG_DELIVERY_VI);
+                storeOrderStatus.setChangeType(StoreOrderStatusConstants.ORDER_LOG_DELIVERY_VI);
                 List<StoreOrderStatus> sOrderStatusResults = storeOrderStatusService.getByEntity(storeOrderStatus);
                 if (sOrderStatusResults.size() > 0) {
                     record.set("type", 2);
@@ -693,7 +689,7 @@ public class OrderServiceImpl implements OrderService {
         // 订单数量
         Integer orderCount = storeOrderService.getOrderCountByUid(userId);
         // 待支付订单数
-        Integer unPaidCount = storeOrderService.getTopDataUtil(Constants.ORDER_STATUS_H5_UNPAID, userId);
+        Integer unPaidCount = storeOrderService.getTopDataUtil(StoreOrderStatusConstants.ORDER_STATUS_H5_UNPAID, userId);
 
         if (orderCount.equals(0)) {
             result.setOrderCount(0);
@@ -714,15 +710,15 @@ public class OrderServiceImpl implements OrderService {
         // 未支付
         result.setUnPaidCount(unPaidCount);
         // 待发货
-        result.setUnShippedCount(storeOrderService.getTopDataUtil(Constants.ORDER_STATUS_H5_NOT_SHIPPED, userId));
+        result.setUnShippedCount(storeOrderService.getTopDataUtil(StoreOrderStatusConstants.ORDER_STATUS_H5_NOT_SHIPPED, userId));
         // 待收货
-        result.setReceivedCount(storeOrderService.getTopDataUtil(Constants.ORDER_STATUS_H5_SPIKE, userId));
+        result.setReceivedCount(storeOrderService.getTopDataUtil(StoreOrderStatusConstants.ORDER_STATUS_H5_SPIKE, userId));
         // 待核销
-        result.setEvaluatedCount(storeOrderService.getTopDataUtil(Constants.ORDER_STATUS_H5_JUDGE, userId));
+        result.setEvaluatedCount(storeOrderService.getTopDataUtil(StoreOrderStatusConstants.ORDER_STATUS_H5_JUDGE, userId));
         // 已完成
-        result.setCompleteCount(storeOrderService.getTopDataUtil(Constants.ORDER_STATUS_H5_COMPLETE, userId));
+        result.setCompleteCount(storeOrderService.getTopDataUtil(StoreOrderStatusConstants.ORDER_STATUS_H5_COMPLETE, userId));
         // 退款中和已退款（只展示退款中）
-        result.setRefundCount(storeOrderService.getTopDataUtil(Constants.ORDER_STATUS_H5_REFUNDING, userId));
+        result.setRefundCount(storeOrderService.getTopDataUtil(StoreOrderStatusConstants.ORDER_STATUS_H5_REFUNDING, userId));
         return result;
     }
 
@@ -733,58 +729,10 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public List<String> getRefundReason() {
-        String reasonString = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_STOR_REASON);
+        String reasonString = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_STORE_REASON);
         reasonString = CrmebUtil.UnicodeToCN(reasonString);
         reasonString = reasonString.replace("rn", "n");
         return Arrays.asList(reasonString.split("\\n"));
-    }
-
-    /**
-     * 订单物流查看
-     *
-     * @param orderId 订单id
-     */
-    @Override
-    public Object expressOrder(String orderId) {
-        HashMap<String, Object> resultMap = new HashMap<>();
-        StoreOrder storeOrderPram = new StoreOrder();
-        storeOrderPram.setOrderId(orderId);
-        StoreOrder existOrder = storeOrderService.getByEntityOne(storeOrderPram);
-        if (ObjectUtil.isNull(existOrder)) throw new CrmebException("未找到该订单信息");
-        if (!existOrder.getDeliveryType().equals(Constants.ORDER_LOG_EXPRESS) || StringUtils.isBlank(existOrder.getDeliveryType()))
-            throw new CrmebException("该订单不存在快递订单号");
-
-        if (existOrder.getType().equals(1)) {// 视频号订单
-            Express express = expressService.getByName(existOrder.getDeliveryName());
-            if (ObjectUtil.isNotNull(express)) {
-                existOrder.setDeliveryCode(express.getCode());
-            } else {
-                existOrder.setDeliveryCode("");
-            }
-        }
-        LogisticsResultVo expressInfo = logisticsService.info(existOrder.getTrackingNo(), null, Optional.ofNullable(existOrder.getDeliveryCode()).orElse(""), storeOrderPram.getUserMobile());
-
-        List<StoreOrderInfoVo> list = storeOrderInfoService.getVoListByOrderId(existOrder.getId());
-        List<HashMap<String, Object>> cartInfos = CollUtil.newArrayList();
-        for (StoreOrderInfoVo infoVo : list) {
-            HashMap<String, Object> cartInfo = new HashMap<>();
-            cartInfo.put("payNum", infoVo.getInfo().getPayNum());
-            cartInfo.put("price", infoVo.getInfo().getPrice());
-            cartInfo.put("productName", infoVo.getInfo().getProductName());
-            cartInfo.put("productImg", infoVo.getInfo().getMainImage());
-            cartInfo.put("attrValueImg", infoVo.getInfo().getAttrValueImage());
-            cartInfos.add(cartInfo);
-        }
-        HashMap<String, Object> orderInfo = new HashMap<>();
-        orderInfo.put("deliveryId", existOrder.getTrackingNo());
-        orderInfo.put("deliveryName", existOrder.getDeliveryName());
-        orderInfo.put("deliveryType", existOrder.getDeliveryType());
-        orderInfo.put("info", cartInfos);
-
-        resultMap.put("order", orderInfo);
-        resultMap.put("express", expressInfo);
-        return resultMap;
-
     }
 
     /**
@@ -1066,10 +1014,10 @@ public class OrderServiceImpl implements OrderService {
 
             storeOrder.setStatus(1);
             storeOrder.setTrackingNo(trackingNo);
-            storeOrder.setDeliveryType(Constants.ORDER_LOG_EXPRESS);
+            storeOrder.setDeliveryType(StoreOrderStatusConstants.ORDER_LOG_EXPRESS);
             this.storeOrderService.updateById(storeOrder);
 
-            this.storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_EXPRESS, Constants.ORDER_STATUS_STR_SHIPPING, 1);
+            this.storeOrderStatusService.createLog(storeOrder.getId(), StoreOrderStatusConstants.ORDER_LOG_EXPRESS, StoreOrderStatusConstants.ORDER_STATUS_STR_SHIPPING, 1);
 
             //短连接
             ShortUrl shortUrl = shortUrlService.getOne(new LambdaQueryWrapper<ShortUrl>().eq(ShortUrl::getLocation, 0).like(ShortUrl::getParam, storeOrder.getOrderId()));
@@ -1103,8 +1051,8 @@ public class OrderServiceImpl implements OrderService {
         StoreOrder storeOrder = this.storeOrderService.getById(id);
         if (Objects.nonNull(storeOrder)) {
             //需要排除的操作类型
-            List<String> constantList = Lists.newArrayList(Constants.ORDER_LOG_EXPRESS, Constants.ORDER_LOG_PAY_SUCCESS
-                    , Constants.ORDER_LOG_DELIVERY_VI, Constants.ORDER_LOG_EDIT, Constants.ORDER_STATUS_CACHE_CREATE_ORDER);
+            List<String> constantList = Lists.newArrayList(StoreOrderStatusConstants.ORDER_LOG_EXPRESS, StoreOrderStatusConstants.ORDER_LOG_PAY_SUCCESS
+                    , StoreOrderStatusConstants.ORDER_LOG_DELIVERY_VI, StoreOrderStatusConstants.ORDER_LOG_EDIT, StoreOrderStatusConstants.ORDER_STATUS_CACHE_CREATE_ORDER);
             //查询
             List<StoreOrderStatus> orderStatusList = this.storeOrderStatusService.list(new LambdaQueryWrapper<StoreOrderStatus>()
                     .eq(StoreOrderStatus::getOid, storeOrder.getId())
@@ -1116,7 +1064,7 @@ public class OrderServiceImpl implements OrderService {
                 map = CommonUtil.objToMap(orderStatus, StoreOrderStatus.class);
 
                 //特殊处理
-                if (orderStatus.getChangeType().equals(Constants.ORDER_LOG_REFUND_APPLY)) {
+                if (orderStatus.getChangeType().equals(StoreOrderStatusConstants.ORDER_LOG_REFUND_APPLY)) {
                     map.put("mobile", storeOrder.getRefundMobile());
                     map.put("desc", storeOrder.getRefundReasonWapExplain());
                     map.put("refundPrice", storeOrder.getRefundPrice());
@@ -1125,31 +1073,31 @@ public class OrderServiceImpl implements OrderService {
                 //转译
                 String changeType;
                 switch (orderStatus.getChangeType()) {
-                    case Constants.ORDER_LOG_REFUND_REFUSE:
+                    case StoreOrderStatusConstants.ORDER_LOG_REFUND_REFUSE:
                         if (storeOrder.getRefundType().equals(0))
                             changeType = "退款被拒绝";
                         else
                             changeType = "退货退款被拒绝";
                         break;
-                    case Constants.ORDER_LOG_REFUND_PRICE:
+                    case StoreOrderStatusConstants.ORDER_LOG_REFUND_PRICE:
                         changeType = "已退款";
                         break;
-                    case Constants.ORDER_LOG_RETURN_GOODS:
+                    case StoreOrderStatusConstants.ORDER_LOG_RETURN_GOODS:
                         changeType = "退货中";
                         break;
-                    case Constants.ORDER_LOG_REFUND_APPLY:
+                    case StoreOrderStatusConstants.ORDER_LOG_REFUND_APPLY:
                         if (storeOrder.getRefundType().equals(0))
                             changeType = "用户申请退款";
                         else
                             changeType = "用户申请退货退款";
                         break;
-                    case Constants.ORDER_LOG_AGREE_RETURN:
+                    case StoreOrderStatusConstants.ORDER_LOG_AGREE_RETURN:
                         changeType = "平台同意退货退款";
                         break;
-                    case Constants.ORDER_LOG_AGREE_REFUND:
+                    case StoreOrderStatusConstants.ORDER_LOG_AGREE_REFUND:
                         changeType = "平台同意退款";
                         break;
-                    case Constants.ORDER_LOG_REFUND_REVOKE:
+                    case StoreOrderStatusConstants.ORDER_LOG_REFUND_REVOKE:
                         changeType = "用户撤销售后";
                         break;
                     default:
@@ -1183,7 +1131,7 @@ public class OrderServiceImpl implements OrderService {
 
         storeOrderService.updateById(storeOrder);
 
-        storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_LOG_REFUND_REVOKE, Constants.ORDER_STATUS_STR_REFUND_REVOKE, 0);
+        storeOrderStatusService.createLog(storeOrder.getId(), StoreOrderStatusConstants.ORDER_LOG_REFUND_REVOKE, StoreOrderStatusConstants.ORDER_STATUS_STR_REFUND_REVOKE, 0);
     }
 
     private void handleOrder(OrderInfoVo infoVo, List<String> storeOrderIdList, User user, CreateOrderRequest request) {
@@ -1434,7 +1382,7 @@ public class OrderServiceImpl implements OrderService {
             // 保存购物车商品详情
             storeOrderInfoService.saveOrderInfos(storeOrderInfos);
             // 生成订单日志
-            storeOrderStatusService.createLog(storeOrder.getId(), Constants.ORDER_STATUS_CACHE_CREATE_ORDER, "订单生成", 0);
+            storeOrderStatusService.createLog(storeOrder.getId(), StoreOrderStatusConstants.ORDER_STATUS_CACHE_CREATE_ORDER, "订单生成", 0);
 
             // 清除购物车数据
             if (CollUtil.isNotEmpty(infoVo.getCartIdList())) {

@@ -1,7 +1,7 @@
 package com.cshy.admin.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.utils.RedisUtil;
@@ -47,7 +47,7 @@ public class ValidateCodeServiceImpl implements ValidateCodeService {
      * @param md5Key value的md5加密值
      */
     public String getRedisKey(String md5Key) {
-        return Constants.VALIDATE_REDIS_KEY_PREFIX + md5Key;
+        return RedisKey.VALIDATE_REDIS_KEY_PREFIX + md5Key;
     }
 
     /**

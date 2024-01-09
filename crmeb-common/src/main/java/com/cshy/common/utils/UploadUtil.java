@@ -1,8 +1,8 @@
 package com.cshy.common.utils;
 
 import cn.hutool.core.util.RandomUtil;
-import com.cshy.common.constants.Constants;
 import com.cshy.common.constants.DateConstants;
+import com.cshy.common.constants.UploadConstants;
 import com.cshy.common.exception.CrmebException;
 import org.apache.commons.io.FilenameUtils;
 
@@ -20,7 +20,7 @@ public class UploadUtil {
     private static String rootPath  = "";
 
     //类型
-    private static String type = "/" + Constants.UPLOAD_TYPE_IMAGE;
+    private static String type = "/" + UploadConstants.UPLOAD_TYPE_IMAGE;
 
 
     //模块

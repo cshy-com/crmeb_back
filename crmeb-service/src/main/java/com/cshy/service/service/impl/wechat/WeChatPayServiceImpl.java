@@ -4,10 +4,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.PayConstants;
-import com.cshy.common.constants.PayType;
-import com.cshy.common.constants.TaskConstants;
+import com.cshy.common.constants.*;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.combination.StoreCombination;
 import com.cshy.common.model.entity.combination.StorePink;
@@ -146,19 +143,19 @@ public class WeChatPayServiceImpl implements WeChatPayService {
             String mchId = "";
             String signKey = "";
             if (storeOrder.getPaymentChannel() == 0) {// 公众号
-                appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
-                mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
-                signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
+                appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
+                mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
+                signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
             }
             if (storeOrder.getPaymentChannel() == 1) {// 小程序
-                appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_APP_ID);
-                mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_MCH_ID);
-                signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_APP_KEY);
+                appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_APP_ID);
+                mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_MCH_ID);
+                signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_APP_KEY);
             }
             if (storeOrder.getPaymentChannel() == 2) {// H5
-                appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
-                mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
-                signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
+                appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
+                mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
+                signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
             }
 
             // 生成查询订单对象
@@ -261,14 +258,14 @@ public class WeChatPayServiceImpl implements WeChatPayService {
         String mchId = "";
         String signKey = "";
         if ("public".equals(userRecharge.getRechargeType())) {// 公众号
-            appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
-            mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
+            appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
+            mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
         }
         if ("routine".equals(userRecharge.getRechargeType())) {// 小程序
-            appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_APP_ID);
-            mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_MCH_ID);
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_APP_KEY);
+            appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_APP_ID);
+            mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_MCH_ID);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_APP_KEY);
         }
         // 生成查询订单对象
         Map<String, String> payVo = getWxChantQueryPayVo(orderNo, appId, mchId, signKey);
@@ -316,23 +313,23 @@ public class WeChatPayServiceImpl implements WeChatPayService {
         String mchId = "";
         String signKey = "";
         if (userRecharge.getRechargeType().equals(PayConstants.PAY_CHANNEL_WE_CHAT_PUBLIC)) {// 公众号
-            appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
-            mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
+            appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
+            mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
         }
         if (userRecharge.getRechargeType().equals(PayConstants.PAY_CHANNEL_WE_CHAT_PROGRAM)) {// 小程序
-            appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_APP_ID);
-            mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_MCH_ID);
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_ROUTINE_APP_KEY);
+            appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_APP_ID);
+            mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_MCH_ID);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_APP_KEY);
         }
         if (userRecharge.getRechargeType().equals(PayConstants.PAY_CHANNEL_WE_CHAT_H5)) {// H5,使用公众号的
-            appId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
-            mchId = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
-            signKey = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
+            appId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_ID);
+            mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_MCH_ID);
+            signKey = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_WE_CHAT_APP_KEY);
         }
 
         // 获取微信预下单对象
-        CreateOrderRequestVo unifiedorderVo = getUnifiedorderVo(userRecharge, userToken.getToken(), clientIp, appId, mchId, signKey);
+        CreateOrderRequestVo unifiedorderVo = getUnifiedOrderVo(userRecharge, userToken.getToken(), clientIp, appId, mchId, signKey);
         // 预下单
         CreateOrderResponseVo responseVo = unifiedOrder(unifiedorderVo);
 
@@ -371,11 +368,11 @@ public class WeChatPayServiceImpl implements WeChatPayService {
      * 获取微信预下单对象
      * @return
      */
-    private CreateOrderRequestVo getUnifiedorderVo(UserRecharge userRecharge, String openid, String ip, String appId, String mchId, String signKey) {
+    private CreateOrderRequestVo getUnifiedOrderVo(UserRecharge userRecharge, String openid, String ip, String appId, String mchId, String signKey) {
 
         // 获取域名
-        String domain = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_SITE_URL);
-        String apiDomain = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_API_URL);
+        String domain = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_SITE_URL);
+        String apiDomain = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_API_URL);
 
         AttachVo attachVo = new AttachVo(Constants.SERVICE_PAY_TYPE_RECHARGE, userRecharge.getUid());
         CreateOrderRequestVo vo = new CreateOrderRequestVo();
@@ -404,7 +401,7 @@ public class WeChatPayServiceImpl implements WeChatPayService {
         CreateOrderH5SceneInfoVo createOrderH5SceneInfoVo = new CreateOrderH5SceneInfoVo(
                 new CreateOrderH5SceneInfoDetailVo(
                         domain,
-                        systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_SITE_NAME)
+                        systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_SITE_NAME)
                 )
         );
         vo.setScene_info(JSONObject.toJSONString(createOrderH5SceneInfoVo));

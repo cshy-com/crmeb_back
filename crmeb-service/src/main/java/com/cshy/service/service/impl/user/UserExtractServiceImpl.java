@@ -9,10 +9,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.DateConstants;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.constants.BrokerageRecordConstants;
-import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.response.UserExtractRecordResponse;
 import com.cshy.service.service.system.SystemAttachmentService;
@@ -340,7 +340,7 @@ public class UserExtractServiceImpl extends ServiceImpl<UserExtractDao, UserExtr
     @Override
     public Boolean extractApply(UserExtractRequest request) {
         //添加判断，提现金额不能后台配置金额
-        String value = systemConfigService.getValueByKeyException(Constants.CONFIG_EXTRACT_MIN_PRICE);
+        String value = systemConfigService.getValueByKeyException(RedisKey.CONFIG_EXTRACT_MIN_PRICE);
         BigDecimal ten = new BigDecimal(value);
         if (request.getExtractPrice().compareTo(ten) < 0) {
             throw new CrmebException(StrUtil.format("最低提现金额{}元", ten));

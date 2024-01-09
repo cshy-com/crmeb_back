@@ -9,9 +9,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.Constants;
 import com.cshy.common.constants.DateConstants;
 import com.cshy.common.constants.ProductType;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttr;
@@ -757,7 +757,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
      */
     @Override
     public void consumeProductStock() {
-        String redisKey = Constants.PRODUCT_SECKILL_STOCK_UPDATE;
+        String redisKey = RedisKey.PRODUCT_SEC_KILL_STOCK_UPDATE;
         Long size = redisUtil.getListSize(redisKey);
         logger.info("StoreProductServiceImpl.doProductStock | size:" + size);
         if (size < 1) {

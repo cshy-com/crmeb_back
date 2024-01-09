@@ -8,16 +8,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cshy.common.constants.DateConstants;
-import com.cshy.common.constants.ProductType;
+import com.cshy.common.constants.*;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttr;
 import com.cshy.common.model.entity.product.StoreProductAttrValue;
 import com.cshy.common.model.entity.product.StoreProductDescription;
 import com.cshy.common.model.page.CommonPage;
-import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.ProductConstants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.order.OrderRefundApplyRequest;
@@ -880,7 +877,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
 
     @Override
     public void consumeProductStock() {
-        String redisKey = Constants.PRODUCT_COMBINATION_STOCK_UPDATE;
+        String redisKey = RedisKey.PRODUCT_COMBINATION_STOCK_UPDATE;
         Long size = redisUtil.getListSize(redisKey);
         logger.info("StoreProductServiceImpl.doProductStock | size:" + size);
         if (size < 1) {
@@ -1049,7 +1046,7 @@ public class StoreCombinationServiceImpl extends ServiceImpl<StoreCombinationDao
         Integer totalPeople = storePinkService.getTotalPeople();
 
         // 获取拼团列表banner
-        List<HashMap<String, Object>> bannerList = systemGroupDataService.getListMapByGid(Constants.GROUP_DATA_ID_COMBINATION_LIST_BANNNER);
+        List<HashMap<String, Object>> bannerList = systemGroupDataService.getListMapByGid(SysFormConstants.GROUP_DATA_ID_COMBINATION_LIST_BANNNER);
 
         CombinationHeaderResponse response = new CombinationHeaderResponse();
         response.setAvatarList(avatarList);

@@ -1,10 +1,7 @@
 package com.cshy.service.delete;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.cshy.common.constants.Constants;
-import com.cshy.common.constants.PayConstants;
-import com.cshy.common.constants.PayType;
-import com.cshy.common.constants.SysConfigConstants;
+import com.cshy.common.constants.*;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.vo.order.StoreOrderInfoOldVo;
@@ -133,46 +130,46 @@ public class OrderUtils {
     public void statusApiByWhere(LambdaQueryWrapper<StoreOrder> queryWrapper, Integer status){
         if (Objects.nonNull(status)){
             switch (status){
-                case Constants.ORDER_STATUS_H5_UNPAID: // 未支付
+                case StoreOrderStatusConstants.ORDER_STATUS_H5_UNPAID: // 未支付
                     queryWrapper.eq(StoreOrder::getPaid, false);
                     queryWrapper.eq(StoreOrder::getStatus, 0);
                     queryWrapper.eq(StoreOrder::getRefundStatus, 0);
                     queryWrapper.eq(StoreOrder::getType, 0);
                     break;
-                case Constants.ORDER_STATUS_H5_NOT_SHIPPED: // 待发货
+                case StoreOrderStatusConstants.ORDER_STATUS_H5_NOT_SHIPPED: // 待发货
                     queryWrapper.eq(StoreOrder::getPaid, true);
                     queryWrapper.eq(StoreOrder::getStatus, 0);
                     queryWrapper.notIn(StoreOrder::getRefundStatus, 1, 2, 3, 4, 5);
 //                queryWrapper.eq(StoreOrder::getShippingType, 1);
                     break;
-                case Constants.ORDER_STATUS_H5_SPIKE: // 待收货
+                case StoreOrderStatusConstants.ORDER_STATUS_H5_SPIKE: // 待收货
                     queryWrapper.eq(StoreOrder::getPaid, true);
                     queryWrapper.eq(StoreOrder::getStatus, 1);
                     queryWrapper.notIn(StoreOrder::getRefundStatus, 1, 2, 3, 4, 5);
                     break;
-                case Constants.ORDER_STATUS_H5_JUDGE: //  已支付 已收货 待评价
+                case StoreOrderStatusConstants.ORDER_STATUS_H5_JUDGE: //  已支付 已收货 待评价
                     queryWrapper.eq(StoreOrder::getPaid, true);
                     queryWrapper.eq(StoreOrder::getStatus, 2);
                     queryWrapper.notIn(StoreOrder::getRefundStatus, 1, 2, 3, 4, 5);
                     break;
-                case Constants.ORDER_STATUS_H5_COMPLETE: // 已完成
+                case StoreOrderStatusConstants.ORDER_STATUS_H5_COMPLETE: // 已完成
                     queryWrapper.eq(StoreOrder::getPaid, true);
                     queryWrapper.eq(StoreOrder::getStatus, 3);
                     queryWrapper.eq(StoreOrder::getRefundStatus, 0);
                     break;
-                case Constants.ORDER_STATUS_H5_REFUNDING: // 退款中
+                case StoreOrderStatusConstants.ORDER_STATUS_H5_REFUNDING: // 退款中
                     queryWrapper.eq(StoreOrder::getPaid, true);
                     queryWrapper.in(StoreOrder::getRefundStatus, 1, 3);
                     break;
-                case Constants.ORDER_STATUS_H5_REFUNDED: // 已退款
+                case StoreOrderStatusConstants.ORDER_STATUS_H5_REFUNDED: // 已退款
                     queryWrapper.eq(StoreOrder::getPaid, true);
                     queryWrapper.eq(StoreOrder::getRefundStatus, 2);
                     break;
-                case Constants.ORDER_STATUS_H5_REFUND: // 包含已退款和退款中 退货待发货  退货已发货 退货退款被拒绝
+                case StoreOrderStatusConstants.ORDER_STATUS_H5_REFUND: // 包含已退款和退款中 退货待发货  退货已发货 退货退款被拒绝
                     queryWrapper.eq(StoreOrder::getPaid, true);
                     queryWrapper.in(StoreOrder::getRefundStatus, 1,2,3,4,5,6);
                     break;
-                case Constants.ORDER_STATUS_H5_REFUND_PROCESSING: // 包含已退款和退款中 退货待发货  退货已发货 退货退款被拒绝
+                case StoreOrderStatusConstants.ORDER_STATUS_H5_REFUND_PROCESSING: // 包含已退款和退款中 退货待发货  退货已发货 退货退款被拒绝
                     queryWrapper.eq(StoreOrder::getPaid, true);
                     queryWrapper.eq(StoreOrder::getRefundStatus, 4);
                     break;

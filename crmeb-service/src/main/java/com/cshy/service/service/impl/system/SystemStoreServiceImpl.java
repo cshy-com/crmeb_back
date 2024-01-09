@@ -3,8 +3,8 @@ package com.cshy.service.service.impl.system;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.request.store.StoreNearRequest;
 import com.cshy.common.model.request.system.SystemStoreRequest;
@@ -173,7 +173,7 @@ public class SystemStoreServiceImpl extends ServiceImpl<SystemStoreDao, SystemSt
     @Override
     public StoreNearResponse getNearList(StoreNearRequest request, PageParamRequest pageParamRequest) {
         StoreNearResponse storeNearResponse = new StoreNearResponse();
-        storeNearResponse.setTengXunMapKey(systemConfigService.getValueByKey(Constants.CONFIG_SITE_TENG_XUN_MAP_KEY));
+        storeNearResponse.setTencentMapKey(systemConfigService.getValueByKey(RedisKey.CONFIG_SITE_TENCENT_MAP_KEY));
 
         PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
 

@@ -88,11 +88,6 @@ public interface OrderService {
     Boolean refundApplyTask(List<OrderRefundApplyRequest> applyList);
 
     /**
-     * 订单物流查看
-     */
-    Object expressOrder(String orderId);
-
-    /**
      * 获取待评价商品信息
      * @param getProductReply 订单详情参数
      * @return 待评价

@@ -6,8 +6,8 @@ import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cshy.common.constants.Constants;
 import com.cshy.common.constants.DateConstants;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.NoModelWriteData;
 import com.cshy.common.model.dto.giftCard.GiftCardDto;
@@ -332,18 +332,18 @@ public class GiftCardServiceImpl extends BaseServiceImpl<GiftCard, GiftCardDto,
 
     private int generateSerialNo() {
         int serialNo;
-        if (!redisUtil.exists(Constants.GIFT_CARD_SERIAL_NUMBER)) {
+        if (!redisUtil.exists(RedisKey.GIFT_CARD_SERIAL_NUMBER)) {
             //从数据库中查询最大的序列号并设置redis
             List<GiftCard> list = this.list(new LambdaQueryWrapper<GiftCard>().orderByDesc(GiftCard::getSerialNo));
             if (CollUtil.isEmpty(list)) {
-                redisUtil.set(Constants.GIFT_CARD_SERIAL_NUMBER, 1);
+                redisUtil.set(RedisKey.GIFT_CARD_SERIAL_NUMBER, 1);
                 serialNo = 1;
             } else {
                 serialNo = Integer.valueOf(list.get(0).getSerialNo()) + 1;
-                redisUtil.set(Constants.GIFT_CARD_SERIAL_NUMBER, serialNo);
+                redisUtil.set(RedisKey.GIFT_CARD_SERIAL_NUMBER, serialNo);
             }
         } else {
-            serialNo = (int) redisUtil.incr(Constants.GIFT_CARD_SERIAL_NUMBER, 1);
+            serialNo = (int) redisUtil.incr(RedisKey.GIFT_CARD_SERIAL_NUMBER, 1);
         }
         return serialNo;
     }

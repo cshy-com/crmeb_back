@@ -1,7 +1,7 @@
 package com.cshy.common.annotation;
 
 
-import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.enums.LimitType;
 
 import java.lang.annotation.*;
@@ -18,7 +18,7 @@ public @interface RateLimiter
     /**
      * 限流key
      */
-    public String key() default Constants.RATE_LIMIT_KEY;
+    public String key() default RedisKey.RATE_LIMIT_KEY;
 
     /**
      * 限流时间,单位秒

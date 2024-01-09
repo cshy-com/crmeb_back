@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.cshy.admin.filter.TokenComponent;
 import com.cshy.admin.service.AdminLoginService;
 import com.cshy.admin.service.ValidateCodeService;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.constants.SysConfigConstants;
 import com.cshy.common.constants.SysGroupDataConstants;
 import com.cshy.common.exception.CrmebException;
@@ -122,10 +123,10 @@ public class AdminLoginServiceImpl implements AdminLoginService {
     public Map<String, Object> getLoginPic() {
         Map<String, Object> map = new HashMap<>();
         //背景图
-        map.put("backgroundImage", systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_LOGIN_BACKGROUND_IMAGE));
+        map.put("backgroundImage", systemConfigService.getValueByKey(RedisKey.CONFIG_KEY_ADMIN_LOGIN_BACKGROUND_IMAGE));
         //logo
-        map.put("logo", systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_LOGIN_LOGO_LEFT_TOP));
-        map.put("loginLogo", systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_ADMIN_LOGIN_LOGO_LOGIN));
+        map.put("logo", systemConfigService.getValueByKey(RedisKey.CONFIG_KEY_ADMIN_LOGIN_LOGO_LEFT_TOP));
+        map.put("loginLogo", systemConfigService.getValueByKey(RedisKey.CONFIG_KEY_ADMIN_LOGIN_LOGO_LOGIN));
         //轮播图
         List<SystemGroupDataAdminLoginBannerResponse> bannerList = systemGroupDataService.getListByGid(SysGroupDataConstants.GROUP_DATA_ID_ADMIN_LOGIN_BANNER_IMAGE_LIST, SystemGroupDataAdminLoginBannerResponse.class);
         map.put("banner", bannerList);

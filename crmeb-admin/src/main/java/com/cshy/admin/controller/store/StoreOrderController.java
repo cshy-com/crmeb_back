@@ -152,16 +152,6 @@ public class StoreOrderController {
         return CommonResult.failed();
     }
 
-    /**
-     * 快递查询
-     */
-    @PreAuthorize("hasAuthority('admin:order:logistics:info')")
-    @ApiOperation(value = "快递查询")
-    @RequestMapping(value = "/getLogisticsInfo", method = RequestMethod.GET)
-    public CommonResult<LogisticsResultVo> getLogisticsInfo(@RequestParam(value = "orderNo") String orderNo) {
-        return CommonResult.success(storeOrderService.getLogisticsInfo(orderNo));
-    }
-
     @PreAuthorize("hasAuthority('admin:order:statistics')")
     @ApiOperation(value = "核销订单头部数据")
     @RequestMapping(value = "/statistics", method = RequestMethod.GET)

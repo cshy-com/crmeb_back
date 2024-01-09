@@ -212,7 +212,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
     @Override
     public List<String> getExtractBank() {
         // 获取提现银行
-        String bank = systemConfigService.getValueByKeyException(Constants.CONFIG_BANK_LIST).replace("\r\n", "\n");
+        String bank = systemConfigService.getValueByKeyException(RedisKey.CONFIG_BANK_LIST).replace("\r\n", "\n");
         List<String> bankArr = new ArrayList<>();
         if (bank.indexOf("\n") > 0) {
             bankArr.addAll(Arrays.asList(bank.split("\n")));
@@ -270,7 +270,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
     public UserRechargeFrontResponse getRechargeConfig() {
         UserRechargeFrontResponse userRechargeResponse = new UserRechargeFrontResponse();
         userRechargeResponse.setRechargeQuota(systemGroupDataService.getListByGid(SysGroupDataConstants.GROUP_DATA_ID_RECHARGE_LIST, UserRechargeItemResponse.class));
-        String rechargeAttention = systemConfigService.getValueByKey(Constants.CONFIG_RECHARGE_ATTENTION);
+        String rechargeAttention = systemConfigService.getValueByKey(RedisKey.CONFIG_RECHARGE_ATTENTION);
         List<String> rechargeAttentionList = new ArrayList<>();
         if (StringUtils.isNotBlank(rechargeAttention)) {
             rechargeAttentionList = CrmebUtil.stringToArrayStrRegex(rechargeAttention, "\n");
@@ -371,7 +371,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
         request.setPayType(PayType.PAY_TYPE_WE_CHAT);
 
         //验证金额是否为最低金额
-        String rechargeMinAmountStr = systemConfigService.getValueByKeyException(Constants.CONFIG_KEY_RECHARGE_MIN_AMOUNT);
+        String rechargeMinAmountStr = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_RECHARGE_MIN_AMOUNT);
         BigDecimal rechargeMinAmount = new BigDecimal(rechargeMinAmountStr);
         int compareResult = rechargeMinAmount.compareTo(request.getPrice());
         if (compareResult > 0) {
@@ -475,7 +475,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
         RegisterThirdUserRequest registerThirdUserRequest = new RegisterThirdUserRequest();
         BeanUtils.copyProperties(userInfo, registerThirdUserRequest);
         registerThirdUserRequest.setSpreadPid(spreadUid);
-        registerThirdUserRequest.setType(Constants.USER_LOGIN_TYPE_PUBLIC);
+        registerThirdUserRequest.setType(LoginConstants.USER_LOGIN_TYPE_PUBLIC);
         registerThirdUserRequest.setOpenId(oauthToken.getOpenId());
         String key = SecureUtil.md5(oauthToken.getOpenId());
         redisUtil.set(key, JSONObject.toJSONString(registerThirdUserRequest), (long) (60 * 2), TimeUnit.MINUTES);
@@ -491,7 +491,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
      */
     @Override
     public String getLogo() {
-        return systemConfigService.getValueByKey(Constants.CONFIG_KEY_MOBILE_LOGIN_LOGO);
+        return systemConfigService.getValueByKey(RedisKey.CONFIG_KEY_MOBILE_LOGIN_LOGO);
     }
 
     /**
@@ -550,7 +550,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
             return loginResponse;
         }
 
-        request.setType(Constants.USER_LOGIN_TYPE_PROGRAM);
+        request.setType(LoginConstants.USER_LOGIN_TYPE_PROGRAM);
         request.setOpenId(response.getOpenId());
         String key = SecureUtil.md5(response.getOpenId());
         redisUtil.set(key, JSONObject.toJSONString(request), (long) (60 * 2), TimeUnit.MINUTES);
@@ -625,7 +625,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
      */
     @Override
     public List<UserSpreadBannerResponse> getSpreadBannerList() {
-        return systemGroupDataService.getListByGid(Constants.GROUP_DATA_ID_SPREAD_BANNER_LIST, UserSpreadBannerResponse.class);
+        return systemGroupDataService.getListByGid(SysFormConstants.GROUP_DATA_ID_SPREAD_BANNER_LIST, UserSpreadBannerResponse.class);
     }
 
     /**

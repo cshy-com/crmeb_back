@@ -9,6 +9,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.Constants;
+import com.cshy.common.constants.StoreOrderStatusConstants;
 import com.cshy.common.model.entity.express.ExpressDetail;
 import com.cshy.common.model.entity.giftCard.GiftCardOrder;
 import com.cshy.common.model.entity.order.StoreOrder;
@@ -302,7 +303,7 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
     @Override
     public void syncExpressStatus() {
         //查询商城订单并更新物流状态
-        List<StoreOrder> storeOrderList = this.storeOrderService.list(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getStatus, Constants.ORDER_STATUS_INT_SPIKE));
+        List<StoreOrder> storeOrderList = this.storeOrderService.list(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getStatus, StoreOrderStatusConstants.ORDER_STATUS_INT_SPIKE));
         logger.info("正在同步礼品卡订单数据， 共{}条", storeOrderList.size());
         storeOrderList.stream().filter(giftCardOrder -> StringUtils.isNotBlank(giftCardOrder.getTrackingNo())).forEach(storeOrder -> {
             try {
@@ -327,11 +328,11 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
             case "0":
             case "1":
             case "2":
-                return Constants.ORDER_STATUS_INT_SPIKE;
+                return StoreOrderStatusConstants.ORDER_STATUS_INT_SPIKE;
             case "3":
-                return Constants.ORDER_STATUS_INT_BARGAIN;
+                return StoreOrderStatusConstants.ORDER_STATUS_INT_BARGAIN;
         }
-        return Constants.ORDER_STATUS_INT_PAID;
+        return StoreOrderStatusConstants.ORDER_STATUS_INT_PAID;
     }
 
     /**
