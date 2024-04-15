@@ -64,11 +64,17 @@ public class StoreProductInfoResponse implements Serializable {
     @ApiModelProperty(value = "是否新品")
     private Boolean isNew;
 
-    @ApiModelProperty(value = "获得积分")
-    private Integer giveIntegral;
-
     @ApiModelProperty(value = "是否优品推荐")
     private Boolean isGood;
+
+    @ApiModelProperty(value = "是否放心用")
+    private Boolean isSafe;
+
+    @ApiModelProperty(value = "是否安心吃")
+    private Boolean isEnjoy;
+
+    @ApiModelProperty(value = "获得积分")
+    private Integer giveIntegral;
 
     @ApiModelProperty(value = "是否单独分佣")
     private Boolean isSub;

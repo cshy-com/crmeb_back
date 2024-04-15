@@ -54,13 +54,6 @@ public interface StoreProductService extends IService<StoreProduct> {
     Boolean update(StoreProductAddRequest storeProductRequest);
 
     /**
-     * 产品详情
-     * @param id 商品id
-     * @return StoreProductResponse
-     */
-    StoreProductResponse getByProductId(Integer id);
-
-    /**
      * 商品详情（管理端）
      * @param id 商品id
      * @return StoreProductInfoResponse
@@ -97,18 +90,6 @@ public interface StoreProductService extends IService<StoreProduct> {
      * @return 恢复结果
      */
     Boolean reStoreProduct(Integer productId);
-
-    /**
-     * 后台任务批量操作库存
-     */
-    void consumeProductStock();
-
-    /**
-     * 扣减库存任务操作
-     * @param storeProductStockRequest 扣减库存参数
-     * @return 执行结果
-     */
-    boolean doProductStock(StoreProductStockRequest storeProductStockRequest);
 
     /**
      * 获取复制商品配置
@@ -223,4 +204,6 @@ public interface StoreProductService extends IService<StoreProduct> {
      * @return List
      */
     List<StoreProduct> getLeaderboard();
+
+    void updateFeature(List<Integer> idList, String feature, boolean flag);
 }

@@ -3,6 +3,6 @@
 <mapper namespace="com.cshy.service.dao.ShippingTemplatesRegionDao">
 
     <select id="getListGroup" resultType="com.cshy.common.model.request.shipping.ShippingTemplatesRegionRequest" parameterType="integer">
-        SELECT group_concat(`city_id`) AS city_id, title, `first`, first_price, `renewal`, renewal_price, uniqid FROM hipping_templates_region where temp_id = #{tempId, jdbcType=INTEGER} GROUP BY `uniqid` ORDER BY id ASC
+        SELECT group_concat(`city_id`) AS city_id, title, `first`, first_price, `renewal`, renewal_price, uniqid FROM shipping_templates_region where temp_id = #{tempId, jdbcType=INTEGER} GROUP BY `uniqid` ORDER BY id ASC
     </select>
 </mapper>

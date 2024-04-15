@@ -74,11 +74,6 @@ public interface StoreBargainService extends IService<StoreBargain> {
     MyRecord start(BargainFrontRequest bargainFrontRequest);
 
     /**
-     * 后台任务批量操作库存
-     */
-    void consumeProductStock();
-
-    /**
      * 砍价活动结束后处理
      */
     void stopAfterChange();

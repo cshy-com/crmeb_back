@@ -1,6 +1,6 @@
 package com.cshy.front.controller;
 
-import com.cshy.common.model.entity.express.ExpressDetail;
+import com.cshy.common.model.vo.delivery.ExpressDetailVo;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.service.service.ExpressService;
 import io.swagger.annotations.Api;
@@ -31,7 +31,7 @@ public class ExpressController {
     @ApiOperation(value = "查询快递信息")
     @RequestMapping(value = "/findExpressDetail", method = RequestMethod.GET)
     @ApiImplicitParam(name="no", value="快递单号（包括前缀）")
-    public CommonResult<ExpressDetail> findExpressDetail(@RequestParam(value = "trackingNo") String trackingNo, @RequestParam(value = "type") Integer type, @RequestParam String userMobile) {
+    public CommonResult<ExpressDetailVo> findExpressDetail(@RequestParam(value = "trackingNo") String trackingNo, @RequestParam(value = "type") Integer type, @RequestParam String userMobile) {
         return CommonResult.success(expressService.findExpressDetail(trackingNo, type, userMobile));
     }
 

@@ -1,8 +1,6 @@
 package com.cshy.common.model.entity.user;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -32,6 +30,7 @@ public class User implements Serializable {
     private Integer uid;
 
     @ApiModelProperty(value = "用户账号")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String account;
 
     @ApiModelProperty(value = "用户密码")

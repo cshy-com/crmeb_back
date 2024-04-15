@@ -1,8 +1,6 @@
 package com.cshy.common.model.entity.sms;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -30,6 +28,7 @@ public class SmsRecord implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "接受短信的手机号")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String phone;
 
     @ApiModelProperty(value = "短信内容")

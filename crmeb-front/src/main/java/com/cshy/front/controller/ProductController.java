@@ -7,18 +7,16 @@ import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.product.ProductListRequest;
 import com.cshy.common.model.request.product.ProductRequest;
 import com.cshy.common.model.response.*;
-import com.cshy.common.model.vo.CategoryTreeVo;
+import com.cshy.common.model.vo.category.CategoryTreeVo;
 import com.cshy.front.service.ProductService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户 -- 用户中心
@@ -136,6 +134,17 @@ public class ProductController {
     @RequestMapping(value = "/product/leaderboard", method = RequestMethod.GET)
     public CommonResult<List<StoreProduct>> getLeaderboard() {
         return CommonResult.success(productService.getLeaderboard());
+    }
+
+    @ApiOperation(value = "根据分类id和商品特性查询商品")
+    @RequestMapping(value = "/product/list/category/feature", method = RequestMethod.GET)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "categoryId", value = "分类id"),
+            @ApiImplicitParam(name = "feature", value = "0是否热卖isHot;1 是否优惠isBenefit;2 是否精品isBest;3 是否新品isNew;4 是否放心用isSafe;5 是否安心吃isEnjoy;")
+    })
+    public CommonResult<List<Map<String, Object>>> queryByCategoryIdAndFeature(@RequestParam(required = false) Integer categoryId, @RequestParam Integer feature) {
+        List<Map<String, Object>> storeProducts = productService.queryByCategoryIdAndFeature(categoryId, feature);
+        return CommonResult.success(storeProducts);
     }
 }
 

@@ -1,15 +1,21 @@
 package com.cshy.front.service;
 
+import com.cshy.common.model.dto.activity.ActivityDto;
+import com.cshy.common.model.entity.activity.Activity;
+import com.cshy.common.model.entity.base.BaseService;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.page.CommonPage;
+import com.cshy.common.model.query.activity.ActivityQuery;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.product.ProductListRequest;
 import com.cshy.common.model.request.product.ProductRequest;
 import com.cshy.common.model.response.*;
+import com.cshy.common.model.vo.activity.ActivityVo;
 import com.github.pagehelper.PageInfo;
-import com.cshy.common.model.vo.CategoryTreeVo;
+import com.cshy.common.model.vo.category.CategoryTreeVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * IndexService 接口
@@ -96,4 +102,6 @@ public interface ProductService {
      * @return List
      */
     List<StoreProduct> getLeaderboard();
+
+    List<Map<String, Object>> queryByCategoryIdAndFeature(Integer categoryId, Integer feature);
 }

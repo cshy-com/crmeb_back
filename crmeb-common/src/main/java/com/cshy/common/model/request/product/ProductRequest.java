@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 商品搜索
@@ -31,6 +32,12 @@ public class ProductRequest implements Serializable {
 
     @ApiModelProperty(value = "销量排序", allowableValues = "range[asc,desc]")
     private String salesOrder;
+
+    @ApiModelProperty(value = "最高价格筛选")
+    private BigDecimal maxSalePrice;
+
+    @ApiModelProperty(value = "最低价格筛选")
+    private BigDecimal minSalePrice;
 
     @ApiModelProperty(value = "是否新品")
     private Boolean news;

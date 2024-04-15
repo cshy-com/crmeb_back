@@ -1,8 +1,7 @@
 package com.cshy.common.model.entity.wechat;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -30,6 +29,7 @@ public class WechatQrcode implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "二维码类型")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String thirdType;
 
     @ApiModelProperty(value = "用户id")

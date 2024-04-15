@@ -19,7 +19,6 @@ import java.util.List;
 
 /**
  * 通知设置 前端控制器
- 
  */
 @Slf4j
 @RestController
@@ -32,6 +31,7 @@ public class SystemNotificationController {
 
     /**
      * 系统通知列表
+     *
      * @param request ExpressSearchRequest 搜索条件
      */
     @PreAuthorize("hasAuthority('admin:system:notification:list')")
@@ -101,6 +101,13 @@ public class SystemNotificationController {
             return CommonResult.success();
         }
         return CommonResult.failed();
+    }
+
+    @ApiOperation(value = "测试")
+    @RequestMapping(value = "/test", method = RequestMethod.POST)
+    public CommonResult<Object> test() {
+        systemNotificationService.sendNotification(13, null, null, "15285143252");
+        return CommonResult.success();
     }
 }
 

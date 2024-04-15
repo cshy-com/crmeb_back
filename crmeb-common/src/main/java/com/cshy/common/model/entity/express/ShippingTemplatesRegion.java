@@ -1,8 +1,6 @@
 package com.cshy.common.model.entity.express;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -31,6 +29,7 @@ public class ShippingTemplatesRegion implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "模板ID")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer tempId;
 
     @ApiModelProperty(value = "城市ID")

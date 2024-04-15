@@ -1,8 +1,6 @@
 package com.cshy.common.model.entity.system;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -30,11 +28,13 @@ public class SystemRole implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "身份管理名称")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String roleName;
 
     @ApiModelProperty(value = "身份管理权限(menus_id)")
     private String rules;
 
+    @ApiModelProperty(value = "level")
     private Integer level;
 
     @ApiModelProperty(value = "状态：0-关闭，1-正常")

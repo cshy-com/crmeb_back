@@ -1,9 +1,9 @@
 package com.cshy.common.model.entity.express;
 
 import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -31,6 +31,7 @@ public class ShippingTemplatesFree implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "模板ID")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer tempId;
 
     @ApiModelProperty(value = "城市ID")

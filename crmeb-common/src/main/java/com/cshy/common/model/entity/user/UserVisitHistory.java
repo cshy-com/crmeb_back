@@ -1,5 +1,7 @@
 package com.cshy.common.model.entity.user;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.cshy.common.model.entity.base.BaseModel;
 import io.swagger.annotations.ApiModel;
@@ -18,5 +20,6 @@ public class UserVisitHistory extends BaseModel<UserVisitHistory> {
     private Integer userId;
 
     @ApiModelProperty(value = "商品id")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer productId;
 }

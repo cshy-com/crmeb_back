@@ -1,7 +1,7 @@
 package com.cshy.front.controller;
 
 
-import com.cshy.common.enums.SmsTriggerEnum;
+import com.cshy.common.enums.NotifyTypeEnum;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.request.LoginMobileRequest;
 import com.cshy.common.model.request.LoginRequest;
@@ -9,8 +9,8 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.LoginResponse;
 import com.cshy.common.utils.StringUtils;
 import com.cshy.front.service.LoginService;
-import com.cshy.service.service.sms.SmsService;
 import com.cshy.service.service.giftCard.GiftCardService;
+import com.cshy.service.service.system.SystemNotificationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 public class LoginController {
 
     @Autowired
-    private SmsService smsService;
+    private SystemNotificationService systemNotificationService;
 
     @Autowired
     private LoginService loginService;
@@ -88,8 +88,8 @@ public class LoginController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "phone", value = "手机号码", required = true)
     })
-    public CommonResult<Object> sendCode(@RequestParam String phone, HttpServletRequest request) {
-        smsService.sendSMS(phone, SmsTriggerEnum.VERIFICATION_CODE.getCode(), request, null);
+    public CommonResult<Object> sendCode(@RequestParam String phone) {
+        systemNotificationService.sendNotification(NotifyTypeEnum.VERIFICATION_CODE.getCode(), null, null, phone);
         return CommonResult.success("发送成功");
     }
 }

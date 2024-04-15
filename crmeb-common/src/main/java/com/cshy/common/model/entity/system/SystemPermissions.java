@@ -1,8 +1,6 @@
 package com.cshy.common.model.entity.system;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -14,7 +12,7 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-//@TableName("sys_permissions")
+@TableName("sys_permissions")
 @ApiModel(value="SystemPermissions对象", description="系统权限表")
 public class SystemPermissions implements Serializable {
 
@@ -25,6 +23,7 @@ public class SystemPermissions implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "父级ID")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer pid;
 
     @ApiModelProperty(value = "权限名称")

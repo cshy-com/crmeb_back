@@ -8,6 +8,7 @@ import com.cshy.common.model.vo.giftCard.GiftCardVo;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public interface GiftCardService extends BaseService<GiftCard, GiftCardDto, GiftCardQuery, GiftCardVo> {
@@ -26,4 +27,6 @@ public interface GiftCardService extends BaseService<GiftCard, GiftCardDto, Gift
     GiftCard getById(String id, Boolean isDel);
 
     String updateBatch(Map<String, Object> params);
+
+    List<Map<String, Object>> getByType(String typeId);
 }

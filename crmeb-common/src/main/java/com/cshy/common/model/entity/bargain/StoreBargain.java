@@ -2,9 +2,8 @@ package com.cshy.common.model.entity.bargain;
 
 import java.math.BigDecimal;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -30,6 +29,7 @@ public class StoreBargain implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "关联商品ID")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer productId;
 
     @ApiModelProperty(value = "砍价活动名称")

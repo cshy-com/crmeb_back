@@ -605,10 +605,11 @@ public final class DateUtil {
         return parse.getTime();
     }
 
-    public static void main(String[] args) {
-        dateLimitUtilVo dateLimit = getDateLimit(DateConstants.SEARCH_DATE_LATELY_7);
-        System.out.println(dateLimit.getStartTime());
-        System.out.println(dateLimit.getEndTime());
+    /**
+     * 字符串转13位时间戳
+     */
+    public static String hutoolDateTime2Str(DateTime dateTime, String dateFormat) {
+        String formattedDate = dateTime.toString(dateFormat);
+        return formattedDate;
     }
-
 }

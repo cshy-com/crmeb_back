@@ -1,9 +1,8 @@
 package com.cshy.common.model.entity.system;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.util.Date;
-import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -29,6 +28,7 @@ public class SystemGroup implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "数据组名称")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String name;
 
     @ApiModelProperty(value = "简介")

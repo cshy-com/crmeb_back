@@ -5,7 +5,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.common.utils.genutils.GenCodePageListUtils;
 import com.cshy.common.utils.genutils.GenCodePageQueryUtils;
-import com.cshy.service.service.impl.CrmebGeneratorCodeService;
+import com.cshy.service.impl.CrmebGeneratorCodeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.io.IOUtils;

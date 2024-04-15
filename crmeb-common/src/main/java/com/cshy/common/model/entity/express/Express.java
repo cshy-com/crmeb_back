@@ -1,8 +1,7 @@
 package com.cshy.common.model.entity.express;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -28,6 +27,7 @@ public class Express implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "快递公司简称")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String code;
 
     @ApiModelProperty(value = "快递公司全称")

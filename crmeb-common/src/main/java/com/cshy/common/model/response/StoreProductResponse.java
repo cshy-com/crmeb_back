@@ -98,6 +98,12 @@ public class StoreProductResponse implements Serializable {
     @ApiModelProperty(value = "是否新品")
     private Boolean isNew;
 
+    @ApiModelProperty(value = "是否放心用")
+    private Boolean isSafe;
+
+    @ApiModelProperty(value = "是否安心吃")
+    private Boolean isEnjoy;
+
     @ApiModelProperty(value = "添加时间")
     private Integer addTime;
 

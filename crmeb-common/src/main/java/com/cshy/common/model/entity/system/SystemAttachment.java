@@ -1,8 +1,7 @@
 package com.cshy.common.model.entity.system;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -29,6 +28,7 @@ public class SystemAttachment implements Serializable {
     private Integer attId;
 
     @ApiModelProperty(value = "附件名称")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String name;
 
     @ApiModelProperty(value = "附件路径")

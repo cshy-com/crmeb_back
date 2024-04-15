@@ -2,10 +2,8 @@ package com.cshy.common.model.entity.combination;
 
 import java.math.BigDecimal;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -32,6 +30,7 @@ public class StoreCombination implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "商品id")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer productId;
 
     @ApiModelProperty(value = "商户id")
@@ -76,8 +75,10 @@ public class StoreCombination implements Serializable {
     @ApiModelProperty(value = "商品状态")
     private Boolean isShow;
 
+    @ApiModelProperty(value = "是否删除")
     private Boolean isDel;
 
+    @ApiModelProperty(value = "combination")
     private Boolean combination;
 
     @ApiModelProperty(value = "商户是否可用1可用0不可用")

@@ -16,13 +16,15 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * token验证处理
-
  */
 @Component
 public class FrontTokenComponent {
@@ -91,8 +93,7 @@ public class FrontTokenComponent {
     public void verifyToken(LoginUserVo loginUser) {
         long expireTime = loginUser.getExpireTime();
         long currentTime = System.currentTimeMillis();
-        if (expireTime - currentTime <= MILLIS_MINUTE_TEN)
-        {
+        if (expireTime - currentTime <= MILLIS_MINUTE_TEN) {
             refreshToken(loginUser);
         }
     }
@@ -130,6 +131,7 @@ public class FrontTokenComponent {
 
     /**
      * 推出登录
+     *
      * @param request HttpServletRequest
      */
     public void logout(HttpServletRequest request) {
@@ -167,30 +169,47 @@ public class FrontTokenComponent {
                 "api/front/index/get/version",
                 "api/front/image/domain",
                 "api/front/product/leaderboard",
-                "api/front/giftCard/order/add",
-                "api/front/giftCard/getInfoByPickupCode",
+                "api/front/giftCard",
                 "api/front/express/findExpressDetail",
                 "api/front/url/shortener/expand",
                 "api/front/url/shortener/shorten",
                 "api/front/common/contact/phone",
+                "api/front/sys/banner/activity/config",
+                "api/front/activity",
+                "api/front/sys/home/config",
+                "api/front/system/config",
         };
 
-        return ArrayUtils.contains(routerList, uri);
+        boolean present = Arrays.stream(routerList).anyMatch(router -> router.equals(uri) || validateApiPath(uri, router));
+        return present;
     }
 
-    public Boolean check(String token, HttpServletRequest request){
+    private boolean validateApiPath(String apiPath, String apiPathRule) {
+        // 将规则中的斜杠转义
+        String escapedLastApiPathRule = apiPathRule.replace("/", "\\/");
+        // 构建正则表达式
+        String regex = escapedLastApiPathRule + ".*";
+        // 编译正则表达式
+        Pattern pattern = Pattern.compile(regex);
+        // 创建匹配器
+        Matcher matcher = pattern.matcher(apiPath);
+        // 进行匹配
+        return matcher.matches();
+    }
+
+    public Boolean check(String token, HttpServletRequest request) {
 
         try {
             boolean exists = redisUtil.exists(getTokenKey(token));
-            if(exists){
+            if (exists) {
                 Integer uid = redisUtil.get(getTokenKey(token));
                 redisUtil.set(getTokenKey(token), uid, expireTime, TimeUnit.MINUTES);
-            }else{
+            } else {
                 //判断路由，部分路由不管用户是否登录/token过期都可以访问
                 exists = checkRouter(RequestUtil.getUri(request));
             }
             return exists;
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }

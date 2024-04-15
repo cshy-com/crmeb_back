@@ -8,6 +8,7 @@ import cn.hutool.crypto.symmetric.DES;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cshy.common.constants.NumConstants;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -140,12 +141,15 @@ public class CrmebUtil {
      * @return int数组
      */
     public static List<Integer> stringToArrayInt(String str){
-        List<String> strings = stringToArrayStrRegex(str, ",");
-        List<Integer> ids = new ArrayList<>();
-        for (String string : strings) {
-            ids.add(Integer.parseInt(string.trim()));
+        if (com.cshy.common.utils.StringUtils.isNotBlank(str)){
+            List<String> strings = stringToArrayStrRegex(str, ",");
+            List<Integer> ids = new ArrayList<>();
+            for (String string : strings) {
+                ids.add(Integer.parseInt(string.trim()));
+            }
+            return ids;
         }
-        return ids;
+        return Lists.newArrayList();
     }
 
     public static List<String> stringToArrayStrRegex(String str, String regex ){

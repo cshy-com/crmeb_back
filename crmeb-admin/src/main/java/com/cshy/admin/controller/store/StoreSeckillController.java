@@ -35,7 +35,6 @@ public class StoreSeckillController {
      * @param request 搜索条件
      * @param pageParamRequest 分页参数
      */
-    @PreAuthorize("hasAuthority('admin:seckill:list')")
     @ApiOperation(value = "分页列表") //配合swagger使用
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public CommonResult<CommonPage<StoreSeckillResponse>>  getList(@Validated StoreSeckillSearchRequest request, @Validated PageParamRequest pageParamRequest) {
@@ -48,7 +47,6 @@ public class StoreSeckillController {
      * 新增商品秒杀产品表
      * @param storeSeckillRequest 新增参数
      */
-    @PreAuthorize("hasAuthority('admin:seckill:save')")
     @ApiOperation(value = "新增")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public CommonResult<String> save(@RequestBody @Validated StoreSeckillAddRequest storeSeckillRequest) {
@@ -63,7 +61,6 @@ public class StoreSeckillController {
      * 删除商品秒杀产品表
      * @param id Integer
      */
-    @PreAuthorize("hasAuthority('admin:seckill:delete')")
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
     public CommonResult<String> delete(@RequestParam(value = "id") Integer id) {
@@ -78,7 +75,6 @@ public class StoreSeckillController {
      * 修改商品秒杀产品表
      * @param storeSeckillRequest 修改参数
      */
-    @PreAuthorize("hasAuthority('admin:seckill:update')")
     @ApiOperation(value = "修改")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public CommonResult<String> update(@RequestBody @Validated StoreSeckillAddRequest storeSeckillRequest) {
@@ -89,7 +85,6 @@ public class StoreSeckillController {
         }
     }
 
-    @PreAuthorize("hasAuthority('admin:seckill:update:status')")
     @ApiOperation(value = "修改秒杀商品状态")
     @RequestMapping(value = "/update/status", method = RequestMethod.POST)
     public CommonResult<String> updateStatus(@RequestParam @Validated Integer id, @RequestParam @Validated boolean status) {
@@ -104,7 +99,6 @@ public class StoreSeckillController {
      * 查询商品秒杀产品表信息
      * @param id Integer
      */
-    @PreAuthorize("hasAuthority('admin:seckill:info')")
     @ApiOperation(value = "详情")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public CommonResult<StoreProductInfoResponse> info(@RequestParam(value = "id") Integer id) {

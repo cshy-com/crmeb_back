@@ -1,9 +1,9 @@
 package com.cshy.common.model.entity.seckill;
 
 import java.math.BigDecimal;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -31,6 +31,7 @@ public class StoreSeckill implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "商品id")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer productId;
 
     @ApiModelProperty(value = "推荐图")

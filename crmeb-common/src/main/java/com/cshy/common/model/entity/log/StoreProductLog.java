@@ -1,8 +1,6 @@
 package com.cshy.common.model.entity.log;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -30,6 +28,7 @@ public class StoreProductLog implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "类型visit,cart,order,pay,collect,refund")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String type;
 
     @ApiModelProperty(value = "商品ID")

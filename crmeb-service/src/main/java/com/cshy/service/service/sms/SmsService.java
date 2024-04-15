@@ -1,7 +1,9 @@
 package com.cshy.service.service.sms;
 
 
+import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.cshy.common.model.entity.sms.SmsRecord;
+import com.cshy.common.model.entity.sms.SmsTemplate;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.sms.SmsRecordsRequest;
@@ -15,14 +17,23 @@ import java.math.BigDecimal;
  */
 public interface SmsService {
 
+//    /**
+//     *
+//     * @param phoneNumber
+//     * @param triggerPosition
+//     * @param request
+//     * @param params
+//     */
+//    void sendSMS(String phoneNumber, Integer triggerPosition, HttpServletRequest request, String... params);
+
+
     /**
      *
      * @param phoneNumber
-     * @param triggerPosition
-     * @param request
+     * @param smsTemplate
      * @param params
      */
-    void sendSMS(String phoneNumber, Integer triggerPosition, HttpServletRequest request, String... params);
+    void sendSMS(String phoneNumber, SmsTemplate smsTemplate, Boolean isVerificationCode, String... params);
 
     /**
      * 阿里云短信服务建立通信

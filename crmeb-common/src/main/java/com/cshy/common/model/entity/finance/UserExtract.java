@@ -2,10 +2,8 @@ package com.cshy.common.model.entity.finance;
 
 import java.math.BigDecimal;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -32,9 +30,11 @@ public class UserExtract implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
+    @ApiModelProperty(value = "用户id")
     private Integer uid;
 
     @ApiModelProperty(value = "名称")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String realName;
 
     @ApiModelProperty(value = "bank = 银行卡 alipay = 支付宝 weixin=微信")

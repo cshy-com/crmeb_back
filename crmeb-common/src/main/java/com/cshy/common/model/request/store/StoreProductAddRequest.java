@@ -83,6 +83,12 @@ public class StoreProductAddRequest implements Serializable {
     @ApiModelProperty(value = "是否优品推荐")
     private Boolean isGood;
 
+    @ApiModelProperty(value = "是否放心用")
+    private Boolean isSafe;
+
+    @ApiModelProperty(value = "是否安心吃")
+    private Boolean isEnjoy;
+
     @ApiModelProperty(value = "获得积分")
     private Integer giveIntegral;
 

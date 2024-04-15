@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -21,7 +22,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @TableName("s_product")
 @ApiModel(value="StoreProduct对象", description="商品表")
-public class StoreProduct implements Serializable {
+public class StoreProduct extends Model<StoreProduct> implements Serializable {
 
     private static final long serialVersionUID=1L;
 
@@ -33,6 +34,7 @@ public class StoreProduct implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "商户Id(0为总后台管理员创建,不为0的时候是商户后台创建)")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer merId;
 
     @ApiModelProperty(value = "商品图片")
@@ -97,6 +99,12 @@ public class StoreProduct implements Serializable {
 
     @ApiModelProperty(value = "是否新品")
     private Boolean isNew;
+
+    @ApiModelProperty(value = "是否放心用")
+    private Boolean isSafe;
+
+    @ApiModelProperty(value = "是否安心吃")
+    private Boolean isEnjoy;
 
     @ApiModelProperty(value = "添加时间")
     private Integer addTime;

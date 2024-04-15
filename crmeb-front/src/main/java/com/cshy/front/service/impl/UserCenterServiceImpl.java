@@ -28,7 +28,7 @@ import com.cshy.service.service.system.SystemGroupDataService;
 import com.cshy.service.service.system.SystemUserLevelService;
 import com.cshy.service.service.user.*;
 import com.cshy.service.service.wechat.WeChatPayService;
-import com.cshy.service.service.wechat.WechatNewService;
+import com.cshy.service.service.wechat.WechatCommonService;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.coupon.StoreCoupon;
@@ -117,7 +117,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
     private UserIntegralRecordService userIntegralRecordService;
 
     @Autowired
-    private WechatNewService wechatNewService;
+    private WechatCommonService wechatCommonService;
 
     @Autowired
     private UserExperienceRecordService experienceRecordService;
@@ -430,7 +430,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
     @Override
     public LoginResponse weChatAuthorizeLogin(String code, Integer spreadUid) {
         // 通过code获取获取公众号授权信息
-        WeChatOauthToken oauthToken = wechatNewService.getOauth2AccessToken(code);
+        WeChatOauthToken oauthToken = wechatCommonService.getOauth2AccessToken(code);
         //检测是否存在
         UserToken userToken = userTokenService.getByOpenidAndType(oauthToken.getOpenId(),  TokenType.THIRD_LOGIN_TOKEN_TYPE_PUBLIC);
         LoginResponse loginResponse = new LoginResponse();
@@ -471,7 +471,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
         }
         // 没有用户，走创建用户流程
         // 从微信获取用户信息，存入Redis中，将key返回给前端，前端在下一步绑定手机号的时候下发
-        WeChatAuthorizeLoginUserInfoVo userInfo = wechatNewService.getSnsUserInfo(oauthToken.getAccessToken(), oauthToken.getOpenId());
+        WeChatAuthorizeLoginUserInfoVo userInfo = wechatCommonService.getSnsUserInfo(oauthToken.getAccessToken(), oauthToken.getOpenId());
         RegisterThirdUserRequest registerThirdUserRequest = new RegisterThirdUserRequest();
         BeanUtils.copyProperties(userInfo, registerThirdUserRequest);
         registerThirdUserRequest.setSpreadPid(spreadUid);
@@ -502,7 +502,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
      */
     @Override
     public LoginResponse weChatAuthorizeProgramLogin(String code, RegisterThirdUserRequest request) {
-        WeChatMiniAuthorizeVo response = wechatNewService.miniAuthCode(code);
+        WeChatMiniAuthorizeVo response = wechatCommonService.miniAuthCode(code);
         System.out.println("小程序登陆成功 = " + JSON.toJSONString(response));
 
         //检测是否存在
@@ -990,7 +990,7 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
                 throw new CrmebException("微信小程序appId未设置");
             }
 
-            WeChatMiniAuthorizeVo response = wechatNewService.miniAuthCode(request.getCode());
+            WeChatMiniAuthorizeVo response = wechatCommonService.miniAuthCode(request.getCode());
 //            WeChatMiniAuthorizeVo response = weChatService.programAuthorizeLogin(request.getCode());
             System.out.println("小程序登陆成功 = " + JSON.toJSONString(response));
             String decrypt = WxUtil.decrypt(programAppId, request.getEncryptedData(), response.getSessionKey(), request.getIv());

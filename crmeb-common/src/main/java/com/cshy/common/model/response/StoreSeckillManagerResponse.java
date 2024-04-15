@@ -73,10 +73,10 @@ public class StoreSeckillManagerResponse {
     private String time;
 
     @ApiModelProperty(value = "主图")
-    private String img;
+    private String image;
 
     @ApiModelProperty(value = "轮播图")
-    private String silderImgs;
+    private String sliderImages;
 
     @ApiModelProperty(value = "秒杀状态，前端用")
     private Integer killStatus;
@@ -96,6 +96,12 @@ public class StoreSeckillManagerResponse {
     @ApiModelProperty(value = "0未删除1已删除")
     private Boolean isDel;
 
+    @ApiModelProperty(value = "活动分类名称")
+    private String activityCat;
+
     @ApiModelProperty(value = "秒杀状态String 未开始/进行中/活动已结束")
     private String statusName;
+
+    @ApiModelProperty(value = "0 活动 1 秒杀")
+    private Integer type;
 }

@@ -1,8 +1,6 @@
 package com.cshy.common.model.entity.system;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -30,6 +28,7 @@ public class SystemMenu implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "父级ID")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer pid;
 
     @ApiModelProperty(value = "名称")

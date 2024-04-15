@@ -268,11 +268,11 @@ public class WeChatConstants {
     public static final String WECHAT_MINI_API_ADD_TEMPLATE_URL = "https://api.weixin.qq.com/wxaapi/newtmpl/addtemplate?access_token={}";
 
     /** 小程序accessToken redis key */
-    public static final String REDIS_WECAHT_MINI_ACCESS_TOKEN_KEY = "wechat_mini_accessToken";
+    public static final String REDIS_WECHAT_MINI_ACCESS_TOKEN_KEY = "wechat:mini_accessToken";
     /** 公众号accessToken redis key */
-    public static final String REDIS_WECAHT_PUBLIC_ACCESS_TOKEN_KEY = "wechat_public_accessToken";
+    public static final String REDIS_WECHAT_PUBLIC_ACCESS_TOKEN_KEY = "wechat:public_accessToken";
     /** 公众号JsApiTicket redis key */
-    public static final String REDIS_PUBLIC_JS_API_TICKET = "wechat_js_api_ticket";
+    public static final String REDIS_PUBLIC_JS_API_TICKET = "wechat:js_api_ticket";
     public static final Long REDIS_PUBLIC_JS_API_TICKET_EXPRESS = 7100L;
 
     /**
@@ -373,7 +373,7 @@ public class WeChatConstants {
     public static final String REDIS_WECHAT_SHOP_CAT_KEY = "wechat_shop_cat";
 
     /** 微信小程序回调，商品审核回调事件 */
-    public static final String WECAHT_CALLBACK_EVENT_SPU_AUDIT = "open_product_spu_audit";
+    public static final String WECHAT_CALLBACK_EVENT_SPU_AUDIT = "open_product_spu_audit";
     /** 微信小程序回调，品牌审核回调事件 */
-    public static final String WECAHT_CALLBACK_EVENT_BRAND_AUDIT = "open_product_brand_audit";
+    public static final String WECHAT_CALLBACK_EVENT_BRAND_AUDIT = "open_product_brand_audit";
 }

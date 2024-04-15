@@ -1,10 +1,10 @@
 package com.cshy.admin.controller.system;
 
 import com.cshy.common.model.Type;
-import com.cshy.common.model.dto.SysFaqDto;
+import com.cshy.common.model.dto.system.SysFaqDto;
 import com.cshy.common.model.entity.base.BasePage;
 import com.cshy.common.model.page.CommonPage;
-import com.cshy.common.model.query.SysFaqQuery;
+import com.cshy.common.model.query.system.SysFaqQuery;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.vo.system.SysFaqVo;
 import com.cshy.service.service.system.SysFaqService;

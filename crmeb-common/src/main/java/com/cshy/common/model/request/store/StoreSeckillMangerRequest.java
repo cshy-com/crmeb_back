@@ -33,22 +33,15 @@ public class StoreSeckillMangerRequest {
     @Length(max = 255, message = "秒杀时段名称不能超过255个字符")
     private String name;
 
-//    @ApiModelProperty(value = "秒杀开始时间段")
-//    private Integer startTime;
-//
-//    @ApiModelProperty(value = "秒杀结束时间段")
-//    private Integer endTime;
-
     @ApiModelProperty(value = "秒杀结束时间段")
-    @NotBlank(message = "秒杀时间段不能为空")
     private String time; // 接收参数一个字段，入库时分割为startTime/endTime
 
     @ApiModelProperty(value = "主图")
-    private String img;
+    private String image;
 
     @ApiModelProperty(value = "轮播图")
     @NotBlank(message = "轮播图不能为空")
-    private String silderImgs;
+    private String sliderImages;
 
     @ApiModelProperty(value = "排序")
     private Integer sort;
@@ -60,4 +53,10 @@ public class StoreSeckillMangerRequest {
 
     @ApiModelProperty(value = "0未删除1已删除")
     private Boolean isDel;
+
+    @ApiModelProperty(value = "活动分类名称")
+    private String activityCat;
+
+    @ApiModelProperty(value = "0 活动 1 秒杀")
+    private Integer type;
 }

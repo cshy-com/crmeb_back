@@ -18,5 +18,8 @@ public class StoreSeckillSearchRequest {
 
     @ApiModelProperty(value = "是否显示关键字 0/1")
     private Integer status;
+
+    @ApiModelProperty(value = "0 活动 1 秒杀")
+    private Integer type;
 }
 

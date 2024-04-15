@@ -6,7 +6,7 @@ import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.utils.QRCodeUtil;
 import com.cshy.common.utils.RestTemplateUtil;
 import com.cshy.front.service.QrCodeService;
-import com.cshy.service.service.wechat.WechatNewService;
+import com.cshy.service.service.wechat.WechatCommonService;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class QrCodeServiceImpl implements QrCodeService {
     @Autowired
     private RestTemplateUtil restTemplateUtil;
     @Autowired
-    private WechatNewService wechatNewService;
+    private WechatCommonService wechatCommonService;
 
     /**
      * 二维码
@@ -56,7 +56,7 @@ public class QrCodeServiceImpl implements QrCodeService {
         }catch (Exception e){
             throw new CrmebException("url参数错误 " + e.getMessage());
         }
-        map.put("code", wechatNewService.createQrCode(page, scene.length() > 0 ? scene.toString() : ""));
+        map.put("code", wechatCommonService.createQrCode(page, scene.length() > 0 ? scene.toString() : ""));
         return map;
     }
 

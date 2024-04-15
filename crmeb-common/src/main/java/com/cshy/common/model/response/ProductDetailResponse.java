@@ -1,5 +1,6 @@
 package com.cshy.common.model.response;
 
+import com.cshy.common.model.entity.express.ShippingTemplates;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttr;
 import io.swagger.annotations.ApiModel;
@@ -34,6 +35,9 @@ public class ProductDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "为移动端特定参数 所有参与的活动")
     private List<ProductActivityItemResponse> activityAllH5;
+
+    @ApiModelProperty(value = "运费模板")
+    private ShippingTemplates shippingTemplates;
 
     @ApiModelProperty(value = "商品信息")
     private StoreProduct productInfo;

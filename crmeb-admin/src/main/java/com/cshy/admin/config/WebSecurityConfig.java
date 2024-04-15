@@ -5,7 +5,7 @@ import com.cshy.admin.manager.AuthenticationEntryPointImpl;
 import com.cshy.admin.manager.CustomAccessDeniedHandler;
 import com.cshy.admin.manager.CustomAuthenticationProvider;
 import com.cshy.common.constants.UploadConstants;
-import com.cshy.service.service.impl.user.UserDetailServiceImpl;
+import com.cshy.service.impl.user.UserDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

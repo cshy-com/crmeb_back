@@ -2,7 +2,7 @@ package com.cshy.admin.controller.wechat;
 
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.WeChatJsSdkConfigResponse;
-import com.cshy.service.service.wechat.WechatNewService;
+import com.cshy.service.service.wechat.WechatCommonService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WeChatAdminController {
 
     @Autowired
-    private WechatNewService wechatNewService;
+    private WechatCommonService wechatCommonService;
 
     /**
      * 获取微信公众号js配置
@@ -35,6 +35,14 @@ public class WeChatAdminController {
     @RequestMapping(value = "/config", method = RequestMethod.GET)
     @ApiImplicitParam(name = "url", value = "页面地址url")
     public CommonResult<WeChatJsSdkConfigResponse> configJs(@RequestParam(value = "url") String url) {
-        return CommonResult.success(wechatNewService.getJsSdkConfig(url));
+        return CommonResult.success(wechatCommonService.getJsSdkConfig(url));
+    }
+
+    @PreAuthorize("hasRole('admin')")
+    @ApiOperation(value = "获取微信公众号accessToken")
+    @RequestMapping(value = "/accessToken", method = RequestMethod.GET)
+    public CommonResult<String> accessToken() {
+        String publicAccessToken = wechatCommonService.getPublicAccessToken();
+        return CommonResult.success(publicAccessToken);
     }
 }

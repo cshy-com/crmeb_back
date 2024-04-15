@@ -141,6 +141,7 @@ public class StoreOrder implements Serializable {
     @ApiModelProperty(value = "商户ID")
     private Integer merId;
 
+    @ApiModelProperty(value = "isMerCheck")
     private Integer isMerCheck;
 
     @ApiModelProperty(value = "拼团商品id0一般商品")

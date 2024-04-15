@@ -2,7 +2,7 @@ package com.cshy.service.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.cshy.common.model.entity.express.ExpressDetail;
+import com.cshy.common.model.vo.delivery.ExpressDetailVo;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.entity.express.Express;
 import com.cshy.common.model.request.express.ExpressSearchRequest;
@@ -74,7 +74,7 @@ public interface ExpressService extends IService<Express> {
     /**
      * 查询快递信息
      */
-    ExpressDetail findExpressDetail(String trackingNo, Integer type, String mobile);
+    ExpressDetailVo findExpressDetail(String trackingNo, Integer type, String mobile);
 
     void syncExpressStatus();
 }

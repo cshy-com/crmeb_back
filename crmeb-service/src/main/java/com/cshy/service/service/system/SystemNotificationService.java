@@ -2,7 +2,7 @@ package com.cshy.service.service.system;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.entity.system.SystemNotification;
-import com.cshy.common.model.entity.wechat.TemplateMessage;
+import com.cshy.common.model.entity.wechat.SysTemplateMessage;
 import com.cshy.common.model.request.NotificationInfoRequest;
 import com.cshy.common.model.request.NotificationSearchRequest;
 import com.cshy.common.model.request.NotificationUpdateRequest;
@@ -72,9 +72,18 @@ public interface SystemNotificationService extends IService<SystemNotification> 
     Boolean modify(NotificationUpdateRequest request);
 
     /**
+     * 统一消息通知入口
+     * @param notifyTypeId 通知类型Id
+     * @param userId 用户Id
+     * @param publicParams 公众号模板参数
+     * @param smsParams 短信模板参数
+     */
+    void sendNotification(Integer notifyTypeId, Integer userId, List<String> publicParams, String... smsParams);
+
+    /**
      * 获取小程序订阅模板编号(小程序端调用)
      * @param type 场景类型(支付之前：beforePay|支付成功：afterPay|申请退款：refundApply|充值之前：beforeRecharge|创建砍价：createBargain|参与拼团：pink|取消拼团：cancelPink)
      * @return List
      */
-    List<TemplateMessage> getMiniTempList(String type);
+    List<SysTemplateMessage> getMiniTempList(String type);
 }

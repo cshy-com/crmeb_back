@@ -1,8 +1,8 @@
 package com.cshy.common.model.entity.system;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 import com.cshy.common.model.entity.base.BaseModel;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -10,6 +10,9 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+@TableName("sys_dict_type")
+@ApiModel(value="SysDictType对象", description="字典类型表")
 public class SysDictType extends BaseModel<SysDictType>
 {
     private static final long serialVersionUID = 1L;
@@ -18,6 +21,7 @@ public class SysDictType extends BaseModel<SysDictType>
     private Integer dictId;
 
     @ApiModelProperty(value = "字典名称")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     @Size(min = 0, max = 100, message = "字典类型名称长度不能超过100个字符")
     private String dictName;
 

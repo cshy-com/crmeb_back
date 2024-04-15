@@ -16,6 +16,6 @@ public class GiftCardType extends BaseModel<GiftCardType> {
     @ApiModelProperty(value = "banner")
     private String banner;
 
-    @ApiModelProperty(value = "卡状态(0 停用 1 启用)")
+    @ApiModelProperty(value = "卡状态(1 停用 0 启用)")
     private Integer status;
 }

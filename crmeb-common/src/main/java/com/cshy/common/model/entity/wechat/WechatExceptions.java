@@ -1,8 +1,6 @@
 package com.cshy.common.model.entity.wechat;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -30,6 +28,7 @@ public class WechatExceptions implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "错误码")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String errcode;
 
     @ApiModelProperty(value = "错误信息")

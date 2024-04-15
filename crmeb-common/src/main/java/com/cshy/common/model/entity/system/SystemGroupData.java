@@ -1,8 +1,6 @@
 package com.cshy.common.model.entity.system;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -30,6 +28,7 @@ public class SystemGroupData implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "对应的数据组id")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer gid;
 
     @ApiModelProperty(value = "数据组对应的数据值（json数据）")

@@ -84,11 +84,6 @@ public interface StoreCombinationService extends IService<StoreCombination> {
     Boolean removePink(StorePinkRequest storePinkRequest);
 
     /**
-     * 后台任务批量操作库存
-     */
-    void consumeProductStock();
-
-    /**
      * 获取当前时间的拼团商品
      */
     List<StoreCombination> getCurrentBargainByProductId(Integer productId);

@@ -4,7 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.model.vo.LoginUserVo;
-import com.cshy.service.service.impl.user.UserDetailServiceImpl;
+import com.cshy.service.impl.user.UserDetailServiceImpl;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

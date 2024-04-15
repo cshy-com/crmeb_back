@@ -83,4 +83,38 @@ public interface SystemConfigService extends IService<SystemConfig> {
      * 清空参数缓存数据
      */
     public void clearConfigCache();
+
+    /**
+     * 获取所有实体类的名称
+     */
+    List<String> modelNameList(String modelName);
+
+    /**
+     * 查询实体类
+     */
+    Class<?> queryModel(String modelName);
+
+    /**
+     * 根据实体类class查询表名
+     * @param clazz
+     * @return
+     */
+    String getTableCNNameByClass(Class clazz);
+
+    /**
+     * 根据类获取属性
+     * @param clazz
+     * @return
+     */
+    List<String> getFieldsByClass(Class clazz);
+
+    /**
+     * 扫描无apiModel或tableName注解的实体类
+     */
+    void scanNoAnnotationModel();
+
+    /**
+     * 配置首页banner位活动
+     */
+    //TODO
 }

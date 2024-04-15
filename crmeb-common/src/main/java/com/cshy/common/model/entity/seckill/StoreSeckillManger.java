@@ -1,9 +1,8 @@
 package com.cshy.common.model.entity.seckill;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.util.Date;
-import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -28,6 +27,7 @@ public class StoreSeckillManger implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "秒杀名称")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String name;
 
     @ApiModelProperty(value = "秒杀开始时间段")
@@ -57,5 +57,9 @@ public class StoreSeckillManger implements Serializable {
     @ApiModelProperty(value = "0未删除1已删除")
     private Boolean isDel;
 
+    @ApiModelProperty(value = "活动分类名称")
+    private String activityCat;
 
+    @ApiModelProperty(value = "0 活动 1 秒杀")
+    private Integer type;
 }

@@ -6,7 +6,7 @@ import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.system.SystemRoleRequest;
 import com.cshy.common.model.request.system.SystemRoleSearchRequest;
 import com.cshy.common.model.response.RoleInfoResponse;
-import com.cshy.common.model.vo.CategoryTreeVo;
+import com.cshy.common.model.vo.category.CategoryTreeVo;
 
 import java.util.List;
 

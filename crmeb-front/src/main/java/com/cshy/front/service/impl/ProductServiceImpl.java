@@ -6,11 +6,14 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cshy.common.constants.ProductType;
 import com.cshy.common.model.dto.user.UserVisitHistoryDto;
+import com.cshy.common.model.entity.category.Category;
+import com.cshy.common.model.entity.express.ShippingTemplates;
 import com.cshy.common.model.entity.product.StoreProductRelation;
 import com.cshy.common.model.entity.user.UserVisitHistory;
 import com.cshy.common.model.response.*;
 import com.cshy.common.utils.StringUtils;
-import com.cshy.service.service.*;
+import com.cshy.service.service.category.CategoryService;
+import com.cshy.service.service.shipping.ShippingTemplatesService;
 import com.cshy.service.service.store.*;
 import com.cshy.service.service.system.SystemConfigService;
 import com.cshy.service.service.system.SystemUserLevelService;
@@ -33,20 +36,19 @@ import com.cshy.common.model.request.product.ProductListRequest;
 import com.cshy.common.model.request.product.ProductRequest;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.utils.RedisUtil;
-import com.cshy.common.model.vo.CategoryTreeVo;
+import com.cshy.common.model.vo.category.CategoryTreeVo;
 import com.cshy.common.model.vo.MyRecord;
 import com.cshy.front.service.ProductService;
 import com.cshy.service.delete.ProductUtils;
+import com.google.common.collect.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * IndexServiceImpl 接口实现
@@ -96,6 +98,9 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private UserVisitHistoryService userVisitHistoryService;
 
+    @Autowired
+    private ShippingTemplatesService shippingTemplatesService;
+
     /**
      * 获取分类
      *
@@ -133,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
             IndexProductResponse productResponse = new IndexProductResponse();
             List<Integer> activityList = CrmebUtil.stringToArrayInt(storeProduct.getActivity());
             // 活动类型默认：直接跳过
-            if (activityList.get(0).equals(ProductType.PRODUCT_TYPE_NORMAL)) {
+            if (CollUtil.isNotEmpty(activityList) && activityList.get(0).equals(ProductType.PRODUCT_TYPE_NORMAL)) {
                 BeanUtils.copyProperties(storeProduct, productResponse);
                 productResponseArrayList.add(productResponse);
                 continue;
@@ -183,7 +188,6 @@ public class ProductServiceImpl implements ProductService {
      * @param id         商品编号
      * @param type       normal-正常，video-视频
      * @param isGiftCard
-     * @param isOrder
      * @return 商品详情信息
      */
     @Override
@@ -201,6 +205,10 @@ public class ProductServiceImpl implements ProductService {
         if (ObjectUtil.isNotNull(userLevel)) {
             storeProduct.setVipPrice(storeProduct.getPrice());
         }
+        //查询运费模板
+        ShippingTemplates shippingTemplates = shippingTemplatesService.getById(storeProduct.getTempId());
+        productDetailResponse.setShippingTemplates(shippingTemplates);
+
         //查询收藏量
         List<StoreProductRelation> productRelationList = storeProductRelationService.getList(id, "collect");
         storeProduct.setCollectNum(productRelationList.size());
@@ -253,6 +261,7 @@ public class ProductServiceImpl implements ProductService {
         StoreProduct updateProduct = new StoreProduct();
         updateProduct.setId(id);
         updateProduct.setBrowse(storeProduct.getBrowse() + 1);
+        updateProduct.setMerId(0);
         storeProductService.updateById(updateProduct);
 
         // 保存用户访问记录
@@ -414,7 +423,7 @@ public class ProductServiceImpl implements ProductService {
             IndexProductResponse productResponse = new IndexProductResponse();
             List<Integer> activityList = CrmebUtil.stringToArrayInt(storeProduct.getActivity());
             // 活动类型默认：直接跳过
-            if (activityList.get(0).equals(ProductType.PRODUCT_TYPE_NORMAL)) {
+            if (CollUtil.isNotEmpty(activityList) && activityList.get(0).equals(ProductType.PRODUCT_TYPE_NORMAL)) {
                 BeanUtils.copyProperties(storeProduct, productResponse);
                 productResponseArrayList.add(productResponse);
                 continue;
@@ -492,7 +501,7 @@ public class ProductServiceImpl implements ProductService {
             IndexProductResponse productResponse = new IndexProductResponse();
             List<Integer> activityList = CrmebUtil.stringToArrayInt(storeProduct.getActivity());
             // 活动类型默认：直接跳过
-            if (activityList.get(0).equals(ProductType.PRODUCT_TYPE_NORMAL)) {
+            if (CollUtil.isNotEmpty(activityList) && activityList.get(0).equals(ProductType.PRODUCT_TYPE_NORMAL)) {
                 BeanUtils.copyProperties(storeProduct, productResponse);
                 productResponseArrayList.add(productResponse);
                 continue;
@@ -577,6 +586,73 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<StoreProduct> getLeaderboard() {
         return storeProductService.getLeaderboard();
+    }
+
+    @Override
+    public List<Map<String, Object>> queryByCategoryIdAndFeature(Integer categoryId, Integer feature) {
+        LambdaQueryWrapper<StoreProduct> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(StoreProduct::getIsShow, true);
+        lambdaQueryWrapper.eq(StoreProduct::getIsRecycle, false);
+        lambdaQueryWrapper.eq(StoreProduct::getIsDel, false);
+        //判断categoryId是二级分类id还是1级分类id categoryId为空则查询所有分类
+        if (null != categoryId){
+            Category category = categoryService.getById(categoryId);
+            List<Integer> cateIdList = Lists.newArrayList();
+            if (category.getPid().equals(0)){
+                //查询二级分类
+                List<Category> childVoListByPid = categoryService.getChildVoListByPid(categoryId);
+                cateIdList = childVoListByPid.stream().map(Category::getId).collect(Collectors.toList());
+            } else {
+                cateIdList.add(categoryId);
+            }
+            List<Integer> finalCateIdList = cateIdList;
+            lambdaQueryWrapper.and(l -> {
+                List<String> sqlList = Lists.newArrayList();
+                finalCateIdList.forEach(id -> sqlList.add(" FIND_IN_SET('" + id + "', cate_id) > 0 "));
+                String join = String.join(" OR ", sqlList);
+                l.apply(join);
+            });
+        }
+
+        switch (feature) {
+            case 0:
+                lambdaQueryWrapper.eq(StoreProduct::getIsHot, true);
+                break;
+            case 1:
+                lambdaQueryWrapper.eq(StoreProduct::getIsBenefit, true);
+                break;
+            case 2:
+                lambdaQueryWrapper.eq(StoreProduct::getIsBest, true);
+                break;
+            case 3:
+                lambdaQueryWrapper.eq(StoreProduct::getIsNew, true);
+                break;
+            case 4:
+                lambdaQueryWrapper.eq(StoreProduct::getIsSafe, true);
+                break;
+            case 5:
+                lambdaQueryWrapper.eq(StoreProduct::getIsEnjoy, true);
+                break;
+            case 6:
+                lambdaQueryWrapper.eq(StoreProduct::getIsGood, true);
+                break;
+        }
+
+        List<StoreProduct> storeProductList = storeProductService.list(lambdaQueryWrapper);
+        List<Map<String, Object>> resList = storeProductList.stream().map(storeProduct -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("otPrice", storeProduct.getOtPrice());
+            map.put("price", storeProduct.getPrice());
+            map.put("ficti", storeProduct.getFicti());
+            map.put("image", storeProduct.getImage());
+            map.put("stock", storeProduct.getStock());
+            map.put("unitName", storeProduct.getUnitName());
+            map.put("storeName", storeProduct.getStoreName());
+            map.put("sales", storeProduct.getSales());
+            map.put("id", storeProduct.getId());
+            return map;
+        }).collect(Collectors.toList());
+        return resList;
     }
 
 }

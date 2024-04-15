@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -202,6 +203,17 @@ public class StoreProductController {
     @RequestMapping(value = "/copy/product", method = RequestMethod.POST)
     public CommonResult<Map<String, Object>> copyProduct(@RequestBody @Valid StoreCopyProductRequest request) {
         return CommonResult.success(storeProductService.copyProduct(request.getUrl()));
+    }
+
+    @PreAuthorize("hasRole('admin')")
+    @ApiOperation(value = "设置商品属性")
+    @RequestMapping(value = "/set/feature", method = RequestMethod.POST)
+    public CommonResult<String> updateFeature(@RequestBody Map<String, Object> params) {
+        List<Integer> idList = (List<Integer>) params.get("idList");
+        String feature = (String) params.get("feature");
+        boolean flag = (Boolean) params.get("flag");
+        storeProductService.updateFeature(idList, feature, flag);
+        return CommonResult.success();
     }
 }
 

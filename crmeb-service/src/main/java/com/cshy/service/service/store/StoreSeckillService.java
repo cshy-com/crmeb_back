@@ -9,6 +9,7 @@ import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.entity.seckill.StoreSeckill;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * StoreSeckillService 接口
@@ -88,11 +89,6 @@ public interface StoreSeckillService extends IService<StoreSeckill> {
     List<StoreSeckill> getCurrentSecKillByProductId(Integer productId);
 
     /**
-     * 后台任务批量操作库存
-     */
-    void consumeProductStock();
-
-    /**
      * 商品是否存在秒杀活动
      * @param productId 商品编号
      */
@@ -118,4 +114,6 @@ public interface StoreSeckillService extends IService<StoreSeckill> {
      * @return SeckillIndexResponse
      */
     SeckillIndexResponse getIndexInfo();
+
+    List<Map<String, Object>> queryByCateId(Integer cateId);
 }

@@ -1,7 +1,7 @@
 package com.cshy.admin.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.cshy.common.model.entity.express.ExpressDetail;
+import com.cshy.common.model.vo.delivery.ExpressDetailVo;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
@@ -128,7 +128,7 @@ public class ExpressController {
     @ApiOperation(value = "查询快递信息")
     @RequestMapping(value = "/findExpressDetail", method = RequestMethod.GET)
     @ApiImplicitParam(name="trackingNo", value="快递单号（包括前缀）")
-    public CommonResult<ExpressDetail> findExpressDetail(@RequestParam(value = "trackingNo") String trackingNo, @RequestParam(value = "type") Integer type, @RequestParam String userMobile) {
+    public CommonResult<ExpressDetailVo> findExpressDetail(@RequestParam(value = "trackingNo") String trackingNo, @RequestParam(value = "type") Integer type, @RequestParam String userMobile) {
         return CommonResult.success(expressService.findExpressDetail(trackingNo, type, userMobile));
     }
 

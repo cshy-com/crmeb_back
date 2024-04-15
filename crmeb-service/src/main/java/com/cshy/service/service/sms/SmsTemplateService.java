@@ -6,6 +6,8 @@ import com.cshy.common.model.entity.sms.SmsTemplate;
 import com.cshy.common.model.query.sms.SmsTemplateQuery;
 import com.cshy.common.model.vo.sms.SmsTemplateVo;
 
+import java.io.Serializable;
+
 /**
  * SmsTemplateService 接口
 
@@ -17,7 +19,7 @@ public interface SmsTemplateService extends BaseService<SmsTemplate, SmsTemplate
      * @param id 模板id
      * @return SmsTemplate
      */
-    SmsTemplate getDetail(Integer id);
+    SmsTemplate getDetail(Serializable id);
 
     void sync() throws Exception;
 

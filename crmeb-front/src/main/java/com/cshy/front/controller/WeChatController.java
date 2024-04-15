@@ -1,6 +1,6 @@
 package com.cshy.front.controller;
 
-import com.cshy.common.model.entity.wechat.TemplateMessage;
+import com.cshy.common.model.entity.wechat.SysTemplateMessage;
 import com.cshy.common.model.request.RegisterThirdUserRequest;
 import com.cshy.common.model.request.wechat.WxBindingPhoneRequest;
 import com.cshy.common.model.response.CommonResult;
@@ -8,7 +8,7 @@ import com.cshy.common.model.response.LoginResponse;
 import com.cshy.common.model.response.WeChatJsSdkConfigResponse;
 import com.cshy.front.service.UserCenterService;
 import com.cshy.service.service.system.SystemNotificationService;
-import com.cshy.service.service.wechat.WechatNewService;
+import com.cshy.service.service.wechat.WechatCommonService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -37,7 +37,7 @@ public class WeChatController {
     private UserCenterService userCenterService;
 
     @Autowired
-    private WechatNewService wechatNewService;
+    private WechatCommonService wechatCommonService;
 
     @Autowired
     private SystemNotificationService systemNotificationService;
@@ -81,7 +81,7 @@ public class WeChatController {
     @RequestMapping(value = "/config", method = RequestMethod.GET)
     @ApiImplicitParam(name = "url", value = "页面地址url")
     public CommonResult<WeChatJsSdkConfigResponse> configJs(@RequestParam(value = "url") String url){
-        return CommonResult.success(wechatNewService.getJsSdkConfig(url));
+        return CommonResult.success(wechatCommonService.getJsSdkConfig(url));
     }
 
     /**
@@ -101,7 +101,7 @@ public class WeChatController {
     @ApiOperation(value = "订阅消息模板列表")
     @RequestMapping(value = "/program/my/temp/list", method = RequestMethod.GET)
     @ApiImplicitParam(name = "type", value = "支付之前：beforePay|支付成功：afterPay|申请退款：refundApply|充值之前：beforeRecharge|创建砍价：createBargain|参与拼团：pink|取消拼团：cancelPink")
-    public CommonResult<List<TemplateMessage>> programMyTempList(@RequestParam(name = "type") String type){
+    public CommonResult<List<SysTemplateMessage>> programMyTempList(@RequestParam(name = "type") String type){
         return CommonResult.success(systemNotificationService.getMiniTempList(type));
     }
 }

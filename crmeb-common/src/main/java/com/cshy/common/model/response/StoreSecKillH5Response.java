@@ -44,4 +44,7 @@ public class StoreSecKillH5Response implements Serializable {
 
     @ApiModelProperty(value = "已抢百分比")
     private Integer percent;
+
+    @ApiModelProperty(value = "已抢百分比")
+    private Integer productId;
 }

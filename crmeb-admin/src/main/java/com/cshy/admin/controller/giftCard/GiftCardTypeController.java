@@ -11,6 +11,7 @@ import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.vo.giftCard.GiftCardTypeVo;
 import com.cshy.common.model.vo.giftCard.GiftCardVo;
 import com.cshy.service.service.giftCard.GiftCardTypeService;
+import com.cshy.service.service.system.SystemAttachmentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -32,6 +33,9 @@ public class GiftCardTypeController {
     @Autowired
     private GiftCardTypeService giftCardTypeService;
 
+    @Autowired
+    private SystemAttachmentService systemAttachmentService;
+
     //    @PreAuthorize("hasAuthority('admin:activity:list')")
     @ApiOperation(value = "分页列表")
     @RequestMapping(value = "/page", method = RequestMethod.POST)
@@ -43,6 +47,7 @@ public class GiftCardTypeController {
     @ApiOperation(value = "新增")
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public CommonResult<String> add(@RequestBody GiftCardTypeDto dto) {
+        dto.setBanner(systemAttachmentService.clearPrefix(dto.getBanner()));
         return CommonResult.success(giftCardTypeService.add(dto));
     }
 
@@ -61,6 +66,7 @@ public class GiftCardTypeController {
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     @ApiImplicitParam(name = "id", value = "文章ID")
     public CommonResult<String> update(@RequestBody GiftCardTypeDto giftCardTypeDto) {
+        giftCardTypeDto.setBanner(systemAttachmentService.clearPrefix(giftCardTypeDto.getBanner()));
         giftCardTypeService.update(giftCardTypeDto);
         return CommonResult.success();
     }

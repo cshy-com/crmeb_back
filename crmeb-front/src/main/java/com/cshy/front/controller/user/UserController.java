@@ -1,6 +1,7 @@
 package com.cshy.front.controller.user;
 
 
+import com.cshy.common.model.entity.user.UserToken;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.user.UserBindingPhoneUpdateRequest;
@@ -8,6 +9,7 @@ import com.cshy.common.model.request.user.UserEditRequest;
 import com.cshy.common.model.request.user.UserExtractRequest;
 import com.cshy.common.model.request.user.UserSpreadPeopleRequest;
 import com.cshy.common.model.response.*;
+import com.cshy.service.service.user.UserTokenService;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.entity.system.SystemUserLevel;
 import com.cshy.common.model.entity.user.User;
@@ -28,10 +30,10 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 用户 -- 用户中心
-
  */
 @Slf4j
 @RestController("FrontUserController")
@@ -47,6 +49,9 @@ public class UserController {
 
     @Autowired
     private UserCenterService userCenterService;
+
+    @Autowired
+    private UserTokenService userTokenService;
 
     /**
      * 修改密码
@@ -186,7 +191,7 @@ public class UserController {
      */
     @ApiOperation(value = "推广人统计")
     @RequestMapping(value = "/spread/people/count", method = RequestMethod.GET)
-    public CommonResult<UserSpreadPeopleResponse>  getSpreadPeopleCount() {
+    public CommonResult<UserSpreadPeopleResponse> getSpreadPeopleCount() {
         return CommonResult.success(userCenterService.getSpreadPeopleCount());
     }
 
@@ -248,6 +253,7 @@ public class UserController {
 
     /**
      * 推广人排行
+     *
      * @return List<User>
      */
     @ApiOperation(value = "推广人排行")
@@ -258,6 +264,7 @@ public class UserController {
 
     /**
      * 佣金排行
+     *
      * @return 优惠券集合
      */
     @ApiOperation(value = "佣金排行")
@@ -280,12 +287,13 @@ public class UserController {
      */
     @ApiOperation(value = "推广海报图")
     @RequestMapping(value = "/user/spread/banner", method = RequestMethod.GET)
-    public CommonResult<List<UserSpreadBannerResponse>>  getSpreadBannerList() {
+    public CommonResult<List<UserSpreadBannerResponse>> getSpreadBannerList() {
         return CommonResult.success(userCenterService.getSpreadBannerList());
     }
 
     /**
      * 绑定推广关系（登录状态）
+     *
      * @param spreadPid 推广id
      * @return 绑定结果
      */
@@ -294,6 +302,24 @@ public class UserController {
     public CommonResult<Boolean> bindsSpread(Integer spreadPid) {
         userService.bindSpread(spreadPid);
         return CommonResult.success();
+    }
+
+    @ApiOperation(value = "获取用户token")
+    @RequestMapping(value = "/user/token", method = RequestMethod.GET)
+    @ApiImplicitParam(name = "type", value = "类型， 1公众号， 2小程序, 5AppIos,6AppAndroid,7ios")
+    public CommonResult<UserToken> getUserToken(@RequestParam Integer type) {
+        Integer userId = userService.getUserId();
+        UserToken token = userTokenService.getTokenByUserId(userId, type);
+        return CommonResult.success(Objects.nonNull(token) ? token.getToken() : null);
+    }
+
+    @ApiOperation(value = "微信获取用户openId")
+    @RequestMapping(value = "/user/get/openid", method = RequestMethod.GET)
+    @ApiImplicitParam(name = "code", value = "微信code")
+    public CommonResult<String> getUserToken(@RequestParam String code) {
+        Integer userId = userService.getUserId();
+        String openId = userTokenService.getOpenIdByCode(code, userId);
+        return CommonResult.success(openId, "success");
     }
 }
 

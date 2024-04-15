@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -28,4 +29,13 @@ public class GiftCardController {
         Map<String, Object> infoByPickupCode = giftCardService.getInfoByPickupCode(pickupCode);
         return  CommonResult.success(infoByPickupCode);
     }
+
+    @ApiOperation(value = "根据 礼品卡类型id查询下面的商品")
+    @RequestMapping(value = "/get/byType", method = RequestMethod.GET)
+    public CommonResult<List<Map<String, Object>>> getByType(@RequestParam(required = false) String typeId) {
+        List<Map<String, Object>> giftCardServiceByType = giftCardService.getByType(typeId);
+        return  CommonResult.success(giftCardServiceByType);
+    }
+
+
 }

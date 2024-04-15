@@ -1,6 +1,5 @@
 package com.cshy.admin.task.express;
 
-import com.cshy.admin.task.product.ProductStockTask;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.service.service.ExpressService;
 import org.slf4j.Logger;

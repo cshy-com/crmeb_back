@@ -1,5 +1,7 @@
 package com.cshy.common.model.entity.system;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -26,6 +28,7 @@ public class SystemRoleMenu implements Serializable {
     private Integer rid;
 
     @ApiModelProperty(value = "权限id")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer menuId;
 
 

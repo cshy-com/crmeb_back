@@ -1,8 +1,7 @@
 package com.cshy.common.model.entity.express;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -30,6 +29,7 @@ public class ShippingTemplates implements Serializable {
     private Integer id;
 
     @ApiModelProperty(value = "模板名称")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String name;
 
     @ApiModelProperty(value = "计费方式")

@@ -2,6 +2,7 @@ package com.cshy.common.model.entity.base;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.page.CommonPage;
+import com.cshy.common.model.vo.system.SysHomeConfigVo;
 
 import java.util.List;
 

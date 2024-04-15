@@ -1,9 +1,7 @@
 package com.cshy.common.model.entity.cat;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -31,6 +29,7 @@ public class StoreCart implements Serializable {
     private Long id;
 
     @ApiModelProperty(value = "用户ID")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer uid;
 
     @ApiModelProperty(value = "类型")

@@ -88,6 +88,20 @@ public class SystemConfigController {
         systemConfigService.resetConfigCache();
         return CommonResult.success("success");
     }
+
+    @ApiOperation(value = "获取实体表")
+    @RequestMapping(value = "/modelNameList", method = RequestMethod.GET)
+    public CommonResult<List<String>> modelNameList(@RequestParam String modelName) {
+        return  CommonResult.success(systemConfigService.modelNameList(modelName));
+    }
+
+    @ApiOperation(value = "获取属性")
+    @RequestMapping(value = "/class/fields", method = RequestMethod.GET)
+    public CommonResult<List<String>> fields(@RequestParam String modelName) {
+        Class<?> aClass = systemConfigService.queryModel(modelName);
+        List<String> fieldsByClass = systemConfigService.getFieldsByClass(aClass);
+        return  CommonResult.success(fieldsByClass);
+    }
 }
 
 

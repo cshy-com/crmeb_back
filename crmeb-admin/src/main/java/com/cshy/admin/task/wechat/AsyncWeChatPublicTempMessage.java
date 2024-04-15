@@ -1,7 +1,7 @@
 package com.cshy.admin.task.wechat;
 
 import com.cshy.common.utils.DateUtil;
-import com.cshy.service.service.TemplateMessageService;
+import com.cshy.service.service.system.SysTemplateMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +22,13 @@ public class AsyncWeChatPublicTempMessage {
     private static final Logger logger = LoggerFactory.getLogger(AsyncWeChatPublicTempMessage.class);
 
     @Autowired
-    private TemplateMessageService templateMessageService;
+    private SysTemplateMessageService sysTemplateMessageService;
 
     @Scheduled(fixedDelay = 1000 * 60L) //1分钟同步一次数据
     public void init() {
         logger.info("---AsyncWeChatPublicTempMessage task------produce Data with fixed rate task: Execution Time - {}", DateUtil.nowDate());
         try {
-            templateMessageService.consumePublic();
+            sysTemplateMessageService.consumePublic();
 
         } catch (Exception e) {
             e.printStackTrace();
