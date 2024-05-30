@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -63,24 +64,28 @@ public class OldMallController {
     @Autowired
     StoreProductDescriptionService storeProductDescriptionService;
 
-    private static final String prefix = "https://www.bankservice.shop/file";
+    private static final String prefix = "https://www.bankservice.shop/file/";
 
     @ApiOperation(value = "同步")
     @RequestMapping(value = "/sync", method = RequestMethod.POST)
-    @Transactional(rollbackFor = Exception.class)
+    @Async
     public CommonResult<Object> sync() {
+        synchronize();
+        return CommonResult.success();
+    }
+
+    void synchronize() {
         List<OldMallListVo> oldMallListVoList = getList();
         System.out.println(oldMallListVoList);
 
         //数据处理
         handleData(oldMallListVoList);
-        return CommonResult.success();
     }
 
     private void handleData(List<OldMallListVo> oldMallListVoList) {
         oldMallListVoList.forEach(oldMallListVo -> {
             StoreProduct storeProduct = new StoreProduct();
-            StoreProduct serviceOne = storeProductService.getOne(new LambdaQueryWrapper<StoreProduct>().eq(StoreProduct::getStoreName, oldMallListVo .getName()));
+            StoreProduct serviceOne = storeProductService.getOne(new LambdaQueryWrapper<StoreProduct>().eq(StoreProduct::getStoreName, oldMallListVo.getName()));
             if (Objects.isNull(serviceOne)) {
                 //基本数据
                 storeProduct.setStoreName(oldMallListVo.getName());
@@ -90,12 +95,12 @@ public class OldMallController {
                 else
                     storeProduct.setImage("");
 
-                List<String> picturePathList = oldMallListVo.getPicturePathList ();
+                List<String> picturePathList = oldMallListVo.getPicturePathList();
                 if (CollUtil.isNotEmpty(picturePathList)) {
                     List<String> collect = picturePathList.stream().map(s -> "\"" + s.replace(prefix, "") + "\"").collect(Collectors.toList());
                     storeProduct.setSliderImage(collect.toString());
                 } else if (StringUtils.isNotBlank(pic)) {
-                    storeProduct.setSliderImage(Lists.newArrayList("\"" + pic.replace(prefix, "") + "\"")   .toString());
+                    storeProduct.setSliderImage(Lists.newArrayList("\"" + pic.replace(prefix, "") + "\"").toString());
                 } else {
                     storeProduct.setSliderImage("");
                 }

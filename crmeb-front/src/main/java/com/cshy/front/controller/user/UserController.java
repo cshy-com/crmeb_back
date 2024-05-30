@@ -20,6 +20,7 @@ import com.cshy.service.service.system.SystemGroupDataService;
 import com.cshy.service.service.user.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -315,10 +316,13 @@ public class UserController {
 
     @ApiOperation(value = "微信获取用户openId")
     @RequestMapping(value = "/user/get/openid", method = RequestMethod.GET)
-    @ApiImplicitParam(name = "code", value = "微信code")
-    public CommonResult<String> getUserToken(@RequestParam String code) {
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "微信code"),
+            @ApiImplicitParam(name = "type", value = "1 公众号 2 小程序")
+    })
+    public CommonResult<String> getUserToken(@RequestParam String code, @RequestParam Integer type) {
         Integer userId = userService.getUserId();
-        String openId = userTokenService.getOpenIdByCode(code, userId);
+        String openId = userTokenService.getOpenIdByCode(code, userId, type);
         return CommonResult.success(openId, "success");
     }
 }

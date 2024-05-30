@@ -13,7 +13,7 @@ public class RedisKey {
     //城市数据 redis key
     public static final String CITY_LIST = "city_list";
     //城市数据 tree redis key
-    public static final String CITY_LIST_TREE = "city_list_tree";
+    public static final String CITY_LIST_TREE = "SYS:CITY_TREE";
     //城市数据 tree redis key
     public static final String CITY_LIST_LEVEL_1 = "city_list_level_1";
 
@@ -77,7 +77,10 @@ public class RedisKey {
     public static final String CONFIG_KEY_PAY_WE_CHAT_APP_APP_ID = "pay_weixin_app_appid"; //公众号appId
     public static final String CONFIG_KEY_PAY_WE_CHAT_APP_MCH_ID = "pay_weixin_app_mchid"; //公众号配的商户号
     public static final String CONFIG_KEY_PAY_WE_CHAT_APP_APP_KEY = "pay_weixin_app_key"; //公众号支付key
-    public static final String SYS_CONFIG_KEY = "sys_config:";
+    public static final String SYS_CONFIG_KEY = "SYS:CONFIG:";
+    public static final String SYS_CATEGORY_KEY = "SYS:CATEGORY:";
+    public static final String SYS_MENU_KEY = "SYS:MENU";
+    public static final String SYS_DICT_KEY = "SYS:DICT:";
 
     public static final String CONFIG_KEY_RECHARGE_MIN_AMOUNT = "store_user_min_recharge"; //最小充值金额
 //    public static final String CONFIG_KEY_PROGRAM_LOGO = "routine_logo"; //小程序logo

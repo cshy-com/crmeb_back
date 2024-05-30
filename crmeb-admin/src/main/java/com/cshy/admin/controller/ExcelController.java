@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -93,7 +94,7 @@ public class ExcelController {
         return CommonResult.success(map);
     }
 
-    @ApiOperation("批量导出")
+    @ApiOperation(value = "批量导出",produces = 	MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @PostMapping("/giftCard")
     public void export(@RequestBody GiftCardQuery query, HttpServletResponse response) throws IOException {
         giftCardService.export(query, response);

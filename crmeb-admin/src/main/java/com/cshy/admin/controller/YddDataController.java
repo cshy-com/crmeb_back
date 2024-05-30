@@ -1,19 +1,16 @@
 package com.cshy.admin.controller;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.log.Log;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cshy.common.constants.ProductType;
 import com.cshy.common.exception.CrmebException;
-import com.cshy.common.model.dto.BrandDto;
 import com.cshy.common.model.entity.category.Category;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttr;
 import com.cshy.common.model.entity.product.StoreProductAttrValue;
 import com.cshy.common.model.entity.product.StoreProductDescription;
-import com.cshy.common.model.entity.system.Brand;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.vo.FileResultVo;
 import com.cshy.common.model.vo.ydd.*;
@@ -37,9 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -81,143 +79,151 @@ public class YddDataController {
     @Autowired
     StoreProductDescriptionService storeProductDescriptionService;
 
+    private static final String testAddress = "http://open.test.yqtbuy.com";
+
+    private static final String proAddress = "https://open.yqtbuy.com";
+
+    private final List<String> filter = Lists.newArrayList("生鲜",
+            "酒类",
+            "珠宝首饰",
+            "钟表",
+            "医疗保健",
+            "家装建材",
+            "美妆护肤",
+            "测试分类(请勿11修改)",
+            "测试分类01",
+            "卖家服务 ",
+            "二手商品",
+            "wh1",
+            "医药健康>",
+            "工业商城",
+            "IP",
+            "医药");
+
     @ApiOperation(value = "同步")
     @RequestMapping(value = "/sync", method = RequestMethod.POST)
-    @Transactional(rollbackFor = Exception.class)
-    public CommonResult<Object> sync() {
-        Integer current = 1;
+    @Async
+    public CommonResult<Object> sync(@RequestParam String token) {
+        synchronize(token);
+        return CommonResult.success();
+    }
 
-        String token = getToken();
-
-        log.info("开始获取分类数据");
-        //获取分类数据
-        List<YddCategoryVo> categoryList = getCategoryList(token);
-
-        //保存分类数据
-        saveCategoryList(categoryList);
-        log.info("获取分类数据完成");
-
-        //获取品牌数据
-        log.info("开始获取品牌数据");
-        List<YddBrandVo> brandList = getBrandList(token);
-
-        //保存品牌数据
-        brandList.forEach(brandVo -> {
-            BrandDto brand = new BrandDto();
-
-            Brand byId = brandService.getById(brandVo.getId());
-            if (Objects.nonNull(byId))
-                BeanUtils.copyProperties(byId, brand);
-            else {
-                brand.setId(String.valueOf(brandVo.getId()));
-                brand.setStatus(true);
-                brand.setIsDel(0);
-            }
-            brand.setBrandName(brandVo.getName());
-            String img = saveImg(brandVo.getIcon(), 0, "product");
-            brand.setIcon(img);
-            if (Objects.nonNull(byId))
-                brandService.updateById(brand);
-            else
-                brandService.insertWithCustomId(brand);
-        });
-        log.info("获取品牌数据完成");
-
+    void synchronize(String token) {
+//        //查询本地分类
+        List<Category> localCategoryList = categoryService.list(new LambdaQueryWrapper<Category>().eq(Category::getType, 1).like(Category::getPath, "/%/%/"));
+//
+//        log.info("开始获取分类数据");
+//        //获取分类数据
+//        List<YddCategoryVo> categoryList = getCategoryList(token);
+//
+//        List<YddCategoryVo> filterList = categoryList.stream().filter(category -> !filter.contains(category.getName())).collect(Collectors.toList());
+//        //保存分类数据
+//        saveCategoryList(filterList);
+//        log.info("获取分类数据完成");
 
         //获取所有商品列表
         log.info("开始获取商品数据数据");
         List<YddProductVo> yddProductVoList = Lists.newArrayList();
 
-        JSONArray total = new JSONArray();
-        boolean flag = true;
 
-//        while (flag) {
-            //继续请求
-            JSONArray dataArray = getList(current, token);
-            total.addAll(dataArray);
-            if (dataArray.size() < 100) {
-                flag = false;
-            }
-            current++;
-//        }
-        for (int i = 0; i < total.size(); i++) {
-            JSONObject itemObject = total.getJSONObject(i);
+        JSONArray dataArray = getProductList(token);
+        for (int i = 0; i < dataArray.size(); i++) {
+            JSONObject itemObject = dataArray.getJSONObject(i);
             YddProductVo yddProductVo = JSONObject.parseObject(JSONObject.toJSONString(itemObject), YddProductVo.class);
             yddProductVoList.add(yddProductVo);
         }
         log.info("获取商品完成");
-        //删除原数据
-        List<String> nameList = yddProductVoList.stream().map(YddProductVo::getItemName).collect(Collectors.toList());
-        storeProductService.remove(new LambdaQueryWrapper<StoreProduct>().in(StoreProduct::getStoreName, nameList));
 
-        //根据商品id获取商品详情 和规格
-        log.info("开始获取商品详情、规格数据");
+        buildAndSave(yddProductVoList, token, localCategoryList);
+    }
+
+    private void buildAndSave(List<YddProductVo> yddProductVoList, String token, List<Category> localCategoryList) {
+        List<String> nameList = localCategoryList.stream().map(Category::getName).collect(Collectors.toList());
         yddProductVoList.forEach(yddProductVo -> {
-            StoreProduct serviceOne = storeProductService.getOne(new LambdaQueryWrapper<StoreProduct>().eq(StoreProduct::getStoreName, yddProductVo.getItemName()));
-            if (Objects.isNull(serviceOne)){
-                log.info("正在处理：" + yddProductVo.getItemName() + " 商品数据");
-                YddProductDetailVo detail = getDetail(Integer.valueOf(yddProductVo.getId()), token);
-                YddSkuDetailVo skuDetail = getSkuDetail(Integer.valueOf(yddProductVo.getId()), token);
+            StoreProduct serviceOne = storeProductService.getOne(new LambdaQueryWrapper<StoreProduct>().eq(StoreProduct::getStoreName, yddProductVo.getName()));
+            if (Objects.isNull(serviceOne)) {
+                log.info("正在处理：" + yddProductVo.getName() + " 商品数据");
+                YddProductDetailVo detail = getDetail(yddProductVo.getGoodsId(), token);
 
                 //数据处理和保存
                 //基本数据设置
                 StoreProduct storeProduct = new StoreProduct();
-                storeProduct.setStoreName(detail.getItemName());
-                storeProduct.setCateId(String.valueOf(detail.getThirdClassId()));
-                storeProduct.setKeyword(detail.getKeywords());
-                storeProduct.setUnitName("件");
-                storeProduct.setStoreInfo(detail.getItemName());
-                storeProduct.setTempId(2);
+                storeProduct.setStoreName(detail.getName());
+                //分类设置
+                if (!nameList.contains(detail.getI3Category()))
+                    return;
+                Optional<Category> first = localCategoryList.stream().filter(ca -> ca.getName().equals(detail.getI3Category())).findFirst();
+                first.ifPresent(category -> storeProduct.setCateId(String.valueOf(category.getId())));
+
+                storeProduct.setKeyword(detail.getName());
+                storeProduct.setUnitName(detail.getUnit());
+                storeProduct.setStoreInfo(detail.getDesc());
+                storeProduct.setTempId(1);
                 storeProduct.setSpecType(false);
-                storeProduct.setIsPostage(false);
-                storeProduct.setPostage(new BigDecimal(10));
-                storeProduct.setIsShow(false);
+                storeProduct.setIsPostage(true);
+                storeProduct.setPostage(new BigDecimal(0));
+                storeProduct.setIsShow(true);
                 storeProduct.setMerId(0);
-                storeProduct.setImage("");
-                storeProduct.setSliderImage("");
                 storeProduct.setAddTime(DateUtil.getNowTime());
-                storeProduct.setStock(9999);
+                if (detail.getStock() > 99999)
+                    storeProduct.setStock(99999);
+                else
+                    storeProduct.setStock(detail.getStock());
 
                 //价格设置
-                storeProduct.setCost(BigDecimal.valueOf(Double.parseDouble(skuDetail.getSkuCostPrice()) / 100));
-                storeProduct.setOtPrice(BigDecimal.valueOf(Double.parseDouble(skuDetail.getSkuCostPrice()) / 100 * 2));
-                storeProduct.setPrice(BigDecimal.valueOf(Double.parseDouble(skuDetail.getSkuCostPrice()) / 100 * 1.8));
-                storeProduct.setVipPrice(BigDecimal.valueOf(Double.parseDouble(skuDetail.getSkuCostPrice()) / 100 * 1.8));
+                if (BigDecimal.valueOf(Double.parseDouble(detail.getCostPrice()) * 1.5).compareTo(BigDecimal.valueOf(Double.parseDouble(detail.getMarketPrice()))) > 0) {
+                    return;
+                }
+                double costPrice = Double.parseDouble(detail.getCostPrice());
+                long roundedPrice = Math.round(costPrice);
+                BigDecimal costPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 1.5);
+
+                double marketPrice = Double.parseDouble(detail.getMarketPrice());
+                long roundedPrice1 = Math.round(marketPrice);
+                BigDecimal marketPriceBigDecimal = BigDecimal.valueOf(roundedPrice1 + 10);
+
+
+                storeProduct.setCost(costPriceBigDecimal);
+                storeProduct.setOtPrice(marketPriceBigDecimal);
+                storeProduct.setPrice(marketPriceBigDecimal);
+                storeProduct.setVipPrice(marketPriceBigDecimal);
 
                 log.info("保存数据");
-                storeProductService.save(storeProduct);
 
                 //处理图片
                 log.info("处理图片");
-                String mainImgUrl = saveImg(detail.getImg(), storeProduct.getId(), "product");
-                List<String> bannerAndVideoList = Lists.newArrayList();
-                if (CollUtil.isNotEmpty(detail.getBannerAndVideoList())) {
-                    detail.getBannerAndVideoList().forEach(bannerAndVideo -> {
-                        String bannerUrl = saveImg(bannerAndVideo.getUrl(), storeProduct.getId(), "product");
-                        bannerAndVideoList.add("\"" + bannerUrl + "\"");
-                    });
+                String mainImgUrl = detail.getMainImg();
+                storeProduct.setImage(mainImgUrl);
+                if (CollUtil.isNotEmpty(detail.getImages())) {
+                    List<String> images = detail.getImages();
+                    storeProduct.setSliderImage(JSONObject.toJSONString(images));
                 }
 
-                //更新数据
-                log.info("更新数据");
-                StoreProduct newProduct = storeProductService.getById(storeProduct.getId());
-                newProduct.setImage(mainImgUrl);
-                if (CollUtil.isNotEmpty(bannerAndVideoList))
-                    newProduct.setSliderImage(bannerAndVideoList.toString());
+                storeProduct.setIsDeliver(true);
+                storeProduct.setIsPickup(false);
 
-                storeProductService.updateById(newProduct);
+                storeProduct.setBarCode(detail.getSkuSn());
+
+                storeProductService.save(storeProduct);
 
                 //商品描述
                 StoreProductDescription storeProductDescription = new StoreProductDescription();
-                storeProductDescription.setDescription(detail.getContents());
-                storeProductDescription.setProductId(newProduct.getId());
+                List<YddProductDetailVo.DetailImage> detailImages = detail.getDetailImages();
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("<p>");
+                detailImages.forEach(detailImage -> {
+                    stringBuilder.append("<img src=\"").append(detailImage.getUrl()).append("\"/>");
+                });
+                stringBuilder.append("</p>");
+                storeProductDescription.setDescription(stringBuilder.toString());
+                storeProductDescription.setProductId(storeProduct.getId());
                 storeProductDescription.setType(ProductType.PRODUCT_TYPE_NORMAL);
                 storeProductDescriptionService.save(storeProductDescription);
 
                 //插入默认规格数据
                 log.info("规格数据");
                 StoreProductAttr storeProductAttr = new StoreProductAttr();
-                storeProductAttr.setProductId(newProduct.getId());
+                storeProductAttr.setProductId(storeProduct.getId());
                 storeProductAttr.setAttrName("规格");
                 storeProductAttr.setAttrValues("默认");
                 storeProductAttr.setType(0);
@@ -225,28 +231,51 @@ public class YddDataController {
                 storeProductAttrService.save(storeProductAttr);
 
                 StoreProductAttrValue storeProductAttrValue = new StoreProductAttrValue();
-                storeProductAttrValue.setProductId(newProduct.getId());
+                storeProductAttrValue.setProductId(storeProduct.getId());
                 storeProductAttrValue.setSuk("默认");
                 storeProductAttrValue.setSales(0);
-                storeProductAttrValue.setImage(newProduct.getImage());
-                storeProductAttrValue.setStock(9999);
+                storeProductAttrValue.setImage(storeProduct.getImage());
+                storeProductAttrValue.setStock(storeProduct.getStock());
                 storeProductAttrValue.setWeight(new BigDecimal(1));
                 storeProductAttrValue.setVolume(new BigDecimal(1));
                 storeProductAttrValue.setAttrValue("{\"规格\":\"默认\"}");
                 storeProductAttrValue.setBrokerage(new BigDecimal(0));
                 storeProductAttrValue.setBrokerageTwo(new BigDecimal(0));
+                storeProductAttrValue.setBarCode(detail.getSkuSn());
 
-                storeProductAttrValue.setPrice(newProduct.getPrice());
-                storeProductAttrValue.setCost(newProduct.getCost());
-                storeProductAttrValue.setOtPrice(newProduct.getOtPrice());
+                storeProductAttrValue.setPrice(storeProduct.getPrice());
+                storeProductAttrValue.setCost(storeProduct.getCost());
+                storeProductAttrValue.setOtPrice(storeProduct.getOtPrice());
 
                 storeProductAttrValueService.save(storeProductAttrValue);
                 log.info("完成");
             }
         });
+    }
 
-        log.info("同步完成");
-        return CommonResult.success();
+    private YddProductDetailVo getDetail(String goodsId, String token) {
+        String url = "https://dist.yqtyun.com/api/distributor/product/getProductDetail";
+        // 请求体
+        String body = "{\"goods_id\":\"" + goodsId + "\"}";
+
+        // 请求头
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/json;charset=UTF-8");
+        headers.add("Authorization", token);
+
+        // 请求
+        HttpEntity<String> request = new HttpEntity<>(body, headers);
+
+        // 使用RestTemplate请求
+        RestTemplate restTemplateHttps = new RestTemplate();
+        ResponseEntity<JSONObject> responseBody = restTemplateHttps.postForEntity(url, request, JSONObject.class);
+        JSONObject httpBody = responseBody.getBody();
+        if (httpBody != null && httpBody.getInteger("code") == 10000) {
+            JSONObject data = httpBody.getJSONObject("data");
+            YddProductDetailVo yddProductDetailVo = JSONObject.parseObject(JSONObject.toJSONString(data), YddProductDetailVo.class);
+            return yddProductDetailVo;
+        }
+        throw new CrmebException("查询商品失败");
     }
 
     private void saveCategoryList(List<YddCategoryVo> categoryList) {
@@ -258,21 +287,19 @@ public class YddDataController {
             if (Objects.nonNull(cat1)) {
                 BeanUtils.copyProperties(cat1, parent);
             } else {
-                parent.setId(parentVo.getId());
                 parent.setType(1);
                 parent.setStatus(true);
                 parent.setSort(0);
                 parent.setPath("/0/");
                 parent.setPid(0);
+                parent.setExtra("crmebimage/public/maintain/def_category_logo.jpg");
             }
             parent.setName(parentVo.getName());
 
-            String imgUrl = saveImg(parentVo.getIcon(), 0, "product");
-            parent.setExtra(imgUrl);
             if (Objects.nonNull(cat1))
                 categoryService.saveOrUpdate(parent);
             else
-                categoryService.insertWithCustomId(parent);
+                categoryService.save(parent);
             //二级分类数据
             parentVo.getChildren().forEach(secondVo -> {
                 Category second = new Category();
@@ -280,21 +307,20 @@ public class YddDataController {
                 if (Objects.nonNull(cat2)) {
                     BeanUtils.copyProperties(cat2, second);
                 } else {
-                    second.setId(secondVo.getId());
                     second.setType(1);
                     second.setStatus(true);
                     second.setSort(0);
                     second.setPath("/0/" + parent.getId());
                     second.setPid(parent.getId());
+                    second.setExtra("crmebimage/public/maintain/def_category_logo.jpg");
+
                 }
                 second.setName(secondVo.getName());
 
-                String secondImgUrl = saveImg(secondVo.getIcon(), 0, "product");
-                second.setExtra(secondImgUrl);
                 if (Objects.nonNull(cat2))
                     categoryService.saveOrUpdate(second);
                 else
-                    categoryService.insertWithCustomId(second);
+                    categoryService.save(second);
                 //三级分类数据
                 secondVo.getChildren().forEach(thirdVo -> {
                     Category third = new Category();
@@ -302,21 +328,20 @@ public class YddDataController {
                     if (Objects.nonNull(cat3)) {
                         BeanUtils.copyProperties(cat3, third);
                     } else {
-                        third.setId(thirdVo.getId());
                         third.setType(1);
                         third.setStatus(true);
                         third.setSort(0);
                         third.setPath("/0/" + parent.getId() + "/" + second.getId());
                         third.setPid(second.getId());
+                        third.setExtra("crmebimage/public/maintain/def_category_logo.jpg");
+
                     }
                     third.setName(thirdVo.getName());
 
-                    String thirdImgUrl = saveImg(thirdVo.getIcon(), 0, "product");
-                    third.setExtra(thirdImgUrl);
                     if (Objects.nonNull(cat3))
                         categoryService.saveOrUpdate(third);
                     else
-                        categoryService.insertWithCustomId(third);
+                        categoryService.save(third);
                 });
             });
         });
@@ -352,18 +377,18 @@ public class YddDataController {
         throw new CrmebException("获取品牌数据失败");
     }
 
-    private List<YddCategoryVo> getCategoryList(String token) {
-        String url = "https://cshy.org.yddstore.com/api/admin/category/auth/page";
-        // 请求体
-        String body = "{\"name\":\"\",\"current\":1,\"size\":20}\n";
+    private static List<YddCategoryVo> getCategoryList(String token) {
+        String url = "https://dist.yqtyun.com/api/distributor/product/getCategoryList";
 
         // 请求头
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json;charset=UTF-8");
-        headers.add("Token", token);
+        headers.add("Authorization", token);
 
+        String body = "{\"parent_id\":0}";
         // 请求
         HttpEntity<String> request = new HttpEntity<>(body, headers);
+
 
         // 使用RestTemplate请求
         List<YddCategoryVo> total = Lists.newArrayList();
@@ -371,8 +396,8 @@ public class YddDataController {
         RestTemplate restTemplateHttps = new RestTemplate();
         ResponseEntity<JSONObject> responseBody = restTemplateHttps.postForEntity(url, request, JSONObject.class);
         JSONObject httpBody = responseBody.getBody();
-        if (httpBody != null && httpBody.getInteger("code") == 0) {
-            JSONArray jsonArray = httpBody.getJSONObject("data").getJSONArray("data");
+        if (httpBody != null && httpBody.getInteger("code") == 10000) {
+            JSONArray jsonArray = httpBody.getJSONObject("data").getJSONArray("items");
             for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject itemObject = jsonArray.getJSONObject(i);
                 YddCategoryVo yddCategoryVo = JSONObject.parseObject(JSONObject.toJSONString(itemObject), YddCategoryVo.class);
@@ -385,15 +410,15 @@ public class YddDataController {
         throw new CrmebException("获取一级分类失败");
     }
 
-    private void getSecondCategory(String token, Integer id, YddCategoryVo parent) {
-        String url = "https://cshy.org.yddstore.com/api/admin/category/v1/auth/list";
+    private static void getSecondCategory(String token, Integer id, YddCategoryVo parent) {
+        String url = "https://dist.yqtyun.com/api/distributor/product/getCategoryList";
         // 请求体
-        String body = "{\"pid\":" + id + "}";
+        String body = "{\"parent_id\":" + id + "}";
 
         // 请求头
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json;charset=UTF-8");
-        headers.add("Token", token);
+        headers.add("Authorization", token);
 
         // 请求
         HttpEntity<String> request = new HttpEntity<>(body, headers);
@@ -403,8 +428,8 @@ public class YddDataController {
         RestTemplate restTemplateHttps = new RestTemplate();
         ResponseEntity<JSONObject> responseBody = restTemplateHttps.postForEntity(url, request, JSONObject.class);
         JSONObject httpBody = responseBody.getBody();
-        if (httpBody != null && httpBody.getInteger("code") == 0) {
-            JSONArray jsonArray = httpBody.getJSONArray("data");
+        if (httpBody != null && httpBody.getInteger("code") == 10000) {
+            JSONArray jsonArray = httpBody.getJSONObject("data").getJSONArray("items");
             for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject itemObject = jsonArray.getJSONObject(i);
                 YddCategoryVo yddCategoryVo = JSONObject.parseObject(JSONObject.toJSONString(itemObject), YddCategoryVo.class);
@@ -419,15 +444,15 @@ public class YddDataController {
 
     }
 
-    private void getThirdCategory(String token, Integer id, YddCategoryVo parent) {
-        String url = "https://cshy.org.yddstore.com/api/admin/category/v1/auth/list";
+    private static void getThirdCategory(String token, Integer id, YddCategoryVo parent) {
+        String url = "https://dist.yqtyun.com/api/distributor/product/getCategoryList";
         // 请求体
-        String body = "{\"pid\":" + id + "}";
+        String body = "{\"parent_id\":" + id + "}";
 
         // 请求头
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json;charset=UTF-8");
-        headers.add("Token", token);
+        headers.add("Authorization", token);
 
         // 请求
         HttpEntity<String> request = new HttpEntity<>(body, headers);
@@ -437,8 +462,8 @@ public class YddDataController {
         RestTemplate restTemplateHttps = new RestTemplate();
         ResponseEntity<JSONObject> responseBody = restTemplateHttps.postForEntity(url, request, JSONObject.class);
         JSONObject httpBody = responseBody.getBody();
-        if (httpBody != null && httpBody.getInteger("code") == 0) {
-            JSONArray jsonArray = httpBody.getJSONArray("data");
+        if (httpBody != null && httpBody.getInteger("code") == 10000) {
+            JSONArray jsonArray = httpBody.getJSONObject("data").getJSONArray("items");
             for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject itemObject = jsonArray.getJSONObject(i);
                 YddCategoryVo yddCategoryVo = JSONObject.parseObject(JSONObject.toJSONString(itemObject), YddCategoryVo.class);
@@ -451,110 +476,70 @@ public class YddDataController {
 
     }
 
-    private YddSkuDetailVo getSkuDetail(Integer id, String token) {
-        String url = "https://cshy.org.yddstore.com/api/admin/item/v1/auth/skuDetail";
+    private static String getToken() {
+        String url = testAddress + "/open/v2/login/getAccessToken";
         // 请求体
-        String body = "{\"id\":" + id + "}";
+        Map<String, Object> params = new HashMap<>();
+        params.put("appId", "554dd352c4185966e04bf6f3");
+        params.put("secret", "rptx7q4ixyoldn2ikhbdt3t13657387v");
 
         // 请求头
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json;charset=UTF-8");
-        headers.add("Token", token);
+        headers.add("Content-Type", "application/json");
+
 
         // 请求
-        HttpEntity<String> request = new HttpEntity<>(body, headers);
+        HttpEntity<String> request = new HttpEntity<>(JSONObject.toJSONString(params), headers);
 
         // 使用RestTemplate请求
         RestTemplate restTemplateHttps = new RestTemplate();
         ResponseEntity<JSONObject> responseBody = restTemplateHttps.postForEntity(url, request, JSONObject.class);
         JSONObject httpBody = responseBody.getBody();
-        if (httpBody != null && httpBody.getInteger("code") == 0) {
-            JSONArray data = httpBody.getJSONArray("data");
-            YddSkuDetailVo skuDetailVo = JSONObject.parseObject(data.getJSONObject(0).toJSONString(), YddSkuDetailVo.class);
-            return skuDetailVo;
-        }
-        throw new CrmebException("获取sku详情失败");
-    }
 
-    private YddProductDetailVo getDetail(Integer id, String token) {
-        String url = "https://cshy.org.yddstore.com/api/admin/item/v1/auth/detail";
-        // 请求体
-        String body = "{\"id\":" + id + "}";
-
-        // 请求头
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json;charset=UTF-8");
-        headers.add("Token", token);
-
-        // 请求
-        HttpEntity<String> request = new HttpEntity<>(body, headers);
-
-        // 使用RestTemplate请求
-        RestTemplate restTemplateHttps = new RestTemplate();
-        ResponseEntity<JSONObject> responseBody = restTemplateHttps.postForEntity(url, request, JSONObject.class);
-        JSONObject httpBody = responseBody.getBody();
-        if (httpBody != null && httpBody.getInteger("code") == 0) {
+        if (httpBody != null && httpBody.getInteger("code") == 10000) {
             JSONObject data = httpBody.getJSONObject("data");
-            YddProductDetailVo yddProductDetailVo = JSONObject.parseObject(data.toJSONString(), YddProductDetailVo.class);
-            return yddProductDetailVo;
-        }
-        throw new CrmebException("获取详情失败");
-    }
-
-    private String getToken() {
-        String url = "https://cshy.org.yddstore.com/api/admin/user/login";
-        // 请求体
-        String body = "{\n" +
-                "    \"phone\": \"15285143252\",\n" +
-                "    \"password\": \"xpz15285143252\"\n" +
-                "}";
-
-        // 请求头
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json;charset=UTF-8");
-
-
-        // 请求
-        HttpEntity<String> request = new HttpEntity<>(body, headers);
-
-        // 使用RestTemplate请求
-        RestTemplate restTemplateHttps = new RestTemplate();
-        ResponseEntity<JSONObject> responseBody = restTemplateHttps.postForEntity(url, request, JSONObject.class);
-        JSONObject httpBody = responseBody.getBody();
-
-        if (httpBody != null && httpBody.getInteger("code") == 0) {
-            JSONObject data = httpBody.getJSONObject("data");
-            return data.getString("token");
+            return data.getString("accessToken");
         }
         throw new CrmebException("获取token失败");
     }
 
-    private JSONArray getList(Integer current, String token) {
-        String url = "https://cshy.org.yddstore.com/api/admin/item/v1/auth/page";
-        // 请求体
-        String body = "{\"brandId\":\"\",\"itemName\":\"\",\"firstClassId\":\"\",\"secondClassId\":\"\",\"thirdClassId\":\"\",\"shelfStatus\":\"\",\"current\":" + current + ",\"size\":100}";
+    private JSONArray getProductList(String token) {
+        int page = 1;
+        int total = 0;
+        JSONArray jsonArray = new JSONArray();
+        String url = "https://dist.yqtyun.com/api/distributor/product/getProductPageListV2";
+        while (total == 0 || total != jsonArray.size()){
+            try {
+                // 请求体
+                String body = "{\"price_type\":2,\"price_min\":\"\",\"price_max\":\"600\",\"profit_rate_type\":1,\"total_profit_rate_min\":\"35\",\"total_profit_rate_max\":\"\",\"is_enable\":\"\",\"keyword_type\":0,\"keyword\":\"\",\"address\":\"\",\"page_size\":2000,\"total\":0,\"page\":" + page + ",\"has_stock\":\"\",\"cost_price_sort\":\"\",\"market_price_sort\":\"\",\"province_id\":\"\",\"city_id\":\"\",\"area_id\":\"\",\"dg_city_id\":[],\"type\":\"\",\"tag_type\":\"4\",\"group_id\":\"\",\"page_sort\":0,\"page_offset\":0}";
 
-        // 请求头
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/json;charset=UTF-8");
-        headers.add("Token", token);
+                // 请求头
+                HttpHeaders headers = new HttpHeaders();
+                headers.add("Content-Type", "application/json;charset=UTF-8");
+                headers.add("Authorization", token);
 
-        // 请求
-        HttpEntity<String> request = new HttpEntity<>(body, headers);
+                // 请求
+                HttpEntity<String> request = new HttpEntity<>(body, headers);
 
-        // 使用RestTemplate请求
-        RestTemplate restTemplateHttps = new RestTemplate();
-        ResponseEntity<JSONObject> responseBody = restTemplateHttps.postForEntity(url, request, JSONObject.class);
-        JSONObject httpBody = responseBody.getBody();
-        if (httpBody != null && httpBody.getInteger("code") == 0) {
-            return httpBody.getJSONObject("data").getJSONArray("data");
+                // 使用RestTemplate请求
+                RestTemplate restTemplateHttps = new RestTemplate();
+                ResponseEntity<JSONObject> responseBody = restTemplateHttps.postForEntity(url, request, JSONObject.class);
+                JSONObject httpBody = responseBody.getBody();
+                if (httpBody != null && httpBody.getInteger("code") == 10000) {
+                    jsonArray.addAll(httpBody.getJSONObject("data").getJSONArray("items"));
+                    total = httpBody.getJSONObject("data").getInteger("total");
+                    page += 1;
+                }
+            }catch (Exception e){
+                throw new CrmebException("获取List失败");
+            }
         }
-        throw new CrmebException("获取List失败");
+        return jsonArray;
     }
 
     private String saveImg(String urlStr, Integer pid, String model) {
         if (StringUtils.isNotBlank(urlStr)) {
-            String localPath = "C:\\Users\\admin\\Desktop\\file\\";
+            String localPath = "/root/new_mall/temp_file/";
             UUID randomUUID = UUID.randomUUID();
             String uuid = randomUUID.toString().replace("-", "");
             String suffix = urlStr.substring(urlStr.lastIndexOf("."));
@@ -588,7 +573,7 @@ public class YddDataController {
                     fileInputStream.close();
                     boolean delete = file.delete();
                     return systemAttachmentService.clearPrefix(fileResultVo.getUrl());
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 throw new CrmebException("上传文件失败");

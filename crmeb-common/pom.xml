@@ -345,6 +345,13 @@
             <artifactId>wechatpay-apache-httpclient</artifactId>
             <version>0.4.9</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-misc</artifactId>
+            <version>8.8.2</version>
+        </dependency>
+
     </dependencies>
 
 

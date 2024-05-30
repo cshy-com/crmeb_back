@@ -56,23 +56,36 @@ public class ResponseFilter implements Filter {
 //        }
 
         filterChain.doFilter(request, wrapperResponse);
+//        if (!(((RepeatedlyRequestWrapper) request).getRequestURI()).contains("download") && !(((RepeatedlyRequestWrapper) request).getRequestURI()).contains("export") ){
 
         //返回前
         byte[] content = wrapperResponse.getContent();//获取返回值
         //判断是否有值
         if (content.length > 0) {
-            String str = new String(content, StandardCharsets.UTF_8);
+            String str;
+            if (!(((HttpServletRequest) request).getRequestURI()).contains("download") && !(((HttpServletRequest) request).getRequestURI()).contains("export")) {
+                str = new String(content, StandardCharsets.UTF_8);
+                try {
+                    HttpServletRequest req = (HttpServletRequest) request;
+                    str = new ResponseRouter().filter(str, RequestUtil.getUri(req));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-            try {
-                HttpServletRequest req = (HttpServletRequest) request;
-                str = new ResponseRouter().filter(str, RequestUtil.getUri(req));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            //把返回值输出到客户端
-            ServletOutputStream outputStream = response.getOutputStream();
-            if (str.length() > 0) {
-                outputStream.write(str.getBytes());
+                //把返回值输出到客户端
+                ServletOutputStream outputStream = response.getOutputStream();
+                if (str.length() > 0) {
+                    outputStream.write(str.getBytes());
+                    outputStream.flush();
+                    outputStream.close();
+                    //最后添加这一句，输出到客户端
+                    response.flushBuffer();
+                }
+            } else {
+
+                //把返回值输出到客户端
+                ServletOutputStream outputStream = response.getOutputStream();
+                outputStream.write(content);
                 outputStream.flush();
                 outputStream.close();
                 //最后添加这一句，输出到客户端
@@ -80,4 +93,6 @@ public class ResponseFilter implements Filter {
             }
         }
     }
+
+//    }
 }

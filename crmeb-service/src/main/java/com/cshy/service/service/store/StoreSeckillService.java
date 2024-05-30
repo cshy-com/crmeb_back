@@ -79,7 +79,7 @@ public interface StoreSeckillService extends IService<StoreSeckill> {
      * @param timeId 秒杀id
      * @return 秒杀中的商品
      */
-    List<StoreSecKillH5Response> getKillListByTimeId(String timeId, PageParamRequest pageParamRequest);
+    List<StoreSecKillH5Response> getKillListByTimeId(Integer timeId, PageParamRequest pageParamRequest);
 
     /**
      * 根据商品id查询正在秒杀的商品信息

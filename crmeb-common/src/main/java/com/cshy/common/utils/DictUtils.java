@@ -2,6 +2,7 @@ package com.cshy.common.utils;
 
 
 import com.alibaba.fastjson2.JSONArray;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.model.entity.system.SysDictData;
 
 import java.util.Collection;
@@ -163,7 +164,7 @@ public class DictUtils
      */
     public static void clearDictCache()
     {
-        Collection<String> keys = SpringUtil.getBean(RedisUtil.class).keys("sys_dict:" + "*");
+        Collection<String> keys = SpringUtil.getBean(RedisUtil.class).keys(RedisKey.SYS_DICT_KEY + "*");
         SpringUtil.getBean(RedisUtil.class).deleteObject(keys);
     }
 
@@ -175,6 +176,6 @@ public class DictUtils
      */
     public static String getCacheKey(String configKey)
     {
-        return "sys_dict:" + configKey;
+        return RedisKey.SYS_DICT_KEY + configKey;
     }
 }

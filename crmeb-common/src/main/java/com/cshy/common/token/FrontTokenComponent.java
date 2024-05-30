@@ -178,6 +178,7 @@ public class FrontTokenComponent {
                 "api/front/activity",
                 "api/front/sys/home/config",
                 "api/front/system/config",
+                "api/front/integral/coupon/isUsed",
         };
 
         boolean present = Arrays.stream(routerList).anyMatch(router -> router.equals(uri) || validateApiPath(uri, router));

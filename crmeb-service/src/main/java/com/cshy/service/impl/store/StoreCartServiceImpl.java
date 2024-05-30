@@ -105,6 +105,9 @@ public class StoreCartServiceImpl extends ServiceImpl<StoreCartDao, StoreCart> i
             cartInfoResponse.setImage(storeProduct.getImage());
             cartInfoResponse.setStoreName(storeProduct.getStoreName());
 
+            cartInfoResponse.setIsDeliver(storeProduct.getIsDeliver());
+            cartInfoResponse.setIsPickup(storeProduct.getIsPickup());
+
             if (!isValid) {// 失效商品直接掠过
                 cartInfoResponse.setAttrStatus(false);
                 response.add(cartInfoResponse);

@@ -1,6 +1,6 @@
 package com.cshy.service.dao;
 
-import com.cshy.common.model.entity.base.BaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cshy.common.model.entity.system.Brand;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;

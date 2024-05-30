@@ -176,7 +176,19 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
                     .or().like(StoreProduct::getKeyword, request.getKeywords()));
         }
         lambdaQueryWrapper.apply(StringUtils.isNotBlank(request.getCateId()), "FIND_IN_SET ('" + request.getCateId() + "', cate_id)");
-        lambdaQueryWrapper.orderByDesc(StoreProduct::getSort).orderByDesc(StoreProduct::getId);
+        if (StringUtils.isNotBlank(request.getPriceOrder())){
+            if (request.getPriceOrder().equals(Order.DESC))
+                lambdaQueryWrapper.orderByDesc(StoreProduct::getPrice);
+            else
+                lambdaQueryWrapper.orderByAsc(StoreProduct::getPrice);
+        } else if (StringUtils.isNotBlank(request.getSalesOrder())) {
+            if (request.getSalesOrder().equals(Order.DESC))
+                lambdaQueryWrapper.orderByDesc(StoreProduct::getSales);
+            else
+                lambdaQueryWrapper.orderByAsc(StoreProduct::getSales);
+        } else {
+            lambdaQueryWrapper.orderByDesc(StoreProduct::getSort).orderByDesc(StoreProduct::getId);
+        }
 
         Page<StoreProduct> storeProductPage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         List<StoreProduct> storeProducts = dao.selectList(lambdaQueryWrapper);
@@ -1046,7 +1058,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         // id、名称、图片、价格、销量、活动
         lqw.select(StoreProduct::getId, StoreProduct::getStoreName, StoreProduct::getImage, StoreProduct::getPrice, StoreProduct::getOtPrice,
                 StoreProduct::getActivity, StoreProduct::getSales, StoreProduct::getFicti, StoreProduct::getUnitName,
-                StoreProduct::getFlatPattern, StoreProduct::getStock);
+                StoreProduct::getFlatPattern, StoreProduct::getStock, StoreProduct::getIsDeliver, StoreProduct::getIsPickup);
 
         lqw.eq(StoreProduct::getIsRecycle, false);
         lqw.eq(StoreProduct::getIsDel, false);
@@ -1113,7 +1125,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         LambdaQueryWrapper<StoreProduct> lqw = Wrappers.lambdaQuery();
         lqw.select(StoreProduct::getId, StoreProduct::getImage, StoreProduct::getStoreName, StoreProduct::getSliderImage,
                 StoreProduct::getOtPrice, StoreProduct::getStock, StoreProduct::getSales, StoreProduct::getPrice, StoreProduct::getActivity,
-                StoreProduct::getFicti, StoreProduct::getIsSub, StoreProduct::getStoreInfo, StoreProduct::getBrowse, StoreProduct::getUnitName, StoreProduct::getTempId);
+                StoreProduct::getFicti, StoreProduct::getIsSub, StoreProduct::getStoreInfo, StoreProduct::getBrowse, StoreProduct::getUnitName, StoreProduct::getTempId, StoreProduct::getIsPickup, StoreProduct::getIsDeliver);
         lqw.eq(StoreProduct::getId, id);
         lqw.eq(StoreProduct::getIsRecycle, false);
         lqw.eq(StoreProduct::getIsDel, false);
@@ -1165,7 +1177,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
     @Override
     public StoreProduct getCartByProId(Integer productId) {
         LambdaQueryWrapper<StoreProduct> lqw = Wrappers.lambdaQuery();
-        lqw.select(StoreProduct::getId, StoreProduct::getImage, StoreProduct::getStoreName);
+        lqw.select(StoreProduct::getId, StoreProduct::getImage, StoreProduct::getStoreName, StoreProduct::getIsDeliver, StoreProduct::getIsPickup);
         lqw.eq(StoreProduct::getId, productId);
         return dao.selectOne(lqw);
     }

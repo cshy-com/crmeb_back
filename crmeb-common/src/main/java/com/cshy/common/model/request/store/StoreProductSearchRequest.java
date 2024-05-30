@@ -32,6 +32,12 @@ public class StoreProductSearchRequest implements Serializable {
     @ApiModelProperty(value = "分类ID， 多个逗号分隔")
     private String cateId;
 
+    @ApiModelProperty(value = "价格排序 asc 升序 desc 降序")
+    private String priceOrder;
+
+    @ApiModelProperty(value = "销量排序 asc 升序 desc 降序")
+    private String salesOrder;
+
     @ApiModelProperty(value = "关键字搜索， 支持(商品名称, 商品简介, 关键字, 商品条码)")
     private String keywords;
 

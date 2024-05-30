@@ -1,5 +1,6 @@
 package com.cshy.common.model.vo.order;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -58,4 +59,10 @@ public class OrderInfoDetailVo {
 
     /** 商品类型:0-普通，1-秒杀，2-砍价，3-拼团，4-视频号 */
     private Integer productType;
+
+    /** 是否到店自提 */
+    private Boolean isPickup;
+
+    /** 是否商家配送 */
+    private Boolean isDeliver;
 }

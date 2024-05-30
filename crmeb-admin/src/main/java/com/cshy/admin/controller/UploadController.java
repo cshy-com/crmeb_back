@@ -43,7 +43,7 @@ public class UploadController {
     })
     public CommonResult<FileResultVo> image(MultipartFile multipart,
                                             @RequestParam(value = "model") String model,
-                                            @RequestParam(value = "pid") Integer pid) throws IOException {
+                                            @RequestParam(value = "pid") Integer pid) throws Exception {
         return CommonResult.success(uploadService.imageUpload(multipart, model, pid));
     }
 

@@ -379,6 +379,7 @@ public class StoreCouponServiceImpl extends ServiceImpl<StoreCouponDao, StoreCou
             throw new CrmebException("优惠券状态无需变更");
         }
         StoreCoupon storeCoupon = new StoreCoupon();
+        BeanUtils.copyProperties(coupon, storeCoupon);
         storeCoupon.setId(id);
         storeCoupon.setStatus(status);
         return updateById(storeCoupon);

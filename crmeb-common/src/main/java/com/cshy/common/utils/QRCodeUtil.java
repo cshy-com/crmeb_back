@@ -24,7 +24,7 @@ import java.util.HashMap;
 @Component
 public class QRCodeUtil {
 
-    public static String crateQRCode(String content, int width, int height) throws IOException {
+    public static String creatQRCode(String content, int width, int height) throws IOException {
 
         if (!StringUtils.isEmpty(content)) {
             ServletOutputStream stream = null;

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.CategoryConstants;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.system.SystemAdmin;
@@ -35,6 +36,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -81,10 +83,21 @@ public class SystemRoleServiceImpl extends ServiceImpl<SystemRoleDao, SystemRole
     */
     @Override
     public List<SystemRole> getList(SystemRoleSearchRequest request, PageParamRequest pageParamRequest) {
+        LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
+        SystemAdmin currentAdmin = loginUserVo.getUser();
+
         PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
         LambdaQueryWrapper<SystemRole> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.select(SystemRole::getId, SystemRole::getRoleName, SystemRole::getStatus,
                 SystemRole::getCreateTime, SystemRole::getUpdateTime);
+
+        //非超级管理员不可以看到超级管理员角色
+        String roles = currentAdmin.getRoles();
+        String[] split = roles.split(",");
+        if (!Arrays.asList(split).contains("1")) {
+            lambdaQueryWrapper.ne(SystemRole::getId, 1);
+        }
+
         if (ObjectUtil.isNotNull(request.getStatus())) {
             lambdaQueryWrapper.eq(SystemRole::getStatus, request.getStatus());
         }
@@ -112,7 +125,7 @@ public class SystemRoleServiceImpl extends ServiceImpl<SystemRoleDao, SystemRole
     public List<CategoryTreeVo> menu() {
         List<Integer> categoryIdList = getRoleListInRoleId();
         System.out.println("权限列表:categoryIdList:"+ JSON.toJSONString(categoryIdList));
-        return categoryService.getListTree(Constants.CATEGORY_TYPE_MENU, 1, categoryIdList);
+        return categoryService.getListTree(CategoryConstants.CATEGORY_TYPE_MENU, 1, categoryIdList);
     }
 
     /**

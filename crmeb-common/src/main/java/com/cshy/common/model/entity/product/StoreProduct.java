@@ -15,16 +15,15 @@ import lombok.experimental.Accessors;
 
 /**
  * 商品表
- 
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @TableName("s_product")
-@ApiModel(value="StoreProduct对象", description="商品表")
+@ApiModel(value = "StoreProduct对象", description = "商品表")
 public class StoreProduct extends Model<StoreProduct> implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     public StoreProduct() {
     }
@@ -173,4 +172,10 @@ public class StoreProduct extends Model<StoreProduct> implements Serializable {
     @ApiModelProperty(value = "收藏量")
     @TableField(exist = false)
     private Integer collectNum;
+
+    @ApiModelProperty(value = "是否商家配送")
+    private Boolean isDeliver;
+
+    @ApiModelProperty(value = "是否到店自提")
+    private Boolean isPickup;
 }

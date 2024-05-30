@@ -20,7 +20,7 @@ public class ResponseRouter {
 //        }
 
         //根据需要处理返回值
-        if ((data.contains(UploadConstants.UPLOAD_TYPE_IMAGE + "/") || data.contains("/upload")) && !data.contains("data:image/png;base64"))
+        if ((data.contains(UploadConstants.UPLOAD_TYPE_IMAGE + "/") || data.contains("upload/")) && !data.contains("data:image/png;base64"))
         {
             data = SpringUtil.getBean(SystemAttachmentService.class).prefixImage(data);
         }

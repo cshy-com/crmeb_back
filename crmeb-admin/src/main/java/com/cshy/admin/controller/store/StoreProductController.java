@@ -1,5 +1,8 @@
 package com.cshy.admin.controller.store;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.cshy.common.exception.CrmebException;
+import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
@@ -10,6 +13,8 @@ import com.cshy.common.model.request.store.StoreProductSearchRequest;
 import com.cshy.common.model.response.StoreProductInfoResponse;
 import com.cshy.common.model.response.StoreProductResponse;
 import com.cshy.common.model.response.StoreProductTabsHeader;
+import com.cshy.common.utils.CrmebUtil;
+import com.cshy.service.service.category.CategoryService;
 import com.cshy.service.service.store.StoreCartService;
 import com.cshy.service.service.store.StoreProductService;
 import io.swagger.annotations.Api;
@@ -26,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -122,6 +128,47 @@ public class StoreProductController {
         } else {
             return CommonResult.failed();
         }
+    }
+
+
+    @ApiOperation(value = "批量更新分类")
+    @RequestMapping(value = "/batchUpdate", method = RequestMethod.POST)
+    public CommonResult<String> batchUpdate(@RequestBody Map<String, Object> map) {
+        if (!map.containsKey("ids") || !map.containsKey("categoryId")) {
+            throw new CrmebException("参数为ids数组 和 categoryId");
+        }
+
+        List<Integer> cateList = new ArrayList<>();
+
+        Object cate =  map.get("categoryId");
+        if(!(cate instanceof ArrayList<?>)){
+            throw new CrmebException("参数不正确");
+        }else {
+            for (Object object : (List<?>) cate) {
+                cateList.add(Integer.class.cast(object));
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Integer item : cateList) {
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            sb.append(item);
+        }
+
+        List<Integer> idList = new ArrayList<>();
+
+        Object value =  map.get("ids");
+        if(!(value instanceof ArrayList<?>)){
+            throw new CrmebException("参数不正确");
+        }else{
+            for (Object object : (List<?>) value) {
+                idList.add(Integer.class.cast(object));
+            }
+            storeProductService.update(new LambdaUpdateWrapper<StoreProduct>().in(StoreProduct::getId, idList).set(StoreProduct::getCateId, sb.toString()));
+        }
+
+        return CommonResult.success();
     }
 
     /**

@@ -710,27 +710,29 @@ public class OrderPayServiceImpl implements OrderPayService {
 
             // 微信支付，调用微信预下单，返回拉起微信支付需要的信息
             if (storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT)) {
-                // 预下单
-                Map<String, String> unifiedorder = unifiedorder(storeOrder, ip);
                 response.setStatus(true);
-                WxPayJsResultVo vo = new WxPayJsResultVo();
-                vo.setAppId(unifiedorder.get("appId"));
-                vo.setNonceStr(unifiedorder.get("nonceStr"));
-                vo.setPackages(unifiedorder.get("package"));
-                vo.setSignType(unifiedorder.get("signType"));
-                vo.setTimeStamp(unifiedorder.get("timeStamp"));
-                vo.setPaySign(unifiedorder.get("paySign"));
-                if (storeOrder.getPaymentChannel() == 2) {
-                    vo.setMwebUrl(unifiedorder.get("mweb_url"));
-                    response.setPayType(PayConstants.PAY_CHANNEL_WE_CHAT_H5);
+                if (!storeOrder.getPayPrice().equals(new BigDecimal("0.00"))){
+                    // 预下单
+                    Map<String, String> unifiedorder = unifiedorder(storeOrder, ip);
+                    WxPayJsResultVo vo = new WxPayJsResultVo();
+                    vo.setAppId(unifiedorder.get("appId"));
+                    vo.setNonceStr(unifiedorder.get("nonceStr"));
+                    vo.setPackages(unifiedorder.get("package"));
+                    vo.setSignType(unifiedorder.get("signType"));
+                    vo.setTimeStamp(unifiedorder.get("timeStamp"));
+                    vo.setPaySign(unifiedorder.get("paySign"));
+                    if (storeOrder.getPaymentChannel() == 2) {
+                        vo.setMwebUrl(unifiedorder.get("mweb_url"));
+                        response.setPayType(PayConstants.PAY_CHANNEL_WE_CHAT_H5);
+                    }
+                    if (storeOrder.getPaymentChannel() == 4 || storeOrder.getPaymentChannel() == 5) {
+                        vo.setPartnerid(unifiedorder.get("partnerid"));
+                    }
+                    // 更新商户订单号
+                    storeOrder.setOutTradeNo(unifiedorder.get("outTradeNo"));
+                    storeOrderService.updateById(storeOrder);
+                    response.setJsConfig(vo);
                 }
-                if (storeOrder.getPaymentChannel() == 4 || storeOrder.getPaymentChannel() == 5) {
-                    vo.setPartnerid(unifiedorder.get("partnerid"));
-                }
-                // 更新商户订单号
-                storeOrder.setOutTradeNo(unifiedorder.get("outTradeNo"));
-                storeOrderService.updateById(storeOrder);
-                response.setJsConfig(vo);
             } else if (storeOrder.getPayType().equals(PayType.PAY_TYPE_INTEGRAL)) {
                 //余额支付
                 Boolean balancePay = balancePay(storeOrder);
@@ -751,6 +753,10 @@ public class OrderPayServiceImpl implements OrderPayService {
 
         String join = StringUtils.join(responseList.stream().map(OrderPayResultResponse::getOrderNo).collect(Collectors.toList()), ",");
         orderPayResultResponse.setOrderNo(join);
+
+        Optional<OrderPayResultResponse> first = responseList.stream().filter(response -> Objects.nonNull(response.getJsConfig())).findFirst();
+        if (first.isPresent())
+            orderPayResultResponse.setJsConfig(first.get().getJsConfig());
         return orderPayResultResponse;
     }
 

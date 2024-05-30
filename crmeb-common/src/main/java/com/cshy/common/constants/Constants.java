@@ -71,15 +71,6 @@ public class Constants {
     public static final String SIGN_TYPE_INTEGRAL_TITLE = "签到积分奖励"; //积分
     public static final String SIGN_TYPE_EXPERIENCE_TITLE = "签到经验奖励"; //经验
 
-    //分类服务类型  类型，1 产品分类，2 附件分类，3 文章分类， 4 设置分类， 5 菜单分类， 6 配置分类， 7 秒杀配置
-    public static final int CATEGORY_TYPE_PRODUCT = 1; //产品
-    public static final int CATEGORY_TYPE_ATTACHMENT = 2; //附件分类
-    public static final int CATEGORY_TYPE_ARTICLE = 3; //文章分类
-    public static final int CATEGORY_TYPE_SET = 4; //设置分类
-    public static final int CATEGORY_TYPE_MENU = 5; //菜单分类
-    public static final int CATEGORY_TYPE_CONFIG = 6; //配置分类
-    public static final int CATEGORY_TYPE_SKILL = 7; //秒杀配置
-
     //首页Banner图片
     public static final int INDEX_RECOMMEND_BANNER = 1; //首页精品推荐Banner图片
     public static final int INDEX_HOT_BANNER = 2; //热门榜单推荐Banner图片

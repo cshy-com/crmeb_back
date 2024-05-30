@@ -6,6 +6,7 @@ import com.cshy.common.constants.*;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.entity.system.SystemAdmin;
+import com.cshy.common.model.entity.system.SystemStoreStaff;
 import com.cshy.common.model.request.store.StoreOrderStaticsticsRequest;
 import com.cshy.common.model.response.StoreOrderVerificationConfirmResponse;
 import com.cshy.common.model.response.StoreStaffDetail;
@@ -20,6 +21,7 @@ import com.cshy.service.delete.OrderUtils;
 import com.cshy.service.service.store.StoreOrderInfoService;
 import com.cshy.service.service.store.StoreOrderService;
 import com.cshy.service.service.store.StoreOrderVerification;
+import com.cshy.service.service.system.SystemStoreStaffService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * StoreOrderVerificationImpl 接口实现 核销订单
@@ -50,6 +53,9 @@ public class StoreOrderVerificationImpl implements StoreOrderVerification {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    private SystemStoreStaffService systemStoreStaffService;
 
     /**
      * 获取订单核销数据
@@ -165,19 +171,25 @@ public class StoreOrderVerificationImpl implements StoreOrderVerification {
         // 判断当前用户是否有权限核销
         LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
         SystemAdmin currentAdmin = loginUserVo.getUser();
-        // 添加核销人员后执行核销操作
-        StoreOrder storeOrder = new StoreOrder();
-        BeanUtils.copyProperties(existOrder,storeOrder);
-        storeOrder.setStatus(StoreOrderStatusConstants.ORDER_STATUS_INT_BARGAIN);
-        storeOrder.setClerkId(currentAdmin.getId());
-        boolean saveStatus = dao.updateById(storeOrder) > 0;
+        SystemStoreStaff systemStoreStaff = systemStoreStaffService.getOne(new LambdaQueryWrapper<SystemStoreStaff>().eq(SystemStoreStaff::getUid, currentAdmin.getId()));
+        if (Objects.nonNull(systemStoreStaff)){
+            if (systemStoreStaff.getStoreId().equals(existOrder.getStoreId())){
+                StoreOrder storeOrder = new StoreOrder();
+                BeanUtils.copyProperties(existOrder,storeOrder);
+                storeOrder.setStatus(StoreOrderStatusConstants.ORDER_STATUS_INT_BARGAIN);
+                storeOrder.setClerkId(currentAdmin.getId());
+                boolean saveStatus = dao.updateById(storeOrder) > 0;
+                // 小程序订阅消息发送
+                if(saveStatus){
+                    //后续操作放入redis
+                    redisUtil.lPush(TaskConstants.ORDER_TASK_REDIS_KEY_AFTER_TAKE_BY_USER, storeOrder.getId());
+                }
 
-        // 小程序订阅消息发送
-        if(saveStatus){
-            //后续操作放入redis
-            redisUtil.lPush(TaskConstants.ORDER_TASK_REDIS_KEY_AFTER_TAKE_BY_USER, storeOrder.getId());
+                return saveStatus;
+            }
+            throw new CrmebException("门店错误，请确认自提门店是否正确");
         }
-        return saveStatus;
+        throw new CrmebException("没有核销权限，请联系管理员将您添加到核销员列表");
     }
 
     /**

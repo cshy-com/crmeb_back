@@ -10,7 +10,6 @@ import com.cshy.service.service.wechat.WechatCommonService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Objects;
 
 /**
  * UserTokenServiceImpl 接口实现
@@ -55,13 +54,16 @@ public class UserTokenServiceImpl extends ServiceImpl<UserTokenDao, UserToken> i
     }
 
     @Override
-    public String getOpenIdByCode(String code, Integer userId) {
+    public String getOpenIdByCode(String code, Integer userId, Integer type) {
         String openid;
         //不存在则获取
-        JSONObject openIdByCode = wechatCommonService.getOpenIdByCode(code);
+        JSONObject openIdByCode = wechatCommonService.getOpenIdByCode(code, type);
         openid = (String) openIdByCode.get("openid");
         UserToken userToken = new UserToken();
-        userToken.setType(1);
+        if (type == 1)
+            userToken.setType(1);
+        else
+            userToken.setType(2);
         userToken.setToken(openid);
         userToken.setUid(userId);
         this.save(userToken);

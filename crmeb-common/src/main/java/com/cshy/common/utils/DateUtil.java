@@ -125,6 +125,14 @@ public final class DateUtil {
     }
 
     /**
+     * 获取当前时间戳（毫秒级）
+     * @return
+     */
+    public static Long getMillisTime() {
+        return System.currentTimeMillis();
+    }
+
+    /**
      * 获取当前日期,指定格式
      * 描述:<描述函数实现的功能>.
      *

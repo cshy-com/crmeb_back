@@ -76,4 +76,7 @@ public class AttrValueResponse implements Serializable {
 
     @ApiModelProperty(value = "砍价商品最低价|砍价专用字段")
     private BigDecimal minPrice;
+
+    @ApiModelProperty(value = "砍价商品最低价|砍价专用字段")
+    private String barCode;
 }

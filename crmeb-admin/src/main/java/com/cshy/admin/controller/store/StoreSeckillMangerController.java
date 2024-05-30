@@ -13,7 +13,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +39,7 @@ public class StoreSeckillMangerController {
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public CommonResult<CommonPage<StoreSeckillManagerResponse>>  getList(
             @Validated StoreSeckillMangerSearchRequest request, @Validated PageParamRequest pageParamRequest) {
-        return CommonResult.success(CommonPage.restPage(storeSeckillMangerService.getList(request, pageParamRequest)));
+        return CommonResult.success(CommonPage.restPage(storeSeckillMangerService.page(request, pageParamRequest)));
     }
 
     /**

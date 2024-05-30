@@ -46,4 +46,9 @@ public class PreOrderDetailRequest {
     @ApiModelProperty(value = "秒杀商品id")
     private Integer seckillId = 0;
 
+    @ApiModelProperty(value = "是否到店自提")
+    private Boolean isPickup;
+
+    @ApiModelProperty(value = "是否商家配送")
+    private Boolean isDeliver;
 }

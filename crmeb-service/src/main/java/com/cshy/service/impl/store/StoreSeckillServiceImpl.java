@@ -227,8 +227,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
      */
     @Override
     public Boolean deleteById(Integer id) {
-        StoreSeckill skill = new StoreSeckill().setId(id).setIsDel(true);
-        return dao.updateById(skill) > 0;
+        return dao.deleteById(id) > 0;
     }
 
     /**
@@ -701,9 +700,9 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
      * @return 秒杀中的商品
      */
     @Override
-    public List<StoreSecKillH5Response> getKillListByTimeId(String timeId, PageParamRequest pageParamRequest) {
-        PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        String currentDate = DateUtil.nowDate(DateConstants.DATE_FORMAT_DATE);
+    public List<StoreSecKillH5Response> getKillListByTimeId(Integer timeId, PageParamRequest pageParamRequest) {
+//        PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        Date currentDate = DateUtil.nowDateTime();
         LambdaQueryWrapper<StoreSeckill> lqw = Wrappers.lambdaQuery();
         lqw.eq(StoreSeckill::getStatus, 1);
         lqw.eq(StoreSeckill::getIsDel, false);

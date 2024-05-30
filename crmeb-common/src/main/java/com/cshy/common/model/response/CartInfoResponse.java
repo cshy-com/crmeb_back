@@ -59,4 +59,10 @@ public class CartInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "sku会员价格")
     private BigDecimal vipPrice;
+
+    @ApiModelProperty(value = "是否到店自提")
+    private Boolean isPickup;
+
+    @ApiModelProperty(value = "是否商家配送")
+    private Boolean isDeliver;
 }

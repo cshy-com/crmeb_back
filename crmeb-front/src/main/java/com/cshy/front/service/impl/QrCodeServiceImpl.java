@@ -79,7 +79,7 @@ public class QrCodeServiceImpl implements QrCodeService {
 
         String base64Image = null;
         try {
-            base64Image = QRCodeUtil.crateQRCode(text,width,height);
+            base64Image = QRCodeUtil.creatQRCode(text,width,height);
         }catch (Exception e){
             throw new CrmebException("生成二维码异常");
         }

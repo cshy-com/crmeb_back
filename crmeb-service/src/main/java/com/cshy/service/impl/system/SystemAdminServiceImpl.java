@@ -14,7 +14,9 @@ import com.cshy.common.model.request.system.SystemAdminAddRequest;
 import com.cshy.common.model.request.system.SystemAdminRequest;
 import com.cshy.common.model.request.system.SystemAdminUpdateRequest;
 import com.cshy.common.model.response.SystemAdminResponse;
+import com.cshy.common.model.vo.LoginUserVo;
 import com.cshy.common.utils.CrmebUtil;
+import com.cshy.common.utils.SecurityUtil;
 import com.cshy.common.utils.ValidateFormUtil;
 import com.github.pagehelper.PageHelper;
 import com.cshy.service.dao.system.SystemAdminDao;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,9 +56,17 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
     @Override
     public List<SystemAdminResponse> getList(SystemAdminRequest request, PageParamRequest pageParamRequest) {
         PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
+        LambdaQueryWrapper<SystemAdmin> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+
+        LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
+        SystemAdmin currentAdmin = loginUserVo.getUser();
+        //非超级管理员不可以看到超级管理员角色
+        Integer adminId = currentAdmin.getId();
+        if (!adminId.equals(1)) {
+            lambdaQueryWrapper.ne(SystemAdmin::getId, 1);
+        }
 
         //带SystemAdminRequest类的多条件查询
-        LambdaQueryWrapper<SystemAdmin> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         if (StrUtil.isNotBlank(request.getRoles())) {
             lambdaQueryWrapper.eq(SystemAdmin::getRoles, request.getRoles());
         }

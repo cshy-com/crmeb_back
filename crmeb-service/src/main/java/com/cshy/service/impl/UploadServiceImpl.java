@@ -71,7 +71,7 @@ public class UploadServiceImpl implements UploadService {
      * @return FileResultVo
      */
     @Override
-    public FileResultVo imageUpload(MultipartFile multipartFile, String model, Integer pid) throws IOException {
+    public FileResultVo imageUpload(MultipartFile multipartFile, String model, Integer pid) throws Exception {
         if (null == multipartFile || multipartFile.isEmpty()) {
             throw new CrmebException("上传的文件对象不存在...");
         }

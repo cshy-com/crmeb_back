@@ -43,8 +43,8 @@ public class EasyExcelUtils<T> {
 
         //获取需要导出的字段、名称
         List<String> headList = Lists.newArrayList();
-        Field[] declaredFields = GiftCard.class.getDeclaredFields();
-        List<String> fieldNameList = Arrays.asList(declaredFields).stream().filter(field -> field.getAnnotationsByType(ExcelProperty.class).length > 0)
+        Field[] declaredFields = clazz.getDeclaredFields();
+        List<String> fieldNameList = Arrays.stream(declaredFields).filter(field -> field.getAnnotationsByType(ExcelProperty.class).length > 0)
                 .map(field -> {
                     //字段
                     headList.add(field.getAnnotationsByType(ExcelProperty.class)[0].value()[0]);
@@ -154,7 +154,7 @@ public class EasyExcelUtils<T> {
         contentStyle.setWrapped(true);
         contentStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         // 设置 水平居中
-//        contentStyle.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        contentStyle.setHorizontalAlignment(HorizontalAlignment.CENTER);
         WriteFont contentWriteFont = new WriteFont();
         // 内容字号
         contentWriteFont.setFontHeightInPoints((short) 12);

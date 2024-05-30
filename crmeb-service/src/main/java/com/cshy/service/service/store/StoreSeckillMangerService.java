@@ -21,7 +21,14 @@ public interface StoreSeckillMangerService extends IService<StoreSeckillManger> 
      * @param pageParamRequest 分页参数
      * @return List
      */
-    List<StoreSeckillManagerResponse> getList(StoreSeckillMangerSearchRequest request, PageParamRequest pageParamRequest);
+    List<StoreSeckillManagerResponse> page(StoreSeckillMangerSearchRequest request, PageParamRequest pageParamRequest);
+
+    /**
+     * 秒杀配置列表
+     * @param request 查询参数
+     * @return List
+     */
+    List<StoreSeckillManagerResponse> list(StoreSeckillMangerSearchRequest request);
 
     /**
      * 删除秒杀配置 逻辑删除

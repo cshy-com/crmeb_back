@@ -49,12 +49,30 @@ public class ProductController {
     }
 
     /**
-     * 获取分类
+     * 获取子分类
      */
     @ApiOperation(value = "获取分类")
     @RequestMapping(value = "/category", method = RequestMethod.GET)
     public CommonResult<List<CategoryTreeVo>> getCategory() {
         return CommonResult.success(productService.getCategory());
+    }
+
+    /**
+     * 获取子分类
+     */
+    @ApiOperation(value = "获取分类")
+    @RequestMapping(value = "/category/children", method = RequestMethod.GET)
+    public CommonResult<List<CategoryTreeVo>> getCategory(@RequestParam Integer parentId) {
+        return CommonResult.success(productService.getChildCategory(parentId));
+    }
+
+    /**
+     * 获取一级分类
+     */
+    @ApiOperation(value = "获取分类")
+    @RequestMapping(value = "/category/parent", method = RequestMethod.GET)
+    public CommonResult<List<CategoryTreeVo>> getFirstCategory() {
+        return CommonResult.success(productService.getFirstCategory());
     }
 
     /**

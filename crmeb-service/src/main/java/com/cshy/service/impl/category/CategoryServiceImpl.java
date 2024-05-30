@@ -1,6 +1,5 @@
 package com.cshy.service.impl.category;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -8,11 +7,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.constants.CategoryConstants;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.vo.category.CategoryTreeVo;
+import com.cshy.common.utils.RedisUtil;
 import com.github.pagehelper.PageHelper;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.model.entity.category.Category;
@@ -21,10 +22,13 @@ import com.cshy.common.model.request.category.CategorySearchRequest;
 import com.cshy.service.dao.category.CategoryDao;
 import com.cshy.service.service.category.CategoryService;
 import com.cshy.service.service.system.SystemAttachmentService;
+import com.google.common.collect.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,32 +45,57 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
     @Autowired
     private SystemAttachmentService systemAttachmentService;
 
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Override
     public List<Category> getList(CategorySearchRequest request, PageParamRequest pageParamRequest) {
-        PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
-        LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        if (null != request.getPid()) {
-            lambdaQueryWrapper.eq(Category::getPid, request.getPid());
+        List<Category> categories = loadFromCacheByType(request.getType());
+        return categories.stream().filter(category -> {
+                    boolean result = true;
+                    if (null != request.getPid()) {
+                        result = result && category.getPid().equals(request.getPid());
+                    }
+                    if (null != request.getType()) {
+                        result = result && category.getType().equals(request.getType());
+                    }
+                    if (ObjectUtil.isNotNull(request.getStatus()) && request.getStatus() >= 0) {
+                        result = result && category.getStatus().equals(request.getStatus().equals(CategoryConstants.CATEGORY_STATUS_NORMAL));
+                    }
+                    if (null != request.getName()) {
+                        result = result && category.getName().contains(request.getName());
+                    }
+                    return result;
+                }).sorted(Comparator.comparing(Category::getSort).reversed().thenComparing(Category::getId))
+                .collect(Collectors.toList());
+    }
+
+    private List<Category> loadFromCache() {
+        Collection<String> keys = redisUtil.keys(RedisKey.SYS_CATEGORY_KEY + "*");
+
+        List<Category> total = Lists.newArrayList();
+        keys.forEach(key -> {
+            Object o = redisUtil.get(key);
+            List<Category> categories = (List<Category>) o;
+            total.addAll(categories);
+        });
+        return total;
+    }
+
+    private List<Category> loadFromCacheByType(Integer type) {
+        String matchKey = matchKey(type);
+        if (StringUtils.isNotBlank(matchKey)) {
+            Object o = redisUtil.get(RedisKey.SYS_CATEGORY_KEY + matchKey);
+            List<Category> categories = (List<Category>) o;
+            return categories;
         }
-        if (null != request.getType()) {
-            lambdaQueryWrapper.eq(Category::getType, request.getType());
-        }
-        if (ObjectUtil.isNotNull(request.getStatus()) && request.getStatus() >= 0) {
-            lambdaQueryWrapper.eq(Category::getStatus, request.getStatus().equals(CategoryConstants.CATEGORY_STATUS_NORMAL));
-        }
-        if (null != request.getName()) {
-            lambdaQueryWrapper.like(Category::getName, request.getName());
-        }
-        lambdaQueryWrapper.orderByDesc(Category::getSort).orderByDesc(Category::getId);
-        return dao.selectList(lambdaQueryWrapper);
+        return loadFromCache();
     }
 
     @Override
     public List<Category> getByIds(List<Integer> idList) {
-        LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.in(Category::getId, idList);
-        return dao.selectList(lambdaQueryWrapper);
+        List<Category> categories = loadFromCache();
+        return categories.stream().filter(category -> idList.contains(category.getId())).collect(Collectors.toList());
     }
 
     @Override
@@ -78,18 +107,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         }
 
         return map;
-    }
-
-    @Override
-    public Boolean checkAuth(List<Integer> pathIdList, String uri) {
-        LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.in(Category::getId, pathIdList).eq(Category::getUrl, uri);
-        List<Category> categoryList = dao.selectList(lambdaQueryWrapper);
-        if (categoryList.size() < 1) {
-            return false;
-        }
-
-        return true;
     }
 
     @Override
@@ -110,6 +127,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
                 //如是开启，则父类的状态为开启
                 updatePidStatusById(id);
             }
+
+            redisUtil.delete(RedisKey.SYS_CATEGORY_KEY + matchKey(category.getType()));
+
+            load2CacheByType(category.getType());
 
             return true;
         } catch (Exception e) {
@@ -176,167 +197,158 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
     }
 
     private List<CategoryTreeVo> getTree(Integer type, Integer status, String name, List<Integer> categoryIdList) {
-        LambdaQueryWrapper<Category> lambdaQueryWrapper = Wrappers.lambdaQuery();
-        lambdaQueryWrapper.eq(Category::getType, type);
-
-        if (null != categoryIdList && categoryIdList.size() > 0) {
-            lambdaQueryWrapper.in(Category::getId, categoryIdList);
-        }
-        if (status >= 0) {
-            lambdaQueryWrapper.eq(Category::getStatus, status);
-        }
-
-        if (StringUtils.isNotBlank(name)) { // 根据名称模糊搜索
-            lambdaQueryWrapper.like(Category::getName, name);
-        }
-
-        lambdaQueryWrapper.orderByDesc(Category::getSort);
-        lambdaQueryWrapper.orderByAsc(Category::getId);
-
-        List<Category> total = dao.selectList(lambdaQueryWrapper);
-
+        List<Category> categories = loadFromCacheByType(type);
+        List<Category> categoryList = categories.stream().filter(category -> {
+                    boolean result = true;
+                    if (null != categoryIdList && categoryIdList.size() > 0) {
+                        result = result && categoryIdList.contains(category.getId());
+                    }
+                    if (status >= 0) {
+                        result = result && category.getStatus().equals(status.equals(CategoryConstants.CATEGORY_STATUS_NORMAL));
+                    }
+                    if (StringUtils.isNotBlank(name)) { // 根据名称模糊搜索
+                        result = result && category.getName().contains(name);
+                    }
+                    return result;
+                }).sorted(Comparator.comparing(Category::getSort).reversed().thenComparing(Category::getId))
+                .collect(Collectors.toList());
         // 构建分类树
-        List<CategoryTreeVo> tree = buildCategoryTree(total, 0);
-        return tree;
+        return buildCategoryTree(categoryList, 0);
     }
 
     // 递归构建分类树
-    private List<CategoryTreeVo> buildCategoryTree(List<Category> categories, Integer parentId) {
-        List<CategoryTreeVo> tree = new ArrayList<>();
+    public List<CategoryTreeVo> buildCategoryTree(List<Category> categories, Integer parentId) {
+        Map<Integer, List<CategoryTreeVo>> categoryMap = new HashMap<>();
+        // 将类别按照父类别 ID 分组
         for (Category category : categories) {
-            if (category.getPid().equals(parentId)) {
-                CategoryTreeVo node = new CategoryTreeVo();
-                node.setId(category.getId());
-                node.setPid(category.getPid());
-                node.setPath(category.getPath());
-                node.setName(category.getName());
-                node.setType(category.getType());
-                node.setUrl(category.getUrl());
-                node.setExtra(category.getExtra());
-                node.setStatus(category.getStatus());
-                node.setSort(category.getSort());
-                // 递归构建子分类
-                List<CategoryTreeVo> children = buildCategoryTree(categories, category.getId());
-                if (!children.isEmpty()) {
-                    node.setChild(children);
-                }
-                tree.add(node);
+            CategoryTreeVo node = new CategoryTreeVo();
+            node.setId(category.getId());
+            node.setPid(category.getPid());
+            node.setPath(category.getPath());
+            node.setName(category.getName());
+            node.setType(category.getType());
+            node.setUrl(category.getUrl());
+            node.setExtra(category.getExtra());
+            node.setStatus(category.getStatus());
+            node.setSort(category.getSort());
+
+            List<CategoryTreeVo> children = categoryMap.getOrDefault(category.getPid(), new ArrayList<>());
+            children.add(node);
+            categoryMap.put(category.getPid(), children);
+        }
+        // 递归构建树
+        return buildTree(categoryMap, parentId);
+    }
+
+    private List<CategoryTreeVo> buildTree(Map<Integer, List<CategoryTreeVo>> categoryMap, Integer parentId) {
+        List<CategoryTreeVo> tree = categoryMap.get(parentId);
+        if (tree == null) {
+            return new ArrayList<>();
+        }
+        for (CategoryTreeVo node : tree) {
+            List<CategoryTreeVo> children = buildTree(categoryMap, node.getId());
+            if (!children.isEmpty()) {
+                node.setChild(children);
             }
         }
         return tree;
     }
 
-//        //循环数据，把数据对象变成带list结构的vo
-//        List<CategoryTreeVo> treeList = new ArrayList<>();
-//
-//        LambdaQueryWrapper<Category> lambdaQueryWrapper = Wrappers.lambdaQuery();
-//        lambdaQueryWrapper.eq(Category::getType, type);
-//
-//        if(null != categoryIdList && categoryIdList.size() > 0){
-//            lambdaQueryWrapper.in(Category::getId, categoryIdList);
-//        }
-//
-//        if(status >= 0){
-//            lambdaQueryWrapper.eq(Category::getStatus, status);
-//        }
-//        if(StringUtils.isNotBlank(name)){ // 根据名称模糊搜索
-//            lambdaQueryWrapper.like(Category::getName,name);
-//        }
-//
-//        lambdaQueryWrapper.orderByDesc(Category::getSort);
-//        lambdaQueryWrapper.orderByAsc(Category::getId);
-//        List<Category> allTree = dao.selectList(lambdaQueryWrapper);
-//        if(allTree == null){
-//            return null;
-//        }
-//        // 根据名称搜索特殊处理 这里仅仅处理两层搜索后有子父级关系的数据
-//        if(StringUtils.isNotBlank(name) && allTree.size() >0){
-//            List<Category> searchCategory = new ArrayList<>();
-//            List<Integer> categoryIds = allTree.stream().map(Category::getId).collect(Collectors.toList());
-//
-//            List<Integer> pidList = allTree.stream().filter(c -> c.getPid() > 0 && !categoryIds.contains(c.getPid()))
-//                    .map(Category::getPid).distinct().collect(Collectors.toList());
-//            if (CollUtil.isNotEmpty(pidList)) {
-//                pidList.forEach(pid -> {
-//                    searchCategory.add(dao.selectById(pid));
-//                });
-//            }
-//            allTree.addAll(searchCategory);
-//        }
-//
-//        for (Category category: allTree) {
-//            CategoryTreeVo categoryTreeVo = new CategoryTreeVo();
-//            BeanUtils.copyProperties(category, categoryTreeVo);
-//            treeList.add(categoryTreeVo);
-//        }
-//
-//
-//        //返回
-//        Map<Integer, CategoryTreeVo> map = new HashMap<>();
-//        //ID 为 key 存储到map 中
-//        for (CategoryTreeVo categoryTreeVo1 : treeList) {
-//            map.put(categoryTreeVo1.getId(), categoryTreeVo1);
-//        }
-//
-//        List<CategoryTreeVo> list = new ArrayList<>();
-//        for (CategoryTreeVo tree : treeList) {
-//            //子集ID返回对象，有则添加。
-//            CategoryTreeVo tree1 = map.get(tree.getPid());
-//            if(tree1 != null){
-//                tree1.getChild().add(tree);
-//            }else {
-//                list.add(tree);
-//            }
-//        }
-//        System.out.println("无限极分类 : getTree:" + JSON.toJSONString(list));
-//        return list;
-//    }
-
     @Override
     public int delete(Integer id) {
+        Category category = getById(id);
         //查看是否有子类, 物理删除
         if (getChildCountByPid(id) > 0) {
             throw new CrmebException("当前分类下有子类，请先删除子类！");
         }
+        dao.deleteById(id);
 
-        return dao.deleteById(id);
+        redisUtil.delete(RedisKey.SYS_CATEGORY_KEY + matchKey(category.getType()));
+
+        load2CacheByType(category.getType());
+
+        return 1;
     }
 
     @Override
-    public void insertWithCustomId(Category category) {
-        baseMapper.insertWithCustomId(category);
+    public void load2Cache() {
+        List<Category> list = this.list();
+        Map<Integer, List<Category>> mapByType = list.stream().collect(Collectors.groupingBy(Category::getType));
+        mapByType.forEach((k, v) -> {
+            String type = matchKey(k);
+            redisUtil.set(RedisKey.SYS_CATEGORY_KEY + type, v);
+        });
+    }
+
+    @Override
+    public void load2CacheByType(Integer type) {
+        List<Category> list = this.list(new LambdaQueryWrapper<Category>().eq(Category::getType, type));
+        String typeStr = matchKey(type);
+        redisUtil.set(RedisKey.SYS_CATEGORY_KEY + typeStr, list);
+    }
+
+    private static String matchKey(Integer k) {
+        String type = "";
+        switch (k) {
+            case CategoryConstants.CATEGORY_TYPE_PRODUCT:
+                type = CategoryConstants.CATEGORY_TYPE_PRODUCT_STR;
+                break;
+            case CategoryConstants.CATEGORY_TYPE_ATTACHMENT:
+                type = CategoryConstants.CATEGORY_TYPE_ATTACHMENT_STR;
+                break;
+            case CategoryConstants.CATEGORY_TYPE_ARTICLE:
+                type = CategoryConstants.CATEGORY_TYPE_ARTICLE_STR;
+                break;
+            case CategoryConstants.CATEGORY_TYPE_SETTING:
+                type = CategoryConstants.CATEGORY_TYPE_SET_STR;
+                break;
+            case CategoryConstants.CATEGORY_TYPE_MENU:
+                type = CategoryConstants.CATEGORY_TYPE_MENU_STR;
+                break;
+            case CategoryConstants.CATEGORY_TYPE_CONFIG:
+                type = CategoryConstants.CATEGORY_TYPE_CONFIG_STR;
+                break;
+            case CategoryConstants.CATEGORY_TYPE_SECKILL:
+                type = CategoryConstants.CATEGORY_TYPE_SKILL_STR;
+                break;
+            default:
+                type = null;
+        }
+        return type;
     }
 
     @Override
     public List<Category> getChildVoListByPid(Integer pid) {
-        //查看是否有子类
-        QueryWrapper<Category> objectQueryWrapper = new QueryWrapper<>();
-        objectQueryWrapper.eq("status", CategoryConstants.CATEGORY_STATUS_NORMAL);
-        objectQueryWrapper.like("path", "/" + pid + "/");
-        return dao.selectList(objectQueryWrapper);
+        List<Category> total = loadFromCache();
+
+        return total.stream().filter(category ->
+                category.getStatus().equals(Boolean.TRUE) && (category.getPath().contains("/" + pid + "/") || category.getPath().contains("/" + pid))
+        ).collect(Collectors.toList());
     }
 
     private int checkName(String name, Integer type) {
-        LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(Category::getName, name);
-        if (ObjectUtil.isNotNull(type)) {
-            lambdaQueryWrapper.eq(Category::getType, type);
-        }
-        return dao.selectCount(lambdaQueryWrapper);
-    }
-
-    @Override
-    public boolean checkUrl(String uri) {
-        LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(Category::getUrl, uri);
-        return dao.selectCount(lambdaQueryWrapper) > 0;
+        String key = matchKey(type);
+        Object o = redisUtil.get(RedisKey.SYS_CATEGORY_KEY + key);
+        List<Category> categories = (List<Category>) o;
+        long count = categories.stream().filter(category -> {
+            if (ObjectUtil.isNotNull(type))
+                return category.getName().equals(name) && category.getType().equals(type);
+            else
+                return category.getName().equals(name);
+        }).count();
+        return (int) count;
     }
 
     @Override
     public boolean updateStatus(Integer id) {
         Category category = getById(id);
         category.setStatus(!category.getStatus());
-        return updateById(category);
+        boolean b = updateById(category);
+        if (b) {
+            load2CacheByType(category.getType());
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -354,7 +366,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         BeanUtils.copyProperties(categoryRequest, category);
         category.setPath(getPathByPId(category.getPid()));
         category.setExtra(systemAttachmentService.clearPrefix(category.getExtra()));
-        return save(category);
+        save(category);
+        redisUtil.delete(RedisKey.SYS_CATEGORY_KEY + matchKey(category.getType()));
+        load2CacheByType(category.getType());
+        return Boolean.TRUE;
     }
 
     /**
@@ -364,13 +379,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
      */
     @Override
     public List<Category> findArticleCategoryList() {
-        LambdaQueryWrapper<Category> lambdaQueryWrapper = Wrappers.lambdaQuery();
-        lambdaQueryWrapper.select(Category::getId, Category::getName);
-        lambdaQueryWrapper.eq(Category::getType, Constants.CATEGORY_TYPE_ARTICLE);
-        lambdaQueryWrapper.eq(Category::getStatus, true);
-        lambdaQueryWrapper.orderByDesc(Category::getSort);
-        lambdaQueryWrapper.orderByAsc(Category::getId);
-        return dao.selectList(lambdaQueryWrapper);
+        String key = matchKey(CategoryConstants.CATEGORY_TYPE_ARTICLE);
+        Object o = redisUtil.get(RedisKey.SYS_CATEGORY_KEY + key);
+        List<Category> categories = (List<Category>) o;
+        return categories.stream().filter(category -> category.getStatus()).sorted(Comparator.comparing(Category::getSort).reversed().thenComparing(Category::getId))
+                .collect(Collectors.toList());
     }
 }
 

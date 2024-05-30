@@ -79,8 +79,8 @@ public class SystemAttachmentServiceImpl extends ServiceImpl<SystemAttachmentDao
         // 如果那些域名不需要加，则跳过
         if (path.contains(getCdnUrl() + "/" + UploadConstants.UPLOAD_TYPE_IMAGE + "/"))
             return path;
-        if (path.contains("/upload")) {
-            return path.replace("/upload", getCdnUrl() + "/upload").replace(UploadConstants.UPLOAD_TYPE_IMAGE + "/", getCdnUrl() + "/" + UploadConstants.UPLOAD_TYPE_IMAGE + "/");
+        if (path.contains("upload/")) {
+            return path.replace("upload/", getCdnUrl() + "/upload/").replace(UploadConstants.UPLOAD_TYPE_IMAGE + "/", getCdnUrl() + "/" + UploadConstants.UPLOAD_TYPE_IMAGE + "/");
         } else {
             return path.replace(UploadConstants.UPLOAD_TYPE_IMAGE + "/", getCdnUrl() + "/" + UploadConstants.UPLOAD_TYPE_IMAGE + "/");
         }

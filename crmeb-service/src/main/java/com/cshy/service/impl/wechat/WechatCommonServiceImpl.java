@@ -758,12 +758,27 @@ public class WechatCommonServiceImpl implements WechatCommonService {
     }
 
     @Override
-    public JSONObject getOpenIdByCode(String code) {
-        String url = WeChatConstants.API_URL + WeChatConstants.WE_CHAT_AUTHORIZE_GET_OPEN_ID;
-        String params = "?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code";
+    public JSONObject getOpenIdByCode(String code, Integer type) {
+        String url;
+        String params;
+        if (type == 1) {
+            url = WeChatConstants.API_URL + WeChatConstants.WE_CHAT_AUTHORIZE_GET_OPEN_ID;
+            params = "?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code";
 
-        String appId = systemConfigService.getValueByKey(WeChatConstants.WECHAT_PUBLIC_APPID);
-        String secret = systemConfigService.getValueByKey(WeChatConstants.WECHAT_PUBLIC_APPSECRET);
+        } else {
+            url = WeChatConstants.API_URL + WeChatConstants.WE_CHAT_AUTHORIZE_PROGRAM_GET_OPEN_ID;
+            params = "?appid=APPID&secret=SECRET&js_code=CODE&grant_type=authorization_code";
+        }
+
+        String appId;
+        String secret;
+        if (type == 1){
+            appId = systemConfigService.getValueByKey(WeChatConstants.WECHAT_PUBLIC_APPID);
+            secret = systemConfigService.getValueByKey(WeChatConstants.WECHAT_PUBLIC_APPSECRET);
+        } else {
+            appId = systemConfigService.getValueByKey(WeChatConstants.WECHAT_MINI_APPID);
+            secret = systemConfigService.getValueByKey(WeChatConstants.WECHAT_MINI_APPSECRET);
+        }
 
         String finalParams = params.replace("APPID", appId).replace("SECRET", secret).replace("CODE", code);
         String finalUrl = url + finalParams;

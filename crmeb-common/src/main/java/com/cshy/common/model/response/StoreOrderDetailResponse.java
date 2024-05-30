@@ -100,4 +100,7 @@ public class StoreOrderDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "是否改价,0-否，1-是")
     private Boolean isAlterPrice;
+
+    @ApiModelProperty(value = "收货地址")
+    private String address;
 }

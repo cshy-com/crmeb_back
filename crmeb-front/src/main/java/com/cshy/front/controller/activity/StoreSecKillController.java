@@ -18,7 +18,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,11 +54,7 @@ public class StoreSecKillController {
         StoreSeckillMangerSearchRequest request = new StoreSeckillMangerSearchRequest();
         request.setActivityCategoryName(activityCategoryName);
 
-        PageParamRequest pageParamRequest = new PageParamRequest();
-        pageParamRequest.setPage(0);
-        pageParamRequest.setLimit(999);
-
-        List<StoreSeckillManagerResponse> storeSeckillMangerServiceList = storeSeckillMangerService.getList(request, pageParamRequest);
+        List<StoreSeckillManagerResponse> storeSeckillMangerServiceList = storeSeckillMangerService.list(request);
 
         //根据list查询商品
         storeSeckillMangerServiceList.forEach(storeSeckillManagerResponse -> {
@@ -91,11 +86,11 @@ public class StoreSecKillController {
 
     @ApiOperation("根据活动配置id查询下面的商品")
     @GetMapping("/query/byId")
-    public CommonResult<List<StoreSecKillH5Response>> queryById(@RequestParam Serializable id) {
+    public CommonResult<List<StoreSecKillH5Response>> queryById(@RequestParam Integer id) {
         PageParamRequest pageParamRequest = new PageParamRequest();
         pageParamRequest.setLimit(9999);
         pageParamRequest.setPage(0);
-        List<StoreSecKillH5Response> secKillListByTimeId = storeSeckillService.getKillListByTimeId((String) id, pageParamRequest);
+        List<StoreSecKillH5Response> secKillListByTimeId = storeSeckillService.getKillListByTimeId(id, pageParamRequest);
 
         return CommonResult.success(secKillListByTimeId);
     }
@@ -126,7 +121,7 @@ public class StoreSecKillController {
      */
     @ApiOperation(value = "秒杀列表")
     @RequestMapping(value = "/list/{timeId}", method = RequestMethod.GET)
-    public CommonResult<CommonPage<StoreSecKillH5Response>> list(@PathVariable("timeId") String timeId, @ModelAttribute PageParamRequest pageParamRequest) {
+    public CommonResult<CommonPage<StoreSecKillH5Response>> list(@PathVariable("timeId") Integer timeId, @ModelAttribute PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(storeSeckillService.getKillListByTimeId(timeId, pageParamRequest)));
     }
 

@@ -21,5 +21,5 @@ public interface UserTokenService extends IService<UserToken> {
 
     UserToken getTokenByUserId(Integer userId, int type);
 
-    String getOpenIdByCode(String code, Integer userId);
+    String getOpenIdByCode(String code, Integer userId, Integer type);
 }

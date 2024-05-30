@@ -121,6 +121,12 @@ public class StoreProductAddRequest implements Serializable {
     @ApiModelProperty(value = "商品描述")
     private String content;
 
+    @ApiModelProperty(value = "是否到店自提")
+    private Boolean isPickup;
+
+    @ApiModelProperty(value = "是否商家配送")
+    private Boolean isDeliver;
+
     @ApiModelProperty(value = "优惠券id集合")
     private List<Integer> couponIds;
 

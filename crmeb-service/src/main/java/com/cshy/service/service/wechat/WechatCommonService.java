@@ -177,7 +177,8 @@ public interface WechatCommonService {
      * 获取、保存微信OpenId
      *
      * @param code 微信code
+     * @param type
      * @return
      */
-    JSONObject getOpenIdByCode(String code);
+    JSONObject getOpenIdByCode(String code, Integer type);
 }

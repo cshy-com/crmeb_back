@@ -108,16 +108,7 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public List<CategoryTreeVo> getCategory() {
-        List<CategoryTreeVo> listTree = categoryService.getListTree(CategoryConstants.CATEGORY_TYPE_PRODUCT, 1, "");
-        for (int i = 0; i < listTree.size(); ) {
-            CategoryTreeVo categoryTreeVo = listTree.get(i);
-            if (!categoryTreeVo.getPid().equals(0)) {
-                listTree.remove(i);
-                continue;
-            }
-            i++;
-        }
-        return listTree;
+        return categoryService.getListTree(CategoryConstants.CATEGORY_TYPE_PRODUCT, 1, "");
     }
 
     /**
@@ -595,10 +586,10 @@ public class ProductServiceImpl implements ProductService {
         lambdaQueryWrapper.eq(StoreProduct::getIsRecycle, false);
         lambdaQueryWrapper.eq(StoreProduct::getIsDel, false);
         //判断categoryId是二级分类id还是1级分类id categoryId为空则查询所有分类
-        if (null != categoryId){
+        if (null != categoryId) {
             Category category = categoryService.getById(categoryId);
             List<Integer> cateIdList = Lists.newArrayList();
-            if (category.getPid().equals(0)){
+            if (category.getPid().equals(0)) {
                 //查询二级分类
                 List<Category> childVoListByPid = categoryService.getChildVoListByPid(categoryId);
                 cateIdList = childVoListByPid.stream().map(Category::getId).collect(Collectors.toList());
@@ -653,6 +644,88 @@ public class ProductServiceImpl implements ProductService {
             return map;
         }).collect(Collectors.toList());
         return resList;
+    }
+
+    @Override
+    public List<CategoryTreeVo> getFirstCategory() {
+        List<Category> list = categoryService.list(new LambdaQueryWrapper<Category>().eq(Category::getPid, 0).eq(Category::getType, 1).eq(Category::getStatus, true));
+        return list.parallelStream().filter(category -> {
+            //查询三级分类中是否有商品
+            List<Category> categories = categoryService.list(new LambdaQueryWrapper<Category>().select(Category::getId).like(Category::getPath, category.getId()).like(Category::getPath, "/%/%/").eq(Category::getStatus, true));
+            List<Integer> categoryIdList = categories.stream().map(Category::getId).collect(Collectors.toList());
+            if (CollUtil.isEmpty(categoryIdList))
+                return false;
+            int count = storeProductService.count(new LambdaQueryWrapper<StoreProduct>().in(StoreProduct::getCateId, categoryIdList).eq(StoreProduct::getIsShow, true));
+            return count > 0;
+        }).map(category -> {
+            CategoryTreeVo categoryTreeVo = new CategoryTreeVo();
+            categoryTreeVo.setId(category.getId());
+            categoryTreeVo.setPid(category.getPid());
+            categoryTreeVo.setPath(category.getPath());
+            categoryTreeVo.setName(category.getName());
+            categoryTreeVo.setType(category.getType());
+            categoryTreeVo.setUrl(category.getUrl());
+            categoryTreeVo.setExtra(category.getExtra());
+            categoryTreeVo.setStatus(category.getStatus());
+            categoryTreeVo.setSort(category.getSort());
+            return categoryTreeVo;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CategoryTreeVo> getChildCategory(Integer parentId) {
+        List<CategoryTreeVo> voList = Lists.newArrayList();
+        List<Category> list = categoryService.list(new LambdaQueryWrapper<Category>().like(Category::getPath, "%/" + parentId + "%").eq(Category::getStatus, true));
+        list.parallelStream().forEach(category -> {
+            if (category.getPid().equals(parentId)) {
+                CategoryTreeVo categoryTreeVo = new CategoryTreeVo();
+                categoryTreeVo.setId(category.getId());
+                categoryTreeVo.setPid(category.getPid());
+                categoryTreeVo.setPath(category.getPath());
+                categoryTreeVo.setName(category.getName());
+                categoryTreeVo.setType(category.getType());
+                categoryTreeVo.setUrl(category.getUrl());
+                categoryTreeVo.setExtra(category.getExtra());
+                categoryTreeVo.setStatus(category.getStatus());
+                categoryTreeVo.setSort(category.getSort());
+
+                List<CategoryTreeVo> children = Lists.newArrayList();
+                //子集
+                list.parallelStream().filter(category1 -> {
+                    return category1.getPath().matches("(?:[^/]*/){3}[^/]*") && category1.getPid().equals(category.getId());
+                }).forEach(category1 -> {
+                    //查询分类中是否有商品
+                    int count = storeProductService.count(new LambdaQueryWrapper<StoreProduct>().eq(StoreProduct::getIsShow, true)
+                            .and(wrapper -> wrapper.like(StoreProduct::getCateId, "," + category1.getId() + ",")
+                                    .or()
+                                    .likeRight(StoreProduct::getCateId, category1.getId() + ",")
+                                    .or()
+                                    .likeLeft(StoreProduct::getCateId, "," + category1.getId())
+                                    .or()
+                                    .eq(StoreProduct::getCateId, category1.getId()))
+                    );
+                    if (count > 1) {
+                        CategoryTreeVo categoryTreeVo1 = new CategoryTreeVo();
+                        categoryTreeVo1.setId(category1.getId());
+                        categoryTreeVo1.setPid(category1.getPid());
+                        categoryTreeVo1.setPath(category1.getPath());
+                        categoryTreeVo1.setName(category1.getName());
+                        categoryTreeVo1.setType(category1.getType());
+                        categoryTreeVo1.setUrl(category1.getUrl());
+                        categoryTreeVo1.setExtra(category1.getExtra());
+                        categoryTreeVo1.setStatus(category1.getStatus());
+                        categoryTreeVo1.setSort(category1.getSort());
+
+                        children.add(categoryTreeVo1);
+                    }
+                });
+                categoryTreeVo.setChild(children);
+                voList.add(categoryTreeVo);
+            }
+        });
+        //过滤没有三级分类的二级分类
+        List<CategoryTreeVo> finalList = voList.parallelStream().filter(vo -> CollUtil.isNotEmpty(vo.getChild())).collect(Collectors.toList());
+        return finalList;
     }
 
 }

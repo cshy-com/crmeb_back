@@ -190,6 +190,7 @@ public class UserAddressServiceImpl extends ServiceImpl<UserAddressDao, UserAddr
     private void cancelDefault(Integer userId) {
         //检测城市Id是否存在
         UserAddress userAddress = new UserAddress();
+        userAddress.setUid(userId);
         userAddress.setIsDefault(false);
         LambdaQueryWrapper<UserAddress> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(UserAddress::getUid, userId);

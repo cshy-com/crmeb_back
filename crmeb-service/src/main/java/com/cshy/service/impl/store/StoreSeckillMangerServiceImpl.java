@@ -48,9 +48,35 @@ public class StoreSeckillMangerServiceImpl extends ServiceImpl<StoreSeckillMange
      * @return List<StoreSeckillManger>
      */
     @Override
-    public List<StoreSeckillManagerResponse> getList(StoreSeckillMangerSearchRequest request, PageParamRequest pageParamRequest) {
+    public List<StoreSeckillManagerResponse> page(StoreSeckillMangerSearchRequest request, PageParamRequest pageParamRequest) {
         PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
 
+        //带 StoreSeckillManger 类的多条件查询
+        LambdaQueryWrapper<StoreSeckillManger> lambdaQueryWrapper = Wrappers.lambdaQuery();
+        if (StringUtils.isNotBlank(request.getName()))
+            lambdaQueryWrapper.like(StoreSeckillManger::getName, request.getName());
+        if (null != request.getStatus()) lambdaQueryWrapper.eq(StoreSeckillManger::getStatus, request.getStatus());
+        if (null != request.getType()) lambdaQueryWrapper.eq(StoreSeckillManger::getType, request.getType());
+        if (StringUtils.isNotBlank(request.getActivityCategoryName())) lambdaQueryWrapper.eq(StoreSeckillManger::getActivityCat, request.getActivityCategoryName());
+
+        lambdaQueryWrapper.eq(StoreSeckillManger::getIsDel, false);
+        lambdaQueryWrapper.orderByAsc(StoreSeckillManger::getSort);
+
+        // 处理数据time格式 适配前端
+        List<StoreSeckillManagerResponse> responses = new ArrayList<>();
+        List<StoreSeckillManger> storeSeckillMangers = dao.selectList(lambdaQueryWrapper);
+        convertTime(responses, storeSeckillMangers);
+        return responses;
+    }
+
+    /**
+     * 列表
+     *
+     * @param request          请求参数
+     * @param pageParamRequest 分页类参数
+     */
+    @Override
+    public List<StoreSeckillManagerResponse> list(StoreSeckillMangerSearchRequest request) {
         //带 StoreSeckillManger 类的多条件查询
         LambdaQueryWrapper<StoreSeckillManger> lambdaQueryWrapper = Wrappers.lambdaQuery();
         if (StringUtils.isNotBlank(request.getName()))

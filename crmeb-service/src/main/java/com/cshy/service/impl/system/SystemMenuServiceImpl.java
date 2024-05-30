@@ -6,6 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.system.SystemMenu;
 import com.cshy.common.model.request.system.SystemMenuRequest;
@@ -19,6 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +38,7 @@ public class SystemMenuServiceImpl extends ServiceImpl<SystemMenuDao, SystemMenu
     @Autowired
     private RedisUtil redisUtil;
 
-    private static final String CACHE_LIST_KEY = "menuList";
+    private static final String CACHE_LIST_KEY = RedisKey.SYS_MENU_KEY;
 
     /**
      * 通过权限获取管理员可访问目录
@@ -51,6 +53,14 @@ public class SystemMenuServiceImpl extends ServiceImpl<SystemMenuDao, SystemMenu
         lqw.in(SystemMenu::getPerms, permissionsList);
         lqw.groupBy(SystemMenu::getId);
         return dao.selectList(lqw);
+    }
+
+    @PostConstruct
+    public void init(){
+        LambdaQueryWrapper<SystemMenu> lqw = Wrappers.lambdaQuery();
+        lqw.eq(SystemMenu::getIsDelte, false);
+        List<SystemMenu> systemMenuList = dao.selectList(lqw);
+        redisUtil.set(CACHE_LIST_KEY, systemMenuList);
     }
 
     /**
