@@ -77,6 +77,9 @@ public class StoreOrderStatusServiceImpl extends ServiceImpl<StoreOrderStatusDao
                 case StoreOrderStatusConstants.ORDER_LOG_REFUND_PRICE:
                     type = "退款";
                     break;
+                case StoreOrderStatusConstants.ORDER_LOG_CANCEL:
+                    type = "取消订单";
+                    break;
                 case StoreOrderStatusConstants.ORDER_STATUS_CACHE_CREATE_ORDER:
                     type = "订单生成";
                     break;
@@ -124,6 +127,21 @@ public class StoreOrderStatusServiceImpl extends ServiceImpl<StoreOrderStatusDao
         StoreOrderStatus storeOrderStatus = new StoreOrderStatus();
         storeOrderStatus.setOid(orderId);
         storeOrderStatus.setChangeType(StoreOrderStatusConstants.ORDER_LOG_REFUND_PRICE);
+        storeOrderStatus.setChangeMessage(changeMessage);
+        storeOrderStatus.setIsSysUser(1);
+        return save(storeOrderStatus);
+    }
+
+    @Override
+    public Boolean saveCancel(Integer orderId, BigDecimal amount, String message) {
+        //此处更新订单状态
+        String changeMessage = MsgConstants.ORDER_LOG_MESSAGE_REFUND_PRICE.replace("{amount}", amount.toString());
+        if(StringUtils.isNotBlank(message)){
+            changeMessage += message;
+        }
+        StoreOrderStatus storeOrderStatus = new StoreOrderStatus();
+        storeOrderStatus.setOid(orderId);
+        storeOrderStatus.setChangeType(StoreOrderStatusConstants.ORDER_LOG_CANCEL);
         storeOrderStatus.setChangeMessage(changeMessage);
         storeOrderStatus.setIsSysUser(1);
         return save(storeOrderStatus);

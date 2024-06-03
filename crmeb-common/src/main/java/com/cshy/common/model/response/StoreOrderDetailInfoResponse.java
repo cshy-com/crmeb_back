@@ -119,7 +119,7 @@ public class StoreOrderDetailInfoResponse implements Serializable {
     private String trackingNo;
 
     @ApiModelProperty(value = "使用积分")
-    private Integer useIntegral;
+    private BigDecimal useIntegral;
 
     @ApiModelProperty(value = "备注")
     private String mark;

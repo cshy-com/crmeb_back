@@ -21,7 +21,7 @@ public class BrokerageRecordConstants {
     /** 佣金记录状态—完成 */
     public static final Integer BROKERAGE_RECORD_STATUS_COMPLETE = 3;
 
-    /** 佣金记录状态—失效（订单退款） */
+    /** 佣金记录状态—失效（订单退款,取消） */
     public static final Integer BROKERAGE_RECORD_STATUS_INVALIDATION = 4;
 
     /** 佣金记录状态—提现申请 */

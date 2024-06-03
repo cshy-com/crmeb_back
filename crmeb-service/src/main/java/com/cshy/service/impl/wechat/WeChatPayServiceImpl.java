@@ -175,7 +175,7 @@ public class WeChatPayServiceImpl implements WeChatPayService {
             Boolean updatePaid = transactionTemplate.execute(e -> {
                 storeOrderService.updatePaid(orderNo);
                 wechatPayInfoService.updateById(wechatPayInfo);
-                if (storeOrder.getUseIntegral() > 0) {
+                if (storeOrder.getUseIntegral().compareTo(BigDecimal.ZERO) > 0) {
                     userService.updateIntegral(user, storeOrder.getUseIntegral(), "sub");
                 }
                 // 处理拼团

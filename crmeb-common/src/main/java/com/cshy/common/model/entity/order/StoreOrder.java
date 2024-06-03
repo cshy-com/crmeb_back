@@ -87,10 +87,10 @@ public class StoreOrder implements Serializable {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
-    @ApiModelProperty(value = "订单状态（0：待发货；1：待收货；2：已收货，待评价；3：已完成；）")
+    @ApiModelProperty(value = "订单状态（0：待发货；1：待收货；2：已收货，待评价；3：已完成；4：已取消）")
     private Integer status;
 
-    @ApiModelProperty(value = "0 未退款 1 申请中 2 已退款 3 退款中 4 退货待发货 5 退货已发货 6 退货退款被拒绝 7 退款被拒绝")
+    @ApiModelProperty(value = "0 未退款 1 申请中 2 已退款 3 退款中 4 退货待发货 5 退货已发货 6 退货退款被拒绝 7 退款被拒绝 ")
     private Integer refundStatus;
 
     @ApiModelProperty(value = "退款图片")
@@ -121,13 +121,13 @@ public class StoreOrder implements Serializable {
     private String trackingNo;
 
     @ApiModelProperty(value = "消费赚取积分")
-    private Integer gainIntegral;
+    private BigDecimal gainIntegral;
 
     @ApiModelProperty(value = "使用积分")
-    private Integer useIntegral;
+    private BigDecimal useIntegral;
 
     @ApiModelProperty(value = "给用户退了多少积分")
-    private Integer backIntegral;
+    private BigDecimal backIntegral;
 
     @ApiModelProperty(value = "备注")
     private String mark;

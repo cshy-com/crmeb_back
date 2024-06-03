@@ -99,4 +99,7 @@ public class StoreProductAttrValueAddRequest implements Serializable {
 
     @ApiModelProperty(value = "砍价商品最低价|砍价专用")
     private BigDecimal minPrice;
+
+    @ApiModelProperty(value = "砍价商品最低价|砍价专用")
+    private String barCode;
 }

@@ -59,7 +59,7 @@ public class OrderInfoVo {
     private String detail;
 
     @ApiModelProperty(value = "用户剩余积分")
-    private Integer userIntegral;
+    private BigDecimal userIntegral;
 
     @ApiModelProperty(value = "用户可用余额")
     private BigDecimal userBalance;

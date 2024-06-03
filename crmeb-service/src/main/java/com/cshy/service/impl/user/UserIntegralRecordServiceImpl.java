@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -100,7 +101,7 @@ public class UserIntegralRecordServiceImpl extends ServiceImpl<UserIntegralRecor
             }
             record.setStatus(IntegralRecordConstants.INTEGRAL_RECORD_STATUS_COMPLETE);
             // 计算积分余额
-            Integer balance = user.getIntegral() + record.getIntegral();
+            BigDecimal balance = user.getIntegral().add(record.getIntegral());
             record.setBalance(balance);
             record.setUpdateTime(cn.hutool.core.date.DateUtil.date());
 
@@ -180,7 +181,7 @@ public class UserIntegralRecordServiceImpl extends ServiceImpl<UserIntegralRecor
      * @return 积分总数
      */
     @Override
-    public Integer getSumIntegral(Integer uid, Integer type, String date, String linkType) {
+    public BigDecimal getSumIntegral(Integer uid, Integer type, String date, String linkType) {
         QueryWrapper<UserIntegralRecord> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("sum(integral) as integral");
         queryWrapper.eq("uid", uid);
@@ -195,7 +196,7 @@ public class UserIntegralRecordServiceImpl extends ServiceImpl<UserIntegralRecor
         }
         UserIntegralRecord integralRecord = dao.selectOne(queryWrapper);
         if (ObjectUtil.isNull(integralRecord) || ObjectUtil.isNull(integralRecord.getIntegral())) {
-            return 0;
+            return BigDecimal.ZERO;
         }
         return integralRecord.getIntegral();
     }
@@ -223,7 +224,7 @@ public class UserIntegralRecordServiceImpl extends ServiceImpl<UserIntegralRecor
      * @return 积分数量
      */
     @Override
-    public Integer getFrozenIntegralByUid(Integer uid) {
+    public BigDecimal getFrozenIntegralByUid(Integer uid) {
         QueryWrapper<UserIntegralRecord> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("sum(integral) as integral");
         queryWrapper.eq("uid", uid);
@@ -232,7 +233,7 @@ public class UserIntegralRecordServiceImpl extends ServiceImpl<UserIntegralRecor
         queryWrapper.eq("status", IntegralRecordConstants.INTEGRAL_RECORD_STATUS_FROZEN);
         UserIntegralRecord integralRecord = dao.selectOne(queryWrapper);
         if (ObjectUtil.isNull(integralRecord) || ObjectUtil.isNull(integralRecord.getIntegral())) {
-            return 0;
+            return BigDecimal.ZERO;
         }
         return integralRecord.getIntegral();
     }

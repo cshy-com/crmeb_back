@@ -35,6 +35,8 @@ public class OrderInfoDetailVo {
 
     /** 购买数量 */
     private Integer payNum;
+    /** 发货数量 */
+    private Integer shipNum;
 
     /** 重量 */
     private BigDecimal weight;
@@ -46,7 +48,7 @@ public class OrderInfoDetailVo {
     private Integer tempId;
 
     /** 获得积分 */
-    private Integer giveIntegral;
+    private BigDecimal giveIntegral;
 
     /** 是否评价 */
     private Integer isReply;

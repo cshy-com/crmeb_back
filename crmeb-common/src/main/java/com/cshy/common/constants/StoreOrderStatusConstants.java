@@ -4,6 +4,7 @@ public class StoreOrderStatusConstants {
     //订单状态
     public static final String ORDER_STATUS_ALL = "all"; //所有
     public static final String ORDER_STATUS_UNPAID = "unPaid"; //未支付
+    public static final String ORDER_STATUS_CANCEL = "cancel"; //已取消
     public static final String ORDER_STATUS_NOT_SHIPPED = "notShipped"; //未发货
     public static final String ORDER_STATUS_SPIKE = "spike"; //待收货
     public static final String ORDER_STATUS_BARGAIN = "bargain"; //已收货待评价
@@ -19,6 +20,7 @@ public class StoreOrderStatusConstants {
     public static final String ORDER_STATUS_CACHE_CREATE_ORDER = "cache_key_create_order";
 
     public static final String ORDER_STATUS_STR_UNPAID = "未支付"; //未支付
+    public static final String ORDER_STATUS_STR_CANCEL = "已取消"; //已取消
     public static final String ORDER_STATUS_STR_NOT_SHIPPING = "未发货"; //未发货
     public static final String ORDER_STATUS_STR_SHIPPING = "已发货"; //未发货
     public static final String ORDER_STATUS_STR_SPIKE = "待收货"; //待收货
@@ -57,7 +59,9 @@ public class StoreOrderStatusConstants {
 
     //订单操作类型
     public static final String ORDER_LOG_REFUND_PRICE = "refund_price"; //退款
+    public static final String ORDER_LOG_CANCEL = "cancel"; //退款
     public static final String ORDER_LOG_EXPRESS = "express"; //快递
+    public static final String ORDER_LOG_PICKUP = "pickup"; //快递
     public static final String ORDER_LOG_REFUND_REFUSE = "refund_refuse"; //不退款
     public static final String ORDER_LOG_REFUND_APPLY = "apply_refund"; //申请退款
     public static final String ORDER_LOG_PAY_SUCCESS = "pay_success"; //支付成功

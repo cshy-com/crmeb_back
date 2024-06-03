@@ -32,6 +32,15 @@ public interface StoreOrderStatusService extends IService<StoreOrderStatus> {
     Boolean saveRefund(Integer orderId, BigDecimal amount, String message);
 
     /**
+     * 保存订单取消记录
+     * @param orderId 订单id
+     * @param amount 金额
+     * @param message 备注
+     * @return Boolean
+     */
+    Boolean saveCancel(Integer orderId, BigDecimal amount, String message);
+
+    /**
      * 添加订单日志
      * @param orderId 订单id
      * @param type 类型

@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -22,7 +23,7 @@ public class UserSignVo implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    public UserSignVo(String title, Integer number, Date createDay) {
+    public UserSignVo(String title, BigDecimal number, Date createDay) {
         this.title = title;
         this.number = number;
         this.createDay = createDay;
@@ -32,7 +33,7 @@ public class UserSignVo implements Serializable {
     private String title;
 
     @ApiModelProperty(value = "获得积分")
-    private Integer number;
+    private BigDecimal number;
 
     @ApiModelProperty(value = "签到日期")
     @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")

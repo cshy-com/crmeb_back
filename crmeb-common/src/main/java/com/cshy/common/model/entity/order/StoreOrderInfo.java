@@ -67,6 +67,9 @@ public class StoreOrderInfo implements Serializable {
     @ApiModelProperty(value = "购买数量")
     private Integer payNum;
 
+    @ApiModelProperty(value = "发货数量")
+    private Integer shipNum;
+
     @ApiModelProperty(value = "重量")
     private BigDecimal weight;
 
@@ -74,7 +77,7 @@ public class StoreOrderInfo implements Serializable {
     private BigDecimal volume;
 
     @ApiModelProperty(value = "获得积分")
-    private Integer giveIntegral;
+    private BigDecimal giveIntegral;
 
     @ApiModelProperty(value = "是否评价")
     private Boolean isReply;

@@ -10,7 +10,6 @@ import com.cshy.common.model.request.store.StoreOrderUpdatePriceRequest;
 import com.cshy.common.model.request.system.SystemWriteOffOrderSearchRequest;
 import com.cshy.common.model.response.*;
 import com.cshy.common.model.vo.ExpressSheetVo;
-import com.cshy.common.model.vo.LogisticsResultVo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -90,11 +89,13 @@ public interface StoreOrderService extends IService<StoreOrder> {
 
     /**
      * 拒绝退款
+     *
      * @param orderNo 订单编号
-     * @param reason String 原因
+     * @param reason  String 原因
+     * @param type
      * @return Boolean
      */
-    Boolean refundRefuse(String orderNo, String reason);
+    Boolean refundRefuse(String orderNo, String reason, Integer type);
 
     StoreOrder getInfoByEntity(StoreOrder storeOrder);
 

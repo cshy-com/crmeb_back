@@ -100,7 +100,6 @@ public class StoreProductAddRequest implements Serializable {
     private Integer ficti;
 
     @ApiModelProperty(value = "运费模板ID", required = true)
-    @NotNull(message = "运费模板不能为空")
     private Integer tempId;
 
     @ApiModelProperty(value = "规格 0单 1多", required = true)

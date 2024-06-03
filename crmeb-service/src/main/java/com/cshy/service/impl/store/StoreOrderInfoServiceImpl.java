@@ -52,6 +52,7 @@ public class StoreOrderInfoServiceImpl extends ServiceImpl<StoreOrderInfoDao, St
             StoreOrderInfoOldVo StoreOrderInfoVo = new StoreOrderInfoOldVo();
             BeanUtils.copyProperties(storeOrderInfo, StoreOrderInfoVo, "info");
             StoreOrderInfoVo.setInfo(JSON.parseObject(storeOrderInfo.getInfo(), OrderInfoDetailVo.class));
+            StoreOrderInfoVo.getInfo().setShipNum(storeOrderInfo.getShipNum());
             if(map.containsKey(storeOrderInfo.getOrderId())){
                 map.get(storeOrderInfo.getOrderId()).add(StoreOrderInfoVo);
             }else{
@@ -78,6 +79,7 @@ public class StoreOrderInfoServiceImpl extends ServiceImpl<StoreOrderInfoDao, St
             StoreOrderInfoOldVo storeOrderInfoVo = new StoreOrderInfoOldVo();
             BeanUtils.copyProperties(storeOrderInfo, storeOrderInfoVo, "info");
             storeOrderInfoVo.setInfo(JSON.parseObject(storeOrderInfo.getInfo(), OrderInfoDetailVo.class));
+            storeOrderInfoVo.getInfo().setShipNum(storeOrderInfo.getShipNum());
             storeOrderInfoVo.getInfo().setIsReply(
                     storeProductReplyService.isReply(storeOrderInfoVo.getUnique(), storeOrderInfoVo.getOrderId()) ? 1 : 0
             );

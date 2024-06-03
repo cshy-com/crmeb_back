@@ -15,6 +15,7 @@ import org.springframework.data.annotation.AccessType;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,7 +37,7 @@ public class StoreIntegralCoupon extends BaseModel<StoreIntegralCoupon> {
     @NotNull(message = "积分为空")
     @ApiModelProperty(value = "积分", required = true)
     @ExcelProperty(value = "积分")
-    private Integer integral;
+    private BigDecimal integral;
 
     @Null(message = "二维码")
     @ApiModelProperty(value = "二维码", hidden = true)

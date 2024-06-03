@@ -136,13 +136,18 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
             * */
 
             //写订单日志
-            storeOrderStatusService.createLog(storeOrder.getId(), "cancel_order", "取消订单", 0);
-            // 退优惠券
-            if (storeOrder.getCouponId() > 0 ) {
-                StoreCouponUser couponUser = couponUserService.getById(storeOrder.getCouponId());
-                couponUser.setStatus(CouponConstants.STORE_COUPON_USER_STATUS_USABLE);
-                couponUserService.updateById(couponUser);
-            }
+//            if (storeOrder.getPaid()){
+//                handleOrder(storeOrder, "取消");
+                storeOrderStatusService.createLog(storeOrder.getId(), "cancel_order", "取消订单", 0);
+                // 退优惠券
+                if (storeOrder.getCouponId() > 0 ) {
+                    StoreCouponUser couponUser = couponUserService.getById(storeOrder.getCouponId());
+                    couponUser.setStatus(CouponConstants.STORE_COUPON_USER_STATUS_USABLE);
+                    couponUserService.updateById(couponUser);
+                }
+//            }
+            //退积分
+
             return rollbackStock(storeOrder);
         }catch (Exception e){
             return false;
@@ -235,6 +240,10 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
      */
     @Override
     public Boolean refundOrder(StoreOrder storeOrder) {
+        return handleOrder(storeOrder, "退款");
+    }
+
+    private Boolean handleOrder(StoreOrder storeOrder, String type) {
         /**
          * 1、写订单日志
          * 2、回滚消耗积分
@@ -248,7 +257,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
         // 获取用户对象
         User user = userService.getById(storeOrder.getUid());
         if (ObjectUtil.isNull(user)) {
-            logger.error("订单退款处理，对应的用户不存在,storeOrder===>" + storeOrder);
+            logger.error("订单" + type + "处理，对应的用户不存在,storeOrder===>" + storeOrder);
             return Boolean.FALSE;
         }
 
@@ -259,7 +268,10 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
         UserExperienceRecord experienceRecord = new UserExperienceRecord();
         BeanUtils.copyProperties(userExperienceRecord, experienceRecord);
         experienceRecord.setId(null);
-        experienceRecord.setTitle(ExperienceRecordConstants.EXPERIENCE_RECORD_TITLE_REFUND);
+        if (type.equals("退款"))
+            experienceRecord.setTitle(ExperienceRecordConstants.EXPERIENCE_RECORD_TITLE_REFUND);
+        else
+            experienceRecord.setTitle(ExperienceRecordConstants.EXPERIENCE_RECORD_TITLE_CANCEL);
         experienceRecord.setType(ExperienceRecordConstants.EXPERIENCE_RECORD_TYPE_SUB);
         experienceRecord.setBalance(user.getExperience());
         experienceRecord.setMark(StrUtil.format("订单退款，扣除{}赠送经验", userExperienceRecord.getExperience()));
@@ -269,12 +281,15 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
         List<UserIntegralRecord> integralRecordList = userIntegralRecordService.findListByOrderIdAndUid(storeOrder.getOrderId(), storeOrder.getUid());
         integralRecordList.forEach(record -> {
             if (record.getType().equals(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_SUB)) {// 订单抵扣部分
-                user.setIntegral(user.getIntegral() + record.getIntegral());
+                user.setIntegral(user.getIntegral().add(record.getIntegral()));
                 record.setId(null);
-                record.setTitle(IntegralRecordConstants.BROKERAGE_RECORD_TITLE_REFUND);
+                if (type.equals("退款"))
+                    record.setTitle(IntegralRecordConstants.BROKERAGE_RECORD_TITLE_REFUND);
+                else
+                    record.setTitle(IntegralRecordConstants.BROKERAGE_RECORD_TITLE_CANCEL);
                 record.setType(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD);
                 record.setBalance(user.getIntegral());
-                record.setMark(StrUtil.format("订单退款，返还支付扣除得{}积分", record.getIntegral()));
+                record.setMark(StrUtil.format("订单" + type + "，返还支付扣除得{}积分", record.getIntegral()));
                 record.setStatus(IntegralRecordConstants.INTEGRAL_RECORD_STATUS_COMPLETE);
                 record.setUpdateTime(cn.hutool.core.date.DateUtil.date());
             } else if (record.getType().equals(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD)) {// 冻结积分部分
@@ -301,7 +316,10 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
 
         Boolean execute = transactionTemplate.execute(e -> {
             //写订单日志
-            storeOrderStatusService.saveRefund(storeOrder.getId(), storeOrder.getRefundPrice(), "成功");
+            if (type.equals("退款"))
+                storeOrderStatusService.saveRefund(storeOrder.getId(), storeOrder.getRefundPrice(), "成功");
+            else
+                storeOrderStatusService.saveCancel(storeOrder.getId(), storeOrder.getRefundPrice(), "成功");
 
             // 更新用户数据
             userService.updateById(user);
@@ -325,8 +343,8 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
 
             // 回滚库存
             rollbackStock(storeOrder);
-
-            storeOrderService.update(new LambdaUpdateWrapper<StoreOrder>().set(StoreOrder::getRefundStatus, 2).eq(StoreOrder::getId, storeOrder.getId()));
+            if (type.equals("退款"))
+                storeOrderService.update(new LambdaUpdateWrapper<StoreOrder>().set(StoreOrder::getRefundStatus, 2).eq(StoreOrder::getId, storeOrder.getId()));
 
             // 拼团状态处理
             if (storeOrder.getCombinationId() > 0) {
@@ -380,7 +398,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
         if (between < 0) {// 未到过期时间继续循环
             return Boolean.FALSE;
         }
-        storeOrder.setIsDel(true).setIsSystemDel(true);
+        storeOrder.setStatus(4);
         Boolean execute = transactionTemplate.execute(e -> {
             storeOrderService.updateById(storeOrder);
             //写订单日志

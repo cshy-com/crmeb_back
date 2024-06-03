@@ -7,6 +7,7 @@ import com.cshy.common.model.response.UserIntegralRecordResponse;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.entity.user.UserIntegralRecord;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -44,7 +45,7 @@ public interface UserIntegralRecordService extends IService<UserIntegralRecord> 
      * @param linkType 关联类型
      * @return 积分总数
      */
-    Integer getSumIntegral(Integer uid, Integer type, String date, String linkType);
+    BigDecimal getSumIntegral(Integer uid, Integer type, String date, String linkType);
 
     /**
      * H5用户积分列表
@@ -59,5 +60,5 @@ public interface UserIntegralRecordService extends IService<UserIntegralRecord> 
      * @param uid 用户uid
      * @return 积分数量
      */
-    Integer getFrozenIntegralByUid(Integer uid);
+    BigDecimal getFrozenIntegralByUid(Integer uid);
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.config.CrmebConfig;
@@ -32,7 +33,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -168,7 +168,7 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
 
         SystemConfig systemConfig = new SystemConfig();
         systemConfig.setStatus(true);
-        update(systemConfig, lambdaQueryWrapper);
+        update(new LambdaUpdateWrapper<SystemConfig>().set(SystemConfig::getStatus, true).eq(SystemConfig::getFormId, formId).eq(SystemConfig::getStatus, false));
 
     }
 
@@ -224,6 +224,15 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
         //缓存获取
         Collection<String> keys = redisUtil.keys(getCacheKey(formId + ":*"));
         HashMap<String, String> map = new HashMap<>();
+        if (keys.size() == 0) {
+            //重新加载缓存
+            List<SystemConfig> systemConfigs = loadingConfigCacheByFormId(formId);
+            systemConfigs.stream().forEach(systemConfig -> {
+                map.put(systemConfig.getName(), systemConfig.getValue());
+                map.put("id", formId.toString());
+            });
+            return map;
+        }
         keys.stream().forEach(key -> {
             Object o = redisUtil.get(key);
             SystemConfig systemConfig = (SystemConfig) o;
@@ -261,6 +270,16 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
         listMap.forEach((k, list) -> {
             list.forEach(config -> redisUtil.set(getCacheKey(k + ":" + config.getName()), config));
         });
+    }
+
+    @Override
+    public List<SystemConfig> loadingConfigCacheByFormId(Integer formId) {
+        List<SystemConfig> configsList = this.list(new LambdaQueryWrapper<SystemConfig>().eq(SystemConfig::getFormId, formId));
+        Map<Integer, List<SystemConfig>> listMap = configsList.stream().collect(Collectors.groupingBy(SystemConfig::getFormId));
+        listMap.forEach((k, list) -> {
+            list.forEach(config -> redisUtil.set(getCacheKey(k + ":" + config.getName()), config));
+        });
+        return configsList;
     }
 
     @Override
@@ -452,7 +471,7 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigDao, System
      * @return String
      */
     private SystemConfig get(String name) {
-        Collection<String> keys = redisUtil.keys(redisKey + "*:" + name);
+        Collection<String> keys = redisUtil.keys(redisKey + "*:*:" + name);
         if (CollUtil.isEmpty(keys)) {
             //没有找到数据
             //去数据库查找，然后写入redis

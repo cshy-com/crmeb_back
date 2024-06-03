@@ -178,7 +178,7 @@ public class OrderPayServiceImpl implements OrderPayService {
         billList.add(userBill);
 
         // 积分抵扣记录
-        if (storeOrder.getUseIntegral() > 0) {
+        if (storeOrder.getUseIntegral().compareTo(BigDecimal.ZERO) > 0) {
             UserIntegralRecord integralRecordSub = integralRecordSubInit(storeOrder, user);
             integralList.add(integralRecordSub);
         }
@@ -192,14 +192,14 @@ public class OrderPayServiceImpl implements OrderPayService {
 
 
         // 积分处理：1.下单赠送积分，2.商品赠送积分
-        int integral;
+        BigDecimal integral;
         // 下单赠送积分
         //赠送积分比例
-        String integralStr = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_RATE_ORDER_GIVE);
-        if (StrUtil.isNotBlank(integralStr) && storeOrder.getPayPrice().compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal integralBig = new BigDecimal(integralStr);
-            integral = integralBig.multiply(storeOrder.getPayPrice()).setScale(0, BigDecimal.ROUND_DOWN).intValue();
-            if (integral > 0) {
+        String integralRate = systemConfigService.getValueByKey(SysConfigConstants.CONFIG_KEY_INTEGRAL_RATE_ORDER_GIVE);
+        if (StrUtil.isNotBlank(integralRate) && storeOrder.getPayPrice().compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal integralBig = new BigDecimal(integralRate);
+            integral = integralBig.multiply(storeOrder.getPayPrice()).setScale(0, BigDecimal.ROUND_DOWN);
+            if (integral.compareTo(BigDecimal.ZERO) > 0) {
                 // 生成积分记录
                 UserIntegralRecord integralRecord = integralRecordInit(storeOrder, user.getIntegral(), integral, "order");
                 integralList.add(integralRecord);
@@ -214,8 +214,10 @@ public class OrderPayServiceImpl implements OrderPayService {
             List<Integer> productIds = orderInfoList.stream().map(StoreOrderInfo::getProductId).collect(Collectors.toList());
             if (productIds.size() > 0) {
                 List<StoreProduct> products = storeProductService.getListInIds(productIds);
-                int sumIntegral = products.stream().mapToInt(StoreProduct::getGiveIntegral).sum();
-                if (sumIntegral > 0) {
+                BigDecimal sumIntegral = products.stream()
+                        .map(StoreProduct::getGiveIntegral)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                if (sumIntegral.compareTo(BigDecimal.ZERO) > 0) {
                     // 生成积分记录
                     UserIntegralRecord integralRecord = integralRecordInit(storeOrder, user.getIntegral(), sumIntegral, "product");
                     integralList.add(integralRecord);
@@ -563,7 +565,7 @@ public class OrderPayServiceImpl implements OrderPayService {
 //        if (user.getNowMoney().compareTo(storeOrder.getPayPrice()) < 0) {
 //            throw new CrmebException("用户余额不足");
 //        }
-        if (user.getIntegral() < storeOrder.getUseIntegral()) {
+        if (user.getIntegral().compareTo(storeOrder.getUseIntegral()) < 0) {
             throw new CrmebException("用户积分不足");
         }
         storeOrder.setPaid(true);
@@ -574,7 +576,7 @@ public class OrderPayServiceImpl implements OrderPayService {
 //            // 这里只扣除金额，账单记录在task中处理
 //            userService.updateNowMoney(user, storeOrder.getPayPrice(), "sub");
             // 扣除积分
-            if (storeOrder.getUseIntegral() > 0) {
+            if (storeOrder.getUseIntegral().compareTo(BigDecimal.ZERO) > 0) {
                 userService.updateIntegral(user, storeOrder.getUseIntegral(), "sub");
             }
 
@@ -699,7 +701,7 @@ public class OrderPayServiceImpl implements OrderPayService {
                 }
             }
 
-            if (user.getIntegral() < storeOrder.getUseIntegral()) {
+            if (user.getIntegral().compareTo(storeOrder.getUseIntegral()) < 0) {
                 throw new CrmebException("用户积分不足");
             }
 
@@ -920,7 +922,7 @@ public class OrderPayServiceImpl implements OrderPayService {
      * 积分添加记录
      * @return UserIntegralRecord
      */
-    private UserIntegralRecord integralRecordInit(StoreOrder storeOrder, Integer balance, Integer integral, String type) {
+    private UserIntegralRecord integralRecordInit(StoreOrder storeOrder, BigDecimal balance, BigDecimal integral, String type) {
         UserIntegralRecord integralRecord = new UserIntegralRecord();
         integralRecord.setUid(storeOrder.getUid());
         integralRecord.setLinkId(storeOrder.getOrderId());

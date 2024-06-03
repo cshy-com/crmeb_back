@@ -121,7 +121,7 @@ public class StoreProduct extends Model<StoreProduct> implements Serializable {
     private Boolean merUse;
 
     @ApiModelProperty(value = "获得积分")
-    private Integer giveIntegral;
+    private BigDecimal giveIntegral;
 
     @ApiModelProperty(value = "成本价")
     private BigDecimal cost;

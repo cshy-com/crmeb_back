@@ -226,7 +226,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         if (ObjectUtil.isNull(request.getMoneyValue()) || ObjectUtil.isNull(request.getIntegralValue())) {
             throw new CrmebException("至少输入一个金额");
         }
-        if (request.getMoneyValue().compareTo(BigDecimal.ZERO) < 1 && request.getIntegralValue() <= 0) {
+        if (request.getMoneyValue().compareTo(BigDecimal.ZERO) < 1 && request.getIntegralValue().compareTo(BigDecimal.ZERO) <= 0) {
             throw new CrmebException("修改值不能等小于等于0");
         }
 
@@ -246,13 +246,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             }
         }
 
-        if (request.getIntegralType().equals(2) && request.getIntegralValue() != 0) {
-            if (user.getIntegral() - request.getIntegralValue() < 0) {
+        if (request.getIntegralType().equals(2) && request.getIntegralValue().compareTo(BigDecimal.ZERO) != 0) {
+            if (user.getIntegral().subtract(request.getIntegralValue()).compareTo(BigDecimal.ZERO) < 0) {
                 throw new CrmebException("积分扣减后不能小于0");
             }
         }
-        if (request.getIntegralType().equals(1) && request.getIntegralValue() != 0) {
-            if ((user.getIntegral() + request.getIntegralValue()) > 99999999) {
+        if (request.getIntegralType().equals(1) && request.getIntegralValue().compareTo(BigDecimal.ZERO) != 0) {
+            if ((user.getIntegral().add(request.getIntegralValue()).compareTo(new BigDecimal(99999999))) > 0) {
                 throw new CrmebException("积分添加后不能大于99999999");
             }
         }
@@ -290,7 +290,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             }
 
             // 处理积分
-            if (request.getIntegralValue() > 0) {
+            if (request.getIntegralValue().compareTo(BigDecimal.ZERO) > 0) {
                 // 生成记录
                 UserIntegralRecord integralRecord = new UserIntegralRecord();
                 integralRecord.setUid(user.getUid());
@@ -300,13 +300,13 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
                 integralRecord.setStatus(IntegralRecordConstants.INTEGRAL_RECORD_STATUS_COMPLETE);
                 if (request.getIntegralType() == 1) {// 增加
                     integralRecord.setType(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD);
-                    integralRecord.setBalance(user.getIntegral() + request.getIntegralValue());
+                    integralRecord.setBalance(user.getIntegral().add(request.getIntegralValue()));
                     integralRecord.setMark(StrUtil.format("后台操作增加了{}积分", request.getIntegralValue()));
 
                     operationIntegral(user.getUid(), request.getIntegralValue(), user.getIntegral(), "add");
                 } else {
                     integralRecord.setType(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_SUB);
-                    integralRecord.setBalance(user.getIntegral() - request.getIntegralValue());
+                    integralRecord.setBalance(user.getIntegral().subtract(request.getIntegralValue()));
                     integralRecord.setMark(StrUtil.format("后台操作减少了{}积分", request.getIntegralValue()));
                     operationIntegral(user.getUid(), request.getIntegralValue(), user.getIntegral(), "sub");
                 }
@@ -862,7 +862,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
      * @return Boolean
      */
     @Override
-    public Boolean operationIntegral(Integer uid, Integer integral, Integer nowIntegral, String type) {
+    public Boolean operationIntegral(Integer uid, BigDecimal integral, BigDecimal nowIntegral, String type) {
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
         if (type.equals("add")) {
             updateWrapper.setSql(StrUtil.format("integral = integral + {}", integral));
@@ -1434,12 +1434,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
      * @return 更新后的用户对象
      */
     @Override
-    public Boolean updateIntegral(User user, Integer integral, String type) {
+    public Boolean updateIntegral(User user, BigDecimal integral, String type) {
         LambdaUpdateWrapper<User> lambdaUpdateWrapper = Wrappers.lambdaUpdate();
         if (type.equals("add")) {
-            lambdaUpdateWrapper.set(User::getIntegral, user.getIntegral() + integral);
+            lambdaUpdateWrapper.set(User::getIntegral, user.getIntegral().add(integral));
         } else {
-            lambdaUpdateWrapper.set(User::getIntegral, user.getIntegral() - integral);
+            lambdaUpdateWrapper.set(User::getIntegral, user.getIntegral().subtract(integral));
         }
         lambdaUpdateWrapper.eq(User::getUid, user.getUid());
         if (type.equals("sub")) {

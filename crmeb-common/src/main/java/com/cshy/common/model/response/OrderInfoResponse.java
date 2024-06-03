@@ -30,6 +30,9 @@ public class OrderInfoResponse implements Serializable {
     @ApiModelProperty(value = "商品数量")
     private Integer cartNum;
 
+    @ApiModelProperty(value = "发货数量")
+    private Integer shipNum;
+
     @ApiModelProperty(value = "商品图片")
     private String image;
 

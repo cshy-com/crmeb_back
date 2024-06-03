@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -34,10 +35,10 @@ public class UserSign implements Serializable {
     private String title;
 
     @ApiModelProperty(value = "获得积分")
-    private Integer number;
+    private BigDecimal number;
 
     @ApiModelProperty(value = "剩余积分")
-    private Integer balance;
+    private BigDecimal balance;
 
     @ApiModelProperty(value = "类型，1积分，2经验")
     private Integer type;

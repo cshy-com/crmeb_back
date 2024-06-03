@@ -22,7 +22,7 @@ public class ExpressTask {
     @Autowired
     private ExpressService expressService;
 
-    @Scheduled(cron = "0 0 */6 * * * ") //6小时执行一次
+    @Scheduled(cron = "0 0 */3 * * * ") //3小时执行一次
     public void sync(){
         logger.info("正在同步物流数据， 当前时间：{}", DateUtil.nowDateTime());
         try {

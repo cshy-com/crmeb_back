@@ -86,8 +86,12 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, Category> impl
         String matchKey = matchKey(type);
         if (StringUtils.isNotBlank(matchKey)) {
             Object o = redisUtil.get(RedisKey.SYS_CATEGORY_KEY + matchKey);
-            List<Category> categories = (List<Category>) o;
-            return categories;
+            if (Objects.nonNull(o)){
+                List<Category> categories = (List<Category>) o;
+                return categories;
+            } else {
+                load2CacheByType(type);
+            }
         }
         return loadFromCache();
     }

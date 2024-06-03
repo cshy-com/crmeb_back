@@ -34,6 +34,6 @@ public class UserSignInfoResponse implements Serializable {
     private Boolean isYesterdaySign;
 
     @ApiModelProperty(value = "用户积分")
-    private Integer integral;
+    private BigDecimal integral;
 
 }

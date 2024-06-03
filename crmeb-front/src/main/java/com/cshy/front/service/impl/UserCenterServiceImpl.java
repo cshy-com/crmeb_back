@@ -879,12 +879,12 @@ public class UserCenterServiceImpl extends ServiceImpl<UserDao, User> implements
         IntegralUserResponse userSignInfoResponse = new IntegralUserResponse();
 
         //签到
-        Integer sumIntegral = userIntegralRecordService.getSumIntegral(user.getUid(), IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD, "", null);
-        Integer deductionIntegral = userIntegralRecordService.getSumIntegral(user.getUid(), IntegralRecordConstants.INTEGRAL_RECORD_TYPE_SUB, "", IntegralRecordConstants.INTEGRAL_RECORD_LINK_TYPE_ORDER);
+        BigDecimal sumIntegral = userIntegralRecordService.getSumIntegral(user.getUid(), IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD, "", null);
+        BigDecimal deductionIntegral = userIntegralRecordService.getSumIntegral(user.getUid(), IntegralRecordConstants.INTEGRAL_RECORD_TYPE_SUB, "", IntegralRecordConstants.INTEGRAL_RECORD_LINK_TYPE_ORDER);
         userSignInfoResponse.setSumIntegral(sumIntegral);
         userSignInfoResponse.setDeductionIntegral(deductionIntegral);
         // 冻结积分
-        Integer frozenIntegral = userIntegralRecordService.getFrozenIntegralByUid(user.getUid());
+        BigDecimal frozenIntegral = userIntegralRecordService.getFrozenIntegralByUid(user.getUid());
         userSignInfoResponse.setFrozenIntegral(frozenIntegral);
         userSignInfoResponse.setIntegral(user.getIntegral());
         return userSignInfoResponse;

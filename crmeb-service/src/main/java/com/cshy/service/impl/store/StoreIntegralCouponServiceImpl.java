@@ -40,6 +40,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -92,7 +93,7 @@ public class StoreIntegralCouponServiceImpl extends BaseServiceImpl<StoreIntegra
     @Override
     protected void onBeforePage(StoreIntegralCouponQuery query, QueryWrapper<StoreIntegralCoupon> queryWrapper) {
         super.onBeforePage(query, queryWrapper);
-        if (StringUtils.isNotBlank(query.getExpireTime())){
+        if (StringUtils.isNotBlank(query.getExpireTime())) {
             try {
                 LocalDate date = LocalDate.parse(query.getExpireTime());
                 LocalDateTime dateTime = date.atStartOfDay();
@@ -185,14 +186,14 @@ public class StoreIntegralCouponServiceImpl extends BaseServiceImpl<StoreIntegra
         Assert.isTrue(estimatedTime >= time, "积分券已失效");
 
         if (!coupon.getIntegral().equals(0)) {
-            if ((user.getIntegral() + coupon.getIntegral()) > 99999999) {
+            if ((user.getIntegral().add(coupon.getIntegral())).compareTo(new BigDecimal(99999999)) > 0) {
                 throw new CrmebException("积分添加后不能大于99999999");
             }
         }
 
         Boolean execute = transactionTemplate.execute(e -> {
             // 处理积分
-            if (coupon.getIntegral() > 0) {
+            if (coupon.getIntegral().compareTo(BigDecimal.ZERO) > 0) {
                 // 生成记录
                 UserIntegralRecord integralRecord = new UserIntegralRecord();
                 integralRecord.setUid(user.getUid());
@@ -201,7 +202,7 @@ public class StoreIntegralCouponServiceImpl extends BaseServiceImpl<StoreIntegra
                 integralRecord.setIntegral(coupon.getIntegral());
                 integralRecord.setStatus(IntegralRecordConstants.INTEGRAL_RECORD_STATUS_COMPLETE);
                 integralRecord.setType(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD);
-                integralRecord.setBalance(user.getIntegral() + coupon.getIntegral());
+                integralRecord.setBalance(user.getIntegral().add(coupon.getIntegral()));
                 integralRecord.setMark(StrUtil.format("积分券获取了{}积分", coupon.getIntegral()));
 
                 userService.operationIntegral(user.getUid(), coupon.getIntegral(), user.getIntegral(), "add");

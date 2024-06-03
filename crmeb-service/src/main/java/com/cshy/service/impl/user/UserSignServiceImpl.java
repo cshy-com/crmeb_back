@@ -143,7 +143,7 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
         userSign.setTitle(Constants.SIGN_TYPE_INTEGRAL_TITLE);
         userSign.setNumber(configVo.getIntegral());
         userSign.setType(Constants.SIGN_TYPE_INTEGRAL);
-        userSign.setBalance(user.getIntegral() + configVo.getIntegral());
+        userSign.setBalance(user.getIntegral().add(configVo.getIntegral()));
 
         // 生成用户积分记录
         UserIntegralRecord integralRecord = new UserIntegralRecord();
@@ -152,7 +152,7 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
         integralRecord.setType(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD);
         integralRecord.setTitle(IntegralRecordConstants.BROKERAGE_RECORD_TITLE_SIGN);
         integralRecord.setIntegral(configVo.getIntegral());
-        integralRecord.setBalance(user.getIntegral() + configVo.getIntegral());
+        integralRecord.setBalance(user.getIntegral().add(configVo.getIntegral()));
         integralRecord.setMark(StrUtil.format("签到积分奖励增加了{}积分", configVo.getIntegral()));
         integralRecord.setStatus(IntegralRecordConstants.INTEGRAL_RECORD_STATUS_COMPLETE);
 
@@ -168,7 +168,7 @@ public class UserSignServiceImpl extends ServiceImpl<UserSignDao, UserSign> impl
         experienceRecord.setStatus(ExperienceRecordConstants.EXPERIENCE_RECORD_STATUS_CREATE);
 
         // 更新用户积分
-        user.setIntegral(user.getIntegral() + configVo.getIntegral());
+        user.setIntegral(user.getIntegral().add(configVo.getIntegral()));
         // 更新用户经验
         user.setExperience(user.getExperience() + configVo.getExperience());
 

@@ -171,17 +171,46 @@ public class YddDataController {
                     storeProduct.setStock(detail.getStock());
 
                 //价格设置
-                if (BigDecimal.valueOf(Double.parseDouble(detail.getCostPrice()) * 1.5).compareTo(BigDecimal.valueOf(Double.parseDouble(detail.getMarketPrice()))) > 0) {
-                    return;
-                }
+                /**
+                 * 利润率35%<40%
+                 * 会员价*1.3（给甲方的成本价）
+                 * 会员价*1.65 （销售价）
+                 *
+                 * 利润率40%=<50%
+                 * 会员价*1.4（给甲方的成本价）
+                 * 会员价*1.8 （销售价）
+                 *
+                 *
+                 * 利润率50%=<
+                 * 会员价*1.5（给甲方的成本价）
+                 * 会员价*1.95 （销售价）
+                 */
+                // 移除百分号
+                String rateString = yddProductVo.getTotalProfitRate().replace("%", "");
+
+                // 将字符串转换为 double 类型
+                double percentage = Double.parseDouble(rateString);
+
+                // 将百分数转换为小数
+                double rate = percentage / 100.0;
                 double costPrice = Double.parseDouble(detail.getCostPrice());
                 long roundedPrice = Math.round(costPrice);
-                BigDecimal costPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 1.5);
 
-                double marketPrice = Double.parseDouble(detail.getMarketPrice());
-                long roundedPrice1 = Math.round(marketPrice);
-                BigDecimal marketPriceBigDecimal = BigDecimal.valueOf(roundedPrice1 + 10);
-
+                BigDecimal costPriceBigDecimal;
+                BigDecimal marketPriceBigDecimal;
+                if (0.35 <= rate && rate < 0.4) {
+                    costPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 1.3);
+                    marketPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 1.65 + 10);
+                } else if (0.40 <= rate && rate < 50) {
+                    costPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 1.4);
+                    marketPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 1.8 + 10);
+                } else if (50 <= rate) {
+                    costPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 1.5);
+                    marketPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 1.95 + 10);
+                }else {
+                    costPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 1.5);
+                    marketPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 2 + 10);
+                }
 
                 storeProduct.setCost(costPriceBigDecimal);
                 storeProduct.setOtPrice(marketPriceBigDecimal);
@@ -508,10 +537,10 @@ public class YddDataController {
         int total = 0;
         JSONArray jsonArray = new JSONArray();
         String url = "https://dist.yqtyun.com/api/distributor/product/getProductPageListV2";
-        while (total == 0 || total != jsonArray.size()){
+        while (total == 0 || total != jsonArray.size()) {
             try {
                 // 请求体
-                String body = "{\"price_type\":2,\"price_min\":\"\",\"price_max\":\"600\",\"profit_rate_type\":1,\"total_profit_rate_min\":\"35\",\"total_profit_rate_max\":\"\",\"is_enable\":\"\",\"keyword_type\":0,\"keyword\":\"\",\"address\":\"\",\"page_size\":2000,\"total\":0,\"page\":" + page + ",\"has_stock\":\"\",\"cost_price_sort\":\"\",\"market_price_sort\":\"\",\"province_id\":\"\",\"city_id\":\"\",\"area_id\":\"\",\"dg_city_id\":[],\"type\":\"\",\"tag_type\":\"4\",\"group_id\":\"\",\"page_sort\":0,\"page_offset\":0}";
+                String body = "{\"price_type\":2,\"price_min\":\"\",\"price_max\":\"1500\",\"profit_rate_type\":1,\"total_profit_rate_min\":\"35\",\"total_profit_rate_max\":\"\",\"is_enable\":\"\",\"keyword_type\":0,\"keyword\":\"\",\"address\":\"\",\"page_size\":2000,\"total\":0,\"page\":" + page + ",\"has_stock\":\"\",\"cost_price_sort\":\"\",\"market_price_sort\":\"\",\"province_id\":\"\",\"city_id\":\"\",\"area_id\":\"\",\"dg_city_id\":[],\"type\":\"\",\"tag_type\":\"4\",\"group_id\":\"\",\"page_sort\":0,\"page_offset\":0}";
 
                 // 请求头
                 HttpHeaders headers = new HttpHeaders();
@@ -526,11 +555,16 @@ public class YddDataController {
                 ResponseEntity<JSONObject> responseBody = restTemplateHttps.postForEntity(url, request, JSONObject.class);
                 JSONObject httpBody = responseBody.getBody();
                 if (httpBody != null && httpBody.getInteger("code") == 10000) {
-                    jsonArray.addAll(httpBody.getJSONObject("data").getJSONArray("items"));
-                    total = httpBody.getJSONObject("data").getInteger("total");
-                    page += 1;
+                    if (!httpBody.getString("msg").equals("无效的access_token")){
+                        jsonArray.addAll(httpBody.getJSONObject("data").getJSONArray("items"));
+                        total = httpBody.getJSONObject("data").getInteger("total");
+                        page += 1;
+                    } else
+                        throw new CrmebException("token过期");
                 }
-            }catch (Exception e){
+                else
+                    throw new CrmebException("token过期");
+            } catch (Exception e) {
                 throw new CrmebException("获取List失败");
             }
         }

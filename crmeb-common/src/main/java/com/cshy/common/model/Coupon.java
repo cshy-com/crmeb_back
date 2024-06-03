@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -14,7 +15,7 @@ public class Coupon {
 
     @NotNull(message = "积分为空")
     @ApiModelProperty(value = "积分", required = true)
-    private Integer integral;
+    private BigDecimal integral;
 
     @NotNull(message = "新增数量为空")
     @ApiModelProperty(value = "新增数量", required = true)

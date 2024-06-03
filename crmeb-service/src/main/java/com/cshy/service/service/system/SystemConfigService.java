@@ -75,6 +75,13 @@ public interface SystemConfigService extends IService<SystemConfig> {
     public void loadingConfigCache();
 
     /**
+     * 加载参数缓存数据
+     *
+     * @return
+     */
+    public List<SystemConfig> loadingConfigCacheByFormId(Integer formId);
+
+    /**
      * 重置参数缓存数据
      */
     public void resetConfigCache();

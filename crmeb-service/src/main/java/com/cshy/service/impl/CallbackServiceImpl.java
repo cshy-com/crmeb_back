@@ -40,6 +40,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.Security;
 import java.util.*;
@@ -171,7 +172,7 @@ public class CallbackServiceImpl implements CallbackService {
                     storeOrder.setPaid(true);
                     storeOrder.setPayTime(DateUtil.nowDateTime());
                     storeOrderService.updateById(storeOrder);
-                    if (storeOrder.getUseIntegral() > 0) {
+                    if (storeOrder.getUseIntegral().compareTo(BigDecimal.ZERO) > 0) {
                         userService.updateIntegral(user, storeOrder.getUseIntegral(), "sub");
                     }
                     wechatPayInfoService.updateById(wechatPayInfo);

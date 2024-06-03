@@ -86,7 +86,7 @@ public class User implements Serializable {
     private BigDecimal brokeragePrice;
 
     @ApiModelProperty(value = "用户剩余积分")
-    private Integer integral;
+    private BigDecimal integral;
 
     @ApiModelProperty(value = "用户剩余经验")
     private Integer experience;

@@ -36,7 +36,7 @@ public class UserOperateIntegralMoneyRequest implements Serializable {
     @ApiModelProperty(value = "积分")
     @Min(value = 0)
     @Max(value = 999999)
-    private Integer integralValue;
+    private BigDecimal integralValue;
 
     @ApiModelProperty(value = "余额类型， 1 = 增加， 2 = 减少")
     @NotNull

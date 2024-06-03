@@ -37,11 +37,11 @@ public class ComputedOrderPriceResponse implements Serializable {
     private BigDecimal proTotalFee;
 
     @ApiModelProperty(value = "剩余积分")
-    private Integer surplusIntegral;
+    private BigDecimal surplusIntegral;
 
     @ApiModelProperty(value = "是否使用积分")
     private Boolean useIntegral;
 
     @ApiModelProperty(value = "使用的积分")
-    private Integer usedIntegral;
+    private BigDecimal usedIntegral;
 }

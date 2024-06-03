@@ -32,6 +32,8 @@ public class ExperienceRecordConstants {
 
     /** 经验记录标题—用户退款 */
     public static final String EXPERIENCE_RECORD_TITLE_REFUND = "用户退款";
+    /** 经验记录标题—用户退款 */
+    public static final String EXPERIENCE_RECORD_TITLE_CANCEL= "用户取消";
 
     /** 经验记录标题—PC管理员操作 */
     public static final String EXPERIENCE_RECORD_TITLE_ADMIN = "管理员操作";

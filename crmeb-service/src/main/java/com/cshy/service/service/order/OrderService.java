@@ -5,6 +5,7 @@ import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.order.OrderComputedPriceRequest;
 import com.cshy.common.model.request.order.OrderRefundApplyRequest;
 import com.cshy.common.model.request.order.PreOrderRequest;
+import com.cshy.common.model.request.store.StoreOrderShipRequest;
 import com.cshy.common.model.request.store.StoreProductReplyAddRequest;
 import com.cshy.common.model.response.*;
 import com.cshy.common.model.vo.MyRecord;
@@ -137,11 +138,11 @@ public interface OrderService {
 
     void refundTrackingNo(String trackingNo, String uni);
 
-    void ship(String orderId, String trackingNo, Integer type, HttpServletRequest request);
-
     List<Map<String, Object>> operationList(Integer id);
 
     Boolean returnShip(String orderId, String trackingNo, String remark, String img);
 
     void refundRevoke(String orderId);
+
+    void ship(StoreOrderShipRequest storeOrderShipRequest, HttpServletRequest request);
 }

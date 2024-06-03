@@ -248,11 +248,14 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
                     throw new CrmebException((String) jsonObject.get("msg"));
                 ExpressDetailVo expressDetail = JSONObject.parseObject(result.toJSONString(), ExpressDetailVo.class);
                 if (type == 0) {
-                    List<StoreOrder> storeOrderList = this.storeOrderService.list(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getTrackingNo, trackingNo));
+                    List<StoreOrder> storeOrderList = this.storeOrderService.list(new LambdaQueryWrapper<StoreOrder>().like(StoreOrder::getTrackingNo, trackingNo));
                     if (CollUtil.isNotEmpty(storeOrderList)) {
                         storeOrderList.forEach(storeOrder -> {
-                            storeOrder.setStatus(transferOrderStatus(expressDetail.getDeliveryStatus()));
-                            this.storeOrderService.updateById(storeOrder);
+                            //部分发货处理
+                            if (!storeOrder.getStatus().equals(0)) {
+                                storeOrder.setStatus(transferOrderStatus(expressDetail.getDeliveryStatus()));
+                                this.storeOrderService.updateById(storeOrder);
+                            }
                         });
                     }
                 } else if (type == 1) {

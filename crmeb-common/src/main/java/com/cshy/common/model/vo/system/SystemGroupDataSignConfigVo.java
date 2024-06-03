@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * 签到记录
@@ -32,7 +33,7 @@ public class SystemGroupDataSignConfigVo implements Serializable {
 
 
     @ApiModelProperty(value = "积分")
-    private Integer integral;
+    private BigDecimal integral;
 
     @ApiModelProperty(value = "经验")
     private Integer experience;

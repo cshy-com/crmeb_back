@@ -10,12 +10,14 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.*;
+import com.cshy.common.model.entity.system.*;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.store.*;
 import com.cshy.common.model.request.system.SystemWriteOffOrderSearchRequest;
 import com.cshy.common.model.response.*;
 import com.cshy.common.model.vo.*;
 import com.cshy.common.model.vo.order.StoreOrderInfoOldVo;
+import com.cshy.common.utils.SecurityUtil;
 import com.cshy.service.service.*;
 import com.cshy.service.service.sms.SmsService;
 import com.cshy.service.service.sms.SmsTemplateService;
@@ -30,9 +32,6 @@ import com.cshy.common.model.entity.combination.StorePink;
 import com.cshy.common.model.entity.express.Express;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.common.model.entity.sms.SmsTemplate;
-import com.cshy.common.model.entity.system.SystemAdmin;
-import com.cshy.common.model.entity.system.SystemNotification;
-import com.cshy.common.model.entity.system.SystemStore;
 import com.cshy.common.model.entity.user.User;
 import com.cshy.common.model.entity.user.UserBrokerageRecord;
 import com.cshy.common.model.entity.user.UserToken;
@@ -52,7 +51,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * StoreOrderServiceImpl 接口实现
@@ -129,6 +130,12 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
     @Autowired
     private SystemAttachmentService systemAttachmentService;
 
+    @Autowired
+    private SystemStoreStaffService systemStoreStaffService;
+
+    @Autowired
+    private SystemRoleMenuService systemRoleMenuService;
+
     /**
      * 列表
      *
@@ -185,14 +192,14 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         });
 
         //查询日期
-        lqw.between(StringUtils.isNotBlank(startDate)&&StringUtils.isNotBlank(endDate),StoreOrder::getCreateTime,startDate,endDate);
+        lqw.between(StringUtils.isNotBlank(startDate) && StringUtils.isNotBlank(endDate), StoreOrder::getCreateTime, startDate, endDate);
 
-        orderUtils.statusApiByWhere(lqw,status);
+        orderUtils.statusApiByWhere(lqw, status);
 
-        lqw.eq(StoreOrder::getUid,uid);
+        lqw.eq(StoreOrder::getUid, uid);
         lqw.orderByDesc(StoreOrder::getId);
         return dao.selectList(lqw);
-}
+    }
 
     /**
      * 创建订单
@@ -227,6 +234,35 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
      */
     @Override
     public SystemWriteOffOrderResponse getWriteOffList(SystemWriteOffOrderSearchRequest request, PageParamRequest pageParamRequest) {
+        //查询当前登录账号能看到的订单
+        LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
+        SystemAdmin currentAdmin = loginUserVo.getUser();
+        //判断超管
+        List<String> roleList = Stream.of(currentAdmin.getRoles().split(",")).collect(Collectors.toList());
+        StringBuilder stringBuilder = new StringBuilder();
+        if (!roleList.contains("1")) {
+            //具有核销员操作权限的应该可以看到所有核销订单
+            List<Integer> roleIdList = systemRoleMenuService.list(new LambdaQueryWrapper<SystemRoleMenu>().eq(SystemRoleMenu::getMenuId, 157)).stream().map(SystemRoleMenu::getRid).collect(Collectors.toList());
+            if (!roleList.stream().anyMatch(role -> roleIdList.contains(Integer.valueOf(role)))){
+                List<SystemStoreStaff> list = systemStoreStaffService.list(new LambdaQueryWrapper<SystemStoreStaff>().eq(SystemStoreStaff::getUid, currentAdmin.getId()));
+                if (CollUtil.isNotEmpty(list)) {
+                    //拼接sql
+                    stringBuilder.append(" and (");
+                    AtomicBoolean first = new AtomicBoolean(true);
+                    list.forEach(systemStoreStaff -> {
+                        if (first.get()) {
+                            first.set(false);
+                        } else {
+                            stringBuilder.append(" or ");
+                        }
+                        stringBuilder.append(" store_id = " + systemStoreStaff.getStoreId());
+                    });
+                    stringBuilder.append(") ");
+                } else {
+                    return null;
+                }
+            }
+        }
         LambdaQueryWrapper<StoreOrder> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         String where = " is_del = 0 and shipping_type = 2";
         //时间
@@ -242,6 +278,8 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         if (request.getStoreId() != null && request.getStoreId() > 0) {
             where += " and store_id = " + request.getStoreId();
         }
+
+        where += stringBuilder;
 
         SystemWriteOffOrderResponse systemWriteOffOrderResponse = new SystemWriteOffOrderResponse();
         BigDecimal totalPrice = dao.getTotalPrice(where);
@@ -557,7 +595,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
                 // 退款task
                 redisUtil.lPush(RedisKey.ORDER_TASK_REDIS_KEY_AFTER_REFUND_BY_USER, storeOrder.getId());
             }
-            if (storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT) ) {
+            if (storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT)) {
                 //新增日志
                 userBillService.saveRefundBill(request, user);
 
@@ -646,16 +684,20 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
      *
      * @param orderNo 订单编号
      * @param reason  String 原因
+     * @param type
      * @return Boolean
      */
     @Override
-    public Boolean refundRefuse(String orderNo, String reason) {
+    public Boolean refundRefuse(String orderNo, String reason, Integer type) {
         if (StrUtil.isBlank(reason)) {
             throw new CrmebException("请填写拒绝退款原因");
         }
         StoreOrder storeOrder = getInfoException(orderNo);
         storeOrder.setRefundReason(reason);
-        storeOrder.setRefundStatus(6);
+        if (type == 0)
+            storeOrder.setRefundStatus(7);
+        else
+            storeOrder.setRefundStatus(6);
 
         Boolean execute = transactionTemplate.execute(e -> {
             updateById(storeOrder);
@@ -2069,6 +2111,11 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
                 && !storeOrder.getIsSystemDel()) {
             map.put("key", StoreOrderStatusConstants.ORDER_STATUS_UNPAID);
             map.put("value", StoreOrderStatusConstants.ORDER_STATUS_STR_UNPAID);
+            return map;
+        }
+        if (!storeOrder.getPaid() && storeOrder.getStatus() == 4) {
+            map.put("key", StoreOrderStatusConstants.ORDER_STATUS_CANCEL);
+            map.put("value", StoreOrderStatusConstants.ORDER_STATUS_STR_CANCEL);
             return map;
         }
         // 未发货

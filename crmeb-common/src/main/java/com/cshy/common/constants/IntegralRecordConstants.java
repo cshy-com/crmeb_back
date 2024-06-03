@@ -21,7 +21,7 @@ public class IntegralRecordConstants {
     /** 积分状态—完成 */
     public static final Integer INTEGRAL_RECORD_STATUS_COMPLETE = 3;
 
-    /** 积分状态—失效（订单退款） */
+    /** 积分状态—失效（订单退款, 取消） */
     public static final Integer INTEGRAL_RECORD_STATUS_INVALIDATION = 4;
 
     /** 积分关联类型—订单 */
@@ -48,4 +48,6 @@ public class IntegralRecordConstants {
 
     /** 积分标题—订单退款 */
     public static final String BROKERAGE_RECORD_TITLE_REFUND = "订单退款";
+    /** 积分标题—订单退款 */
+    public static final String BROKERAGE_RECORD_TITLE_CANCEL = "订单取消";
 }

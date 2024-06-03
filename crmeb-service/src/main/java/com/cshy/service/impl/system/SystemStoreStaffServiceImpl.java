@@ -112,10 +112,6 @@ public class SystemStoreStaffServiceImpl extends ServiceImpl<SystemStoreStaffDao
      */
     @Override
     public Boolean saveUnique(SystemStoreStaffRequest request) {
-        List<Integer> userIds = new ArrayList<>();
-        userIds.add(request.getUid());
-        List<SystemStoreStaff> existStaffs = getByAdminUserIds(userIds);
-        if (CollUtil.isNotEmpty(existStaffs) && existStaffs.size() > 0) throw new CrmebException(MsgConstants.RESULT_VERIFICATION_USER_EXIST);
         SystemStoreStaff systemStoreStaff = new SystemStoreStaff();
         BeanUtils.copyProperties(request, systemStoreStaff);
         return dao.insert(systemStoreStaff) > 0;

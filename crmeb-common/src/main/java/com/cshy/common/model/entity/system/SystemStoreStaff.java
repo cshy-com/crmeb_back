@@ -26,7 +26,7 @@ public class SystemStoreStaff implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @ApiModelProperty(value = "微信用户id")
+    @ApiModelProperty(value = "后管用户id")
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer uid;
 

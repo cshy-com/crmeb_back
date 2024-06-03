@@ -145,8 +145,8 @@ public class StoreOrderController {
     @PreAuthorize("hasAuthority('admin:order:refund:refuse')")
     @ApiOperation(value = "拒绝退款")
     @RequestMapping(value = "/refund/refuse", method = RequestMethod.GET)
-    public CommonResult<Object> refundRefuse(@RequestParam String orderNo, @RequestParam String reason) {
-        if (storeOrderService.refundRefuse(orderNo, reason)) {
+    public CommonResult<Object> refundRefuse(@RequestParam String orderNo, @RequestParam String reason, @RequestParam Integer type) {
+        if (storeOrderService.refundRefuse(orderNo, reason, type)) {
             return CommonResult.success();
         }
         return CommonResult.failed();
@@ -206,14 +206,9 @@ public class StoreOrderController {
     }
 
     @ApiOperation(value = "发货")
-    @RequestMapping(value = "/ship", method = RequestMethod.GET)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "0 普通订单 1 礼品卡订单"),
-            @ApiImplicitParam(name = "orderId", value = "订单号"),
-            @ApiImplicitParam(name = "trackingNo", value = "物流单号")
-    })
-    public CommonResult<String> ship(@RequestParam String orderId, @RequestParam String trackingNo, @RequestParam Integer type, HttpServletRequest request) {
-        orderService.ship(orderId, trackingNo, type, request);
+    @RequestMapping(value = "/ship", method = RequestMethod.POST)
+    public CommonResult<String> ship(@RequestBody StoreOrderShipRequest storeOrderShipRequest, HttpServletRequest request) {
+        orderService.ship(storeOrderShipRequest, request);
         return CommonResult.success();
     }
 

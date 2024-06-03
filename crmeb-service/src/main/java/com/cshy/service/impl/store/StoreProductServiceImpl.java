@@ -52,6 +52,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -176,7 +177,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
                     .or().like(StoreProduct::getKeyword, request.getKeywords()));
         }
         lambdaQueryWrapper.apply(StringUtils.isNotBlank(request.getCateId()), "FIND_IN_SET ('" + request.getCateId() + "', cate_id)");
-        if (StringUtils.isNotBlank(request.getPriceOrder())){
+        if (StringUtils.isNotBlank(request.getPriceOrder())) {
             if (request.getPriceOrder().equals(Order.DESC))
                 lambdaQueryWrapper.orderByDesc(StoreProduct::getPrice);
             else
@@ -315,7 +316,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
             storeProduct.setIsGood(false);
         }
         if (ObjectUtil.isNull(request.getGiveIntegral())) {
-            storeProduct.setGiveIntegral(0);
+            storeProduct.setGiveIntegral(BigDecimal.ZERO);
         }
         if (ObjectUtil.isNull(request.getFicti())) {
             storeProduct.setFicti(0);
@@ -707,8 +708,8 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
                 default:
                     break;
             }
-            List<StoreProduct> storeProducts = dao.selectList(lambdaQueryWrapper);
-            h.setCount(storeProducts.size());
+            Integer count = dao.selectCount(lambdaQueryWrapper);
+            h.setCount(count);
         }
 
         return headers;
@@ -1098,15 +1099,14 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
             } else {
                 lqw.last(" order by (sales + ficti) asc, sort asc, id asc");
             }
-        } else {
-            if (StrUtil.isNotBlank(request.getPriceOrder())) {
-                if (request.getPriceOrder().equals(Order.DESC)) {
-                    lqw.orderByDesc(StoreProduct::getPrice);
-                } else {
-                    lqw.orderByAsc(StoreProduct::getPrice);
-                }
+        } else if (StrUtil.isNotBlank(request.getPriceOrder())) {
+            if (request.getPriceOrder().equals(Order.DESC)) {
+                lqw.orderByDesc(StoreProduct::getPrice);
+            } else {
+                lqw.orderByAsc(StoreProduct::getPrice);
             }
 
+        } else {
             lqw.orderByDesc(StoreProduct::getSort);
             lqw.orderByDesc(StoreProduct::getId);
         }
