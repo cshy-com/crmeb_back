@@ -35,6 +35,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,6 +45,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -103,6 +105,7 @@ public class YddDataController {
     @ApiOperation(value = "同步")
     @RequestMapping(value = "/sync", method = RequestMethod.POST)
     @Async
+    @Transactional
     public CommonResult<Object> sync(@RequestParam String token) {
         synchronize(token);
         return CommonResult.success();
@@ -110,7 +113,7 @@ public class YddDataController {
 
     void synchronize(String token) {
 //        //查询本地分类
-        List<Category> localCategoryList = categoryService.list(new LambdaQueryWrapper<Category>().eq(Category::getType, 1).like(Category::getPath, "/%/%/"));
+//        List<Category> localCategoryList = categoryService.list(new LambdaQueryWrapper<Category>().eq(Category::getType, 1).like(Category::getPath, "/%/%/"));
 //
 //        log.info("开始获取分类数据");
 //        //获取分类数据
@@ -134,7 +137,49 @@ public class YddDataController {
         }
         log.info("获取商品完成");
 
-        buildAndSave(yddProductVoList, token, localCategoryList);
+        resetPrice(yddProductVoList, token);
+    }
+
+    private void resetPrice(List<YddProductVo> yddProductVoList, String token) {
+        yddProductVoList.forEach(yddProductVo -> {
+            StoreProduct serviceOne = storeProductService.getOne(new LambdaQueryWrapper<StoreProduct>().eq(StoreProduct::getStoreName, yddProductVo.getName()).like(StoreProduct::getBarCode, "G"));
+            if (Objects.nonNull(serviceOne)) {
+                YddProductDetailVo detail = getDetail(yddProductVo.getGoodsId(), token);
+                // 将百分数转换为小数
+                BigDecimal costPrice = new BigDecimal(detail.getCostPrice());
+
+                /**
+                 * 利润率35%<40%
+                 * 会员价*1.3（给甲方的成本价）
+                 * 会员价*1.65 （销售价）
+                 *
+                 * 利润率40%=<50%
+                 * 会员价*1.4（给甲方的成本价）
+                 * 会员价*1.8 （销售价）
+                 *
+                 *
+                 * 利润率50%=<
+                 * 会员价*1.5（给甲方的成本价）
+                 * 会员价*1.95 （销售价）
+                 */
+                BigDecimal costPriceBigDecimal;
+                BigDecimal marketPriceBigDecimal;
+                costPriceBigDecimal = costPrice.multiply(new BigDecimal("1.2")).setScale(2, RoundingMode.HALF_UP).add(BigDecimal.TEN);
+                marketPriceBigDecimal = costPrice.multiply(new BigDecimal("1.3")).setScale(2, RoundingMode.HALF_UP).add(BigDecimal.TEN);
+
+                serviceOne.setCost(costPriceBigDecimal);
+                serviceOne.setOtPrice(marketPriceBigDecimal);
+                serviceOne.setPrice(marketPriceBigDecimal);
+                serviceOne.setVipPrice(marketPriceBigDecimal);
+                storeProductService.updateById(serviceOne);
+                //查询属性数据
+                StoreProductAttrValue storeProductAttrValue = storeProductAttrValueService.getOne(new LambdaQueryWrapper<StoreProductAttrValue>().eq(StoreProductAttrValue::getProductId, serviceOne.getId()));
+                storeProductAttrValue.setCost(serviceOne.getCost());
+                storeProductAttrValue.setOtPrice(serviceOne.getOtPrice());
+                storeProductAttrValue.setPrice(serviceOne.getPrice());
+                storeProductAttrValueService.updateById(storeProductAttrValue);
+            }
+        });
     }
 
     private void buildAndSave(List<YddProductVo> yddProductVoList, String token, List<Category> localCategoryList) {
@@ -207,7 +252,7 @@ public class YddDataController {
                 } else if (50 <= rate) {
                     costPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 1.5);
                     marketPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 1.95 + 10);
-                }else {
+                } else {
                     costPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 1.5);
                     marketPriceBigDecimal = BigDecimal.valueOf(roundedPrice * 2 + 10);
                 }
@@ -555,14 +600,13 @@ public class YddDataController {
                 ResponseEntity<JSONObject> responseBody = restTemplateHttps.postForEntity(url, request, JSONObject.class);
                 JSONObject httpBody = responseBody.getBody();
                 if (httpBody != null && httpBody.getInteger("code") == 10000) {
-                    if (!httpBody.getString("msg").equals("无效的access_token")){
+                    if (!httpBody.getString("msg").equals("无效的access_token")) {
                         jsonArray.addAll(httpBody.getJSONObject("data").getJSONArray("items"));
                         total = httpBody.getJSONObject("data").getInteger("total");
                         page += 1;
                     } else
                         throw new CrmebException("token过期");
-                }
-                else
+                } else
                     throw new CrmebException("token过期");
             } catch (Exception e) {
                 throw new CrmebException("获取List失败");

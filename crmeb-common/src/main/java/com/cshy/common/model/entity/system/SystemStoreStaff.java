@@ -34,7 +34,7 @@ public class SystemStoreStaff implements Serializable {
     private String avatar;
 
     @ApiModelProperty(value = "门店id")
-    private Integer storeId;
+    private String storeId;
 
     @ApiModelProperty(value = "店员名称")
     private String staffName;

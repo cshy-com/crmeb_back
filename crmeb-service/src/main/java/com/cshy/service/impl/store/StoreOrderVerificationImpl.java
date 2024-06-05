@@ -29,8 +29,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * StoreOrderVerificationImpl 接口实现 核销订单
@@ -173,7 +175,9 @@ public class StoreOrderVerificationImpl implements StoreOrderVerification {
         SystemAdmin currentAdmin = loginUserVo.getUser();
         SystemStoreStaff systemStoreStaff = systemStoreStaffService.getOne(new LambdaQueryWrapper<SystemStoreStaff>().eq(SystemStoreStaff::getUid, currentAdmin.getId()));
         if (Objects.nonNull(systemStoreStaff)){
-            if (systemStoreStaff.getStoreId().equals(existOrder.getStoreId())){
+            List<String> list = Arrays.asList(systemStoreStaff.getStoreId().split(","));
+            List<Integer> integerList = list.stream().map(Integer::valueOf).collect(Collectors.toList());
+            if (integerList.contains(existOrder.getStoreId())){
                 StoreOrder storeOrder = new StoreOrder();
                 BeanUtils.copyProperties(existOrder,storeOrder);
                 storeOrder.setStatus(StoreOrderStatusConstants.ORDER_STATUS_INT_BARGAIN);

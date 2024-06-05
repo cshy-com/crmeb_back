@@ -22,7 +22,6 @@ import javax.validation.Valid;
 
 /**
  * 后台管理员表 前端控制器
-
  */
 @Slf4j
 @RestController
@@ -35,8 +34,9 @@ public class SystemAdminController {
 
     /**
      * 分页显示后台管理员表
+     *
      * @param systemAdminRequest 搜索条件
-     * @param pageParamRequest 分页参数
+     * @param pageParamRequest   分页参数
      */
     @PreAuthorize("hasAuthority('admin:system:admin:list')")
     @ApiOperation(value = "分页列表")
@@ -49,6 +49,7 @@ public class SystemAdminController {
 
     /**
      * 新增后台管理员
+     *
      * @param systemAdminAddRequest 新增参数
      */
     @PreAuthorize("hasAuthority('admin:system:admin:save')")
@@ -63,6 +64,7 @@ public class SystemAdminController {
 
     /**
      * 删除后台管理员表
+     *
      * @param id Integer
      */
     @PreAuthorize("hasAuthority('admin:system:admin:delete')")
@@ -78,6 +80,7 @@ public class SystemAdminController {
 
     /**
      * 修改后台管理员表
+     *
      * @param systemAdminRequest 修改参数
      */
     @PreAuthorize("hasAuthority('admin:system:admin:update')")
@@ -93,6 +96,7 @@ public class SystemAdminController {
 
     /**
      * 后台管理员详情
+     *
      * @param id Integer
      */
     @PreAuthorize("hasAuthority('admin:system:admin:info')")
@@ -104,6 +108,7 @@ public class SystemAdminController {
 
     /**
      * 修改后台管理员状态
+     *
      * @param id Integer
      */
     @PreAuthorize("hasAuthority('admin:system:admin:update:status')")
@@ -127,6 +132,12 @@ public class SystemAdminController {
             return CommonResult.success("修改成功");
         }
         return CommonResult.failed("修改失败");
+    }
+
+    @ApiOperation(value = "根据id查询管理员")
+    @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
+    public CommonResult<SystemAdmin> getAdminById(@PathVariable Integer id) {
+        return CommonResult.success(systemAdminService.getById(id));
     }
 }
 

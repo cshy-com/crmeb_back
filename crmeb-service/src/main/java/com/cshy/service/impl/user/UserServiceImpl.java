@@ -1469,12 +1469,15 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public Boolean updateUser(UserUpdateRequest userRequest) {
         User tempUser = getById(userRequest.getUid());
-        User user = new User();
-        BeanUtils.copyProperties(userRequest, user);
-        if (!tempUser.getIsPromoter() && user.getIsPromoter()) {
-            user.setPromoterTime(cn.hutool.core.date.DateUtil.date());
+        tempUser.setAddres(userRequest.getAddres());
+        tempUser.setMark(userRequest.getMark());
+        tempUser.setGroupId(userRequest.getGroupId());
+        tempUser.setTagId(userRequest.getTagId());
+        tempUser.setStatus(userRequest.getStatus());
+        if (!tempUser.getIsPromoter() && userRequest.getIsPromoter()) {
+            tempUser.setPromoterTime(cn.hutool.core.date.DateUtil.date());
         }
-        return updateById(user);
+        return updateById(tempUser);
     }
 
     /**

@@ -103,4 +103,25 @@ public class StoreOrderDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "收货地址")
     private String address;
+
+    @ApiModelProperty(value = "使用积分")
+    private BigDecimal useIntegral;
+
+    @ApiModelProperty(value = "用户手机号")
+    private String userMobile;
+
+    @ApiModelProperty(value = "订单总金额")
+    private BigDecimal totalPrice;
+
+    @ApiModelProperty(value = "配送方式 1=快递 ，2=门店自提")
+    private Integer shippingType;
+
+    @ApiModelProperty(value = "邮费")
+    private BigDecimal totalPostage;
+
+    @ApiModelProperty(value = "支付时间")
+    private Date payTime;
+
+    @ApiModelProperty(value = "是否发货")
+    private Boolean isShipped;
 }

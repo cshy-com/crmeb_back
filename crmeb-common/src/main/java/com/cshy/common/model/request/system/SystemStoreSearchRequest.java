@@ -27,8 +27,8 @@ public class SystemStoreSearchRequest implements Serializable {
     @ApiModelProperty(value = "搜索关键字，支持 门店名称|简介|手机号码||省市区|详细地址")
     private String keywords;
 
-    @ApiModelProperty(value = "状态，0隐藏，1显示，2回收站", example = "1")
-    @Range(min = 0, max = 2, message = "未知的状态")
+    @ApiModelProperty(value = "状态，0隐藏，1显示，2回收站 3 全部", example = "1")
+    @Range(min = 0, max = 3, message = "未知的状态")
     private int status;
 
 }

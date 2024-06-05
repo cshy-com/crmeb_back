@@ -17,6 +17,7 @@ public class StoreOrderStatusConstants {
     public static final String ORDER_STATUS_REFUNDING = "refunding"; //退款中
     public static final String ORDER_STATUS_REFUNDED = "refunded"; //已退款
     public static final String ORDER_STATUS_DELETED = "deleted"; //已删除
+    public static final String ORDER_STATUS_CANCELED = "canceled"; //已删除
     public static final String ORDER_STATUS_CACHE_CREATE_ORDER = "cache_key_create_order";
 
     public static final String ORDER_STATUS_STR_UNPAID = "未支付"; //未支付

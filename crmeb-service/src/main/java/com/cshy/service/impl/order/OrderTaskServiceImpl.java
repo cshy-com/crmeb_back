@@ -161,7 +161,7 @@ public class OrderTaskServiceImpl implements OrderTaskService {
         }
         for (int i = 0; i < size; i++) {
             //如果10秒钟拿不到一个数据，那么退出循环
-            Object data = redisUtil.getRightPop(redisKey, 10L);
+            Object data = redisUtil.getRightPop(redisKey,  10L);
             if (ObjectUtil.isNull(data)) {
                 continue;
             }
@@ -177,7 +177,8 @@ public class OrderTaskServiceImpl implements OrderTaskService {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                redisUtil.lPush(redisKey, data);
+                if (!e.getMessage().contains("订单不存在"))
+                    redisUtil.lPush(redisKey, data);
             }
         }
     }

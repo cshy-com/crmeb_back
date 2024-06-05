@@ -39,7 +39,7 @@ public class StoreOrderItemResponse implements Serializable {
     private String realName;
 
     @ApiModelProperty(value = "用户电话")
-    private String userPhone;
+    private String userMobile;
 
     @ApiModelProperty(value = "订单总价")
     private BigDecimal totalPrice;

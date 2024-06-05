@@ -101,5 +101,5 @@ domainUrl: https://cshy.store/
 # token超时配置
 token:
   expireTime:
-    front: 300
-    admin: 300
+    front: 44640 #31天
+    admin: 10080 #一周

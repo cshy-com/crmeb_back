@@ -25,7 +25,7 @@ public class StoreOrderSearchRequest implements Serializable {
     private static final long serialVersionUID=1L;
 
     @ApiModelProperty(value = "订单号")
-    private String orderNo;
+    private String keywords;
 
     @ApiModelProperty(value = "创建时间区间")
     private String dateLimit;

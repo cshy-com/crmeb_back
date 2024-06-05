@@ -4,8 +4,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.request.PageParamRequest;
 import com.cshy.common.model.request.system.SystemStoreStaffRequest;
 import com.cshy.common.model.response.SystemStoreStaffResponse;
+import com.cshy.common.model.vo.MyRecord;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.model.entity.system.SystemStoreStaff;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * SystemStoreStaffService 接口
@@ -41,4 +45,6 @@ public interface SystemStoreStaffService extends IService<SystemStoreStaff> {
      * @return Boolean
      */
     Boolean updateStatus(Integer id, Integer status);
+
+    SystemStoreStaffResponse info(Integer id);
 }

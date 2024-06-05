@@ -14,6 +14,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 门店店员表
@@ -36,8 +37,7 @@ public class SystemStoreStaffRequest implements Serializable {
     private String avatar;
 
     @ApiModelProperty(value = "提货点id")
-    @Min(value = 1, message = "请选择提货点")
-    private Integer storeId;
+    private List<Integer> storeId;
 
     @ApiModelProperty(value = "核销员 名称 [昵称]")
     @NotBlank(message = "核销员名称不能为空")

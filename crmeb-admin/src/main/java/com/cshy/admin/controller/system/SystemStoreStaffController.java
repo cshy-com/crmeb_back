@@ -50,7 +50,7 @@ public class SystemStoreStaffController {
     @PreAuthorize("hasAuthority('admin:system:staff:save')")
     @ApiOperation(value = "新增")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public CommonResult<String> save(@RequestBody @ModelAttribute SystemStoreStaffRequest systemStoreStaffRequest) {
+    public CommonResult<String> save(@RequestBody SystemStoreStaffRequest systemStoreStaffRequest) {
         if (systemStoreStaffService.saveUnique(systemStoreStaffRequest)) {
             return CommonResult.success();
         }
@@ -79,7 +79,7 @@ public class SystemStoreStaffController {
     @PreAuthorize("hasAuthority('admin:system:staff:update')")
     @ApiOperation(value = "修改")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
-    public CommonResult<String> update(@RequestParam Integer id, @RequestBody @ModelAttribute SystemStoreStaffRequest systemStoreStaffRequest) {
+    public CommonResult<String> update(@RequestParam Integer id, @RequestBody SystemStoreStaffRequest systemStoreStaffRequest) {
         if (systemStoreStaffService.edit(id, systemStoreStaffRequest)) {
             return CommonResult.success();
         }
@@ -108,8 +108,8 @@ public class SystemStoreStaffController {
     @PreAuthorize("hasAuthority('admin:system:staff:info')")
     @ApiOperation(value = "详情")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
-    public CommonResult<SystemStoreStaff> info(@RequestParam(value = "id") Integer id) {
-        return CommonResult.success(systemStoreStaffService.getById(id));
+    public CommonResult<SystemStoreStaffResponse> info(@RequestParam(value = "id") Integer id) {
+        return CommonResult.success(systemStoreStaffService.info(id));
    }
 }
 

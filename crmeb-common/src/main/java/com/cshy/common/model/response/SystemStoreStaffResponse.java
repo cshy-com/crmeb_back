@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 门店店员表
@@ -40,10 +41,10 @@ public class SystemStoreStaffResponse implements Serializable {
     private User user;
 
     @ApiModelProperty(value = "门店id")
-    private Integer storeId;
+    private List<Integer> storeId;
 
     @ApiModelProperty(value = "门店")
-    private SystemStore systemStore;
+    private List<SystemStore> systemStore;
 
     @ApiModelProperty(value = "店员名称")
     private String staffName;

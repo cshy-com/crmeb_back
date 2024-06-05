@@ -149,9 +149,16 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         QueryWrapper<StoreOrder> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id", "order_id", "uid", "real_name", "pay_price", "pay_type", "create_time", "status", "refund_status"
                 , "refund_reason_wap_img", "refund_reason_wap_explain", "refund_reason_wap", "refund_reason", "refund_reason_time"
-                , "is_del", "combination_id", "pink_id", "seckill_id", "bargain_id", "verify_code", "remark", "paid", "is_system_del", "shipping_type", "type", "is_alter_price", "refund_type", "address");
-        if (StrUtil.isNotBlank(request.getOrderNo())) {
-            queryWrapper.like("order_id", request.getOrderNo());
+                , "is_del", "combination_id", "pink_id", "seckill_id", "bargain_id", "verify_code", "remark", "paid", "is_system_del", "shipping_type", "type", "is_alter_price"
+                , "refund_type", "address", "user_mobile", "use_integral", "total_price", "total_postage", "pay_time");
+        if (StrUtil.isNotBlank(request.getKeywords())) {
+            queryWrapper.and(wrapper -> {
+                wrapper.like("order_id", request.getKeywords())
+                        .or()
+                        .like("user_mobile", request.getKeywords())
+                        .or()
+                        .like("real_name", request.getKeywords());
+            });
         }
         getRequestTimeWhere(queryWrapper, request);
         getStatusWhere(queryWrapper, request.getStatus());
@@ -255,7 +262,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
                         } else {
                             stringBuilder.append(" or ");
                         }
-                        stringBuilder.append(" store_id = " + systemStoreStaff.getStoreId());
+                        stringBuilder.append(" store_id in (" + systemStoreStaff.getStoreId() + ")");
                     });
                     stringBuilder.append(") ");
                 } else {
@@ -272,7 +279,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         }
 
         if (!StringUtils.isBlank(request.getKeywords())) {
-            where += " and (real_name like '%" + request.getKeywords() + "%' or user_phone = '" + request.getKeywords() + "' or order_id = '" + request.getKeywords() + "' or id = '" + request.getKeywords() + "' )";
+            where += " and (real_name like '%" + request.getKeywords() + "%' or user_mobile like '%" + request.getKeywords() + "%' or order_id like '%" + request.getKeywords() + "%' or id = '" + request.getKeywords() + "' )";
         }
 
         if (request.getStoreId() != null && request.getStoreId() > 0) {
@@ -351,6 +358,9 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
 
             // 添加订单类型信息
             storeOrderItemResponse.setOrderType(getOrderTypeStr(storeOrder));
+
+            //判断发货状态
+            storeOrderItemResponse.setIsShipped(0 != storeOrder.getStatus() && 4 != storeOrder.getStatus());
             detailResponseList.add(storeOrderItemResponse);
         }
         return detailResponseList;
@@ -2101,6 +2111,11 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         map.put("key", "");
         map.put("value", "");
         if (null == storeOrder) {
+            return map;
+        }
+        if (storeOrder.getStatus() == 4){
+            map.put("key", StoreOrderStatusConstants.ORDER_STATUS_CANCELED);
+            map.put("value", StoreOrderStatusConstants.ORDER_STATUS_STR_CANCEL);
             return map;
         }
         // 未支付

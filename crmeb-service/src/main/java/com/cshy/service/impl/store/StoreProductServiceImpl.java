@@ -664,7 +664,7 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         List<StoreProductTabsHeader> headers = new ArrayList<>();
         StoreProductTabsHeader header1 = new StoreProductTabsHeader(0, "出售中商品", 1);
         StoreProductTabsHeader header2 = new StoreProductTabsHeader(0, "仓库中商品", 2);
-        StoreProductTabsHeader header3 = new StoreProductTabsHeader(0, "已经售馨商品", 3);
+        StoreProductTabsHeader header3 = new StoreProductTabsHeader(0, "已经售罄商品", 3);
         StoreProductTabsHeader header4 = new StoreProductTabsHeader(0, "警戒库存", 4);
         StoreProductTabsHeader header5 = new StoreProductTabsHeader(0, "商品回收站", 5);
         headers.add(header1);

@@ -28,15 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * SystemAdminServiceImpl 接口实现
-
  */
 @Service
 public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAdmin> implements SystemAdminService {
@@ -49,7 +45,8 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
 
     /**
      * 后台管理员列表
-     * @param request 请求参数
+     *
+     * @param request          请求参数
      * @param pageParamRequest 分页参数
      * @return List
      */
@@ -92,11 +89,11 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
             List<String> roleNames = new ArrayList<>();
             for (Integer roleId : roleIds) {
                 List<SystemRole> hasRoles = roleList.stream().filter(e -> e.getId().equals(roleId)).collect(Collectors.toList());
-                if (hasRoles.size()> 0) {
+                if (hasRoles.size() > 0) {
                     roleNames.add(hasRoles.stream().map(SystemRole::getRoleName).collect(Collectors.joining(",")));
                 }
             }
-            sar.setRoleNames(StringUtils.join(roleNames,","));
+            sar.setRoleNames(StringUtils.join(roleNames, ","));
             systemAdminResponses.add(sar);
         }
         return systemAdminResponses;
@@ -104,6 +101,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
 
     /**
      * 新增管理员
+     *
      * @param systemAdminAddRequest 新增参数
      * @return Boolean
      */
@@ -129,6 +127,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
 
     /**
      * 管理员名称唯一校验
+     *
      * @param account 管理员账号
      * @return Integer
      */
@@ -144,25 +143,40 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
      */
     @Override
     public Boolean updateAdmin(SystemAdminUpdateRequest systemAdminRequest) {
-        getDetail(systemAdminRequest.getId());
-        verifyAccount(systemAdminRequest.getId(), systemAdminRequest.getAccount());
-        // 如果有手机号，校验手机号
-        if (StrUtil.isNotBlank(systemAdminRequest.getPhone())) {
-            ValidateFormUtil.isPhoneException(systemAdminRequest.getPhone());
-        }
-        SystemAdmin systemAdmin = new SystemAdmin();
-        BeanUtils.copyProperties(systemAdminRequest, systemAdmin);
-        systemAdmin.setPwd(null);
-        if (StrUtil.isNotBlank(systemAdminRequest.getPwd())) {
-            String pwd = CrmebUtil.encryptPassword(systemAdminRequest.getPwd(), systemAdminRequest.getAccount());
+        SystemAdmin admin = getById(systemAdminRequest.getId());
+        if (Objects.nonNull(admin)) {
+            getDetail(systemAdminRequest.getId());
+            verifyAccount(systemAdminRequest.getId(), systemAdminRequest.getAccount());
+            // 如果有手机号，校验手机号
+            if (StrUtil.isNotBlank(systemAdminRequest.getPhone())) {
+                ValidateFormUtil.isPhoneException(systemAdminRequest.getPhone());
+            }
+            SystemAdmin systemAdmin = new SystemAdmin();
+            BeanUtils.copyProperties(systemAdminRequest, systemAdmin);
+            systemAdmin.setPwd(null);
+            //修改用户名的情况下 密码加密会变化 所以每次更改都需要更新密码
+            String pwd;
+            if (StringUtils.isNotBlank(systemAdminRequest.getPwd()))
+                pwd = CrmebUtil.encryptPassword(systemAdminRequest.getPwd(), systemAdminRequest.getAccount());
+            else
+                pwd = CrmebUtil.encryptPassword(CrmebUtil.decryptPassowrd(admin.getPwd(), admin.getAccount()), systemAdminRequest.getAccount());
             systemAdmin.setPwd(pwd);
+            return updateById(systemAdmin);
         }
-        return updateById(systemAdmin);
+         throw new CrmebException("用户不存在");
+    }
+
+    public static void main(String[] args) {
+        String encryptPassword = CrmebUtil.encryptPassword("admin", "123456");
+        String s = CrmebUtil.decryptPassowrd(encryptPassword, "123456");
+        System.out.println(encryptPassword);
+        System.out.println(s);
     }
 
     /**
      * 校验账号唯一性（管理员更新时）
-     * @param id 管理员id
+     *
+     * @param id      管理员id
      * @param account 管理员账号
      */
     private void verifyAccount(Integer id, String account) {
@@ -177,7 +191,8 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
 
     /**
      * 修改后台管理员状态
-     * @param id 管理员id
+     *
+     * @param id     管理员id
      * @param status 状态
      * @return Boolean
      */
@@ -193,6 +208,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
 
     /**
      * 根据idList获取Map
+     *
      * @param adminIdList id数组
      * @return HashMap
      */
@@ -216,6 +232,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
 
     /**
      * 修改后台管理员是否接收状态
+     *
      * @param id 管理员id
      * @return Boolean
      */
@@ -231,6 +248,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
 
     /**
      * 获取可以接收短信的管理员
+     *
      * @return List
      */
     @Override
@@ -248,6 +266,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
 
     /**
      * 管理员详情
+     *
      * @param id 管理员id
      * @return SystemAdmin
      */
@@ -262,6 +281,7 @@ public class SystemAdminServiceImpl extends ServiceImpl<SystemAdminDao, SystemAd
 
     /**
      * 通过用户名获取用户
+     *
      * @param username 用户名
      * @return SystemAdmin
      */

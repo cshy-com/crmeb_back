@@ -35,6 +35,7 @@ import com.cshy.service.service.user.UserService;
 import com.google.common.collect.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -50,6 +51,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -248,11 +250,6 @@ public class StoreIntegralCouponServiceImpl extends BaseServiceImpl<StoreIntegra
             throw new CrmebException("不能选择已导出/已使用的数据，请重新选择");
 
         storeIntegralCouponList.forEach(coupon -> {
-            StoreIntegralCouponDto dto = new StoreIntegralCouponDto();
-            BeanUtils.copyProperties(coupon, dto);
-            dto.setIsExported(Boolean.TRUE);
-            this.update(dto);
-
             byte[] qrCode = Base64.getDecoder().decode(coupon.getQrCode().substring("data:image/png;base64,".length()));
             coupon.setQrcodeByte(qrCode);
         });
@@ -260,5 +257,15 @@ public class StoreIntegralCouponServiceImpl extends BaseServiceImpl<StoreIntegra
         EasyExcelUtils<StoreIntegralCoupon> easyExcelUtils = new EasyExcelUtils<StoreIntegralCoupon>();
         NoModelWriteData noModelWriteData = easyExcelUtils.buildData(storeIntegralCouponList, StoreIntegralCoupon.class, ".xlsx");
         easyExcelUtils.noModelWrite(noModelWriteData, response);
+
+        List<StoreIntegralCoupon> finalStoreIntegralCouponList = storeIntegralCouponList;
+        CompletableFuture<Boolean> future = CompletableFuture.supplyAsync(() -> {
+            finalStoreIntegralCouponList.forEach(coupon -> {
+                coupon.setIsExported(Boolean.TRUE);
+                this.updateById(coupon);
+            });
+            return true;
+        });
     }
+
 }
