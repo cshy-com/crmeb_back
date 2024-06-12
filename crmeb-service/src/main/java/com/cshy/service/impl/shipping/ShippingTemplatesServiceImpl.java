@@ -17,6 +17,7 @@ import com.cshy.service.service.shipping.ShippingTemplatesFreeService;
 import com.cshy.service.service.shipping.ShippingTemplatesRegionService;
 import com.cshy.service.service.shipping.ShippingTemplatesService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -70,6 +71,9 @@ public class ShippingTemplatesServiceImpl extends ServiceImpl<ShippingTemplatesD
         shippingTemplates.setSort(request.getSort());
         shippingTemplates.setType(request.getType());
         shippingTemplates.setAppoint(request.getAppoint());
+        shippingTemplates.setIsFreePostage(request.getIsFreePostage());
+        shippingTemplates.setFullReductionAmount(request.getFullReductionAmount());
+        shippingTemplates.setDeductionPostage(request.getDeductionPostage());
 
         save(shippingTemplates);
 
@@ -120,6 +124,10 @@ public class ShippingTemplatesServiceImpl extends ServiceImpl<ShippingTemplatesD
         shippingTemplates.setSort(request.getSort());
         shippingTemplates.setType(request.getType());
         shippingTemplates.setAppoint(request.getAppoint());
+        shippingTemplates.setDeductionPostage(request.getDeductionPostage());
+        shippingTemplates.setDeductionPostage(request.getDeductionPostage());
+        shippingTemplates.setFullReductionAmount(request.getFullReductionAmount());
+        shippingTemplates.setIsFreePostage(request.getIsFreePostage());
 
 
         updateById(shippingTemplates);

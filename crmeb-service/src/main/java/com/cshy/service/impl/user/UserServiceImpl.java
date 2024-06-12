@@ -775,6 +775,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         user.setPhone(phone);
         user.setUserType(LoginConstants.USER_LOGIN_TYPE_H5);
         user.setNickname("微信用户" + phone);
+        user.setIntegral(BigDecimal.ZERO);
         user.setAvatar(systemConfigService.getValueByKey(Constants.USER_DEFAULT_AVATAR_CONFIG_KEY));
         Date nowDate = DateUtil.nowDateTime();
         user.setCreateTime(nowDate);

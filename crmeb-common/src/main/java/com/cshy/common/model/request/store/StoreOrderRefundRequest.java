@@ -1,5 +1,6 @@
 package com.cshy.common.model.request.store;
 
+import com.cshy.common.model.request.order.RefundOrderInfoRequest;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -11,6 +12,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 订单退款表
@@ -41,4 +43,7 @@ public class StoreOrderRefundRequest {
 
     @ApiModelProperty(value = "退货收件电话")
     private String returnMobile;
+
+    @ApiModelProperty(value = "退款商品数量")
+    private List<RefundOrderInfoRequest> refundOrderInfoRequestList;
 }

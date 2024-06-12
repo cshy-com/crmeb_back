@@ -51,6 +51,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -188,7 +189,7 @@ public class StoreIntegralCouponServiceImpl extends BaseServiceImpl<StoreIntegra
         Assert.isTrue(estimatedTime >= time, "积分券已失效");
 
         if (!coupon.getIntegral().equals(0)) {
-            if ((user.getIntegral().add(coupon.getIntegral())).compareTo(new BigDecimal(99999999)) > 0) {
+            if (Objects.nonNull(user.getIntegral()) && (user.getIntegral().add(coupon.getIntegral())).compareTo(new BigDecimal(99999999)) > 0) {
                 throw new CrmebException("积分添加后不能大于99999999");
             }
         }

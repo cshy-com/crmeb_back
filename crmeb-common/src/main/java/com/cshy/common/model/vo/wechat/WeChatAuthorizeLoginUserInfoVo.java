@@ -1,4 +1,4 @@
-package com.cshy.common.model.vo;
+package com.cshy.common.model.vo.wechat;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;

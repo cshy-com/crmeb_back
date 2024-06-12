@@ -3,6 +3,7 @@ package com.cshy.common.model.entity.express;
 import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import io.swagger.annotations.ApiModel;
@@ -47,5 +48,12 @@ public class ShippingTemplates implements Serializable {
     @ApiModelProperty(value = "修改时间")
     private Date updateTime;
 
+    @ApiModelProperty(value = "减邮费")
+    private BigDecimal deductionPostage;
 
+    @ApiModelProperty(value = "满减金额")
+    private BigDecimal fullReductionAmount;
+
+    @ApiModelProperty(value = "是否包邮")
+    private Boolean isFreePostage;
 }

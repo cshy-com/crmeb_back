@@ -1,4 +1,4 @@
-package com.cshy.common.model.vo;
+package com.cshy.common.model.vo.wechat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;

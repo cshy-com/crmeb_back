@@ -67,6 +67,12 @@ public class StoreOrderDetailInfoResponse implements Serializable {
     @ApiModelProperty(value = "抵扣金额")
     private BigDecimal deductionPrice;
 
+    @ApiModelProperty(value = "减免邮费")
+    private BigDecimal deductionPostage;
+
+    @ApiModelProperty(value = "返还积分")
+    private BigDecimal backIntegral;
+
     @ApiModelProperty(value = "优惠券id")
     private Integer couponId;
 

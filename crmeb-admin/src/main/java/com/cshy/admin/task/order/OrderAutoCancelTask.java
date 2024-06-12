@@ -24,16 +24,16 @@ public class OrderAutoCancelTask {
     @Autowired
     private OrderTaskService orderTaskService;
 
-    @Scheduled(fixedDelay = 1000 * 60L) //1分钟同步一次数据
+    @Scheduled(fixedDelay = 1000 * 60L * 5) //1分钟同步一次数据
     public void init() {
-        logger.info("---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - {}", DateUtil.nowDateTime());
-        try {
-            orderTaskService.autoCancel();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("OrderAutoCancelTask.task" + " | msg : " + e.getMessage());
-        }
+//        logger.info("---OrderAutoCancelTask task------produce Data with fixed rate task: Execution Time - {}", DateUtil.nowDateTime());
+//        try {
+//            orderTaskService.autoCancel();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            logger.error("OrderAutoCancelTask.task" + " | msg : " + e.getMessage());
+//        }
 
     }
 }

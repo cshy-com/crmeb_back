@@ -30,8 +30,8 @@ public class SmsSyncTask {
     public void sync(){
         logger.info("正在同步短信模板/签名， 当前时间：{}", DateUtil.nowDateTime());
         try {
-            smsTemplateService.sync();
-            smsSignService.sync();
+//            smsTemplateService.sync();
+//            smsSignService.sync();
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("同步短信模板/签名失败， 错误信息：{}", e.getMessage());

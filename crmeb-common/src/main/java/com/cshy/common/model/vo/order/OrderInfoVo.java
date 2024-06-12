@@ -37,6 +37,9 @@ public class OrderInfoVo {
     @ApiModelProperty(value = "实际支付金额")
     private BigDecimal payFee;
 
+    @ApiModelProperty(value = "减邮费")
+    private BigDecimal deductionPostage;
+
     @ApiModelProperty(value = "地址id")
     private Integer addressId;
 

@@ -43,6 +43,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.cshy.service.dao.store.StoreProductDao;
 import com.cshy.service.delete.ProductUtils;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -452,9 +453,9 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         if (tempProduct.getIsRecycle() || tempProduct.getIsDel()) {
             throw new CrmebException("商品已删除");
         }
-        if (tempProduct.getIsShow()) {
-            throw new CrmebException("请先下架商品，再进行修改");
-        }
+//        if (tempProduct.getIsShow()) {
+//            throw new CrmebException("请先下架商品，再进行修改");
+//        }
         // 如果商品是活动商品主商品不允许修改
 //        if (storeSeckillService.isExistByProductId(storeProductRequest.getId())) {
 //            throw new CrmebException("商品作为秒杀商品的主商品，需要修改请先删除对应秒杀商品");
@@ -566,6 +567,35 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
                 storeProductCouponService.deleteByProductId(storeProduct.getId());
             }
 
+            return Boolean.TRUE;
+        });
+
+        return execute;
+    }
+
+    @Override
+    public Boolean updateAttrValue(StoreProductAttrValueUpdateRequest storeProductAttrValueUpdateRequest) {
+        //查询商品
+        StoreProduct storeProduct = getById(storeProductAttrValueUpdateRequest.getId());
+        storeProduct.setStock(storeProduct.getStock() + storeProductAttrValueUpdateRequest.getAttrValueUpdateRequestList().stream().filter(attrValueUpdateRequest -> Objects.nonNull(attrValueUpdateRequest.getNum())).mapToInt(AttrValueUpdateRequest::getNum).sum());
+        AttrValueUpdateRequest minAttrValue = storeProductAttrValueUpdateRequest.getAttrValueUpdateRequestList().stream().min(Comparator.comparing(AttrValueUpdateRequest::getPrice)).get();
+        storeProduct.setPrice(minAttrValue.getPrice());
+        storeProduct.setOtPrice(minAttrValue.getOtPrice());
+        storeProduct.setCost(minAttrValue.getCost());
+
+        List<StoreProductAttrValue> updateList = Lists.newArrayList();
+        storeProductAttrValueUpdateRequest.getAttrValueUpdateRequestList().forEach(attrValueUpdateRequest -> {
+            //查询规格属性
+            StoreProductAttrValue attrValueServiceById = storeProductAttrValueService.getById(attrValueUpdateRequest.getId());
+            BeanUtils.copyProperties(attrValueUpdateRequest, attrValueServiceById);
+            //设置库存
+            attrValueServiceById.setStock(attrValueServiceById.getStock() + attrValueUpdateRequest.getNum());
+            updateList.add(attrValueServiceById);
+        });
+        Boolean execute = transactionTemplate.execute(e -> {
+            storeProductAttrValueService.updateBatchById(updateList);
+
+            this.updateById(storeProduct);
             return Boolean.TRUE;
         });
 
@@ -1319,6 +1349,15 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         }
         lambdaUpdateWrapper.in(StoreProduct::getId, idList);
         update(lambdaUpdateWrapper);
+    }
+
+    @Override
+    public boolean updateShippingTemplates(List<Integer> prodcutIdList, Integer tempId) {
+        List<StoreProduct> list = list(new LambdaQueryWrapper<StoreProduct>().in(StoreProduct::getId, prodcutIdList));
+        boolean b = list.stream().anyMatch(storeProduct -> storeProduct.getIsDeliver().equals(false));
+        if (b)
+            throw new CrmebException("不能选择仅自提的商品");
+        return update(new LambdaUpdateWrapper<StoreProduct>().set(StoreProduct::getTempId, tempId).in(StoreProduct::getId, prodcutIdList).eq(StoreProduct::getIsDeliver, true));
     }
 
 }

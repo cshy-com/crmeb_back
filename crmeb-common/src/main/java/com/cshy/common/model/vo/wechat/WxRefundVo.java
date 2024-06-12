@@ -1,5 +1,5 @@
 
-package com.cshy.common.model.vo;
+package com.cshy.common.model.vo.wechat;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

@@ -38,7 +38,7 @@ public class SmsTemplateController {
     @ApiOperation(value = "同步短信模板")
     @RequestMapping(value = "/sync", method = RequestMethod.GET)
     public CommonResult<String> sync() throws Exception {
-        smsTemplateService.sync();
+//        smsTemplateService.sync();
         return CommonResult.success();
     }
 

@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.cshy.common.model.vo.order.CreateOrderRequestVo;
-import com.cshy.common.model.vo.WxRefundVo;
+import com.cshy.common.model.vo.wechat.WxRefundVo;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.constants.PayConstants;
 import com.cshy.common.exception.CrmebException;

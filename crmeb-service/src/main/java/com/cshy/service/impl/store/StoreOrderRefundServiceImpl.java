@@ -6,7 +6,7 @@ import com.cshy.common.constants.RedisKey;
 import com.cshy.common.model.request.store.StoreOrderRefundRequest;
 import com.cshy.common.utils.RestTemplateUtil;
 import com.cshy.common.utils.WxPayUtil;
-import com.cshy.common.model.vo.WxRefundVo;
+import com.cshy.common.model.vo.wechat.WxRefundVo;
 import com.cshy.common.model.entity.order.StoreOrder;
 import com.cshy.service.dao.store.StoreOrderDao;
 import com.cshy.service.service.store.StoreOrderRefundService;

@@ -4,6 +4,10 @@ import cn.hutool.core.collection.CollUtil;
 import com.cshy.common.config.CrmebConfig;
 import com.cshy.common.constants.DateConstants;
 import com.cshy.common.constants.UploadConstants;
+import com.cshy.common.model.entity.order.StoreOrder;
+import com.cshy.common.model.entity.system.SystemAdmin;
+import com.cshy.common.model.entity.system.SystemStore;
+import com.cshy.common.model.entity.user.User;
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.constants.Constants;
 import com.cshy.common.exception.CrmebException;
@@ -20,7 +24,11 @@ import com.cshy.service.service.store.StoreBargainService;
 import com.cshy.service.service.store.StoreCombinationService;
 import com.cshy.service.service.store.StoreOrderService;
 import com.cshy.service.service.store.StoreProductService;
+import com.cshy.service.service.system.SystemAdminService;
 import com.cshy.service.service.system.SystemConfigService;
+import com.cshy.service.service.system.SystemStoreService;
+import com.cshy.service.service.system.SystemStoreStaffService;
+import com.cshy.service.service.user.UserService;
 import com.github.pagehelper.PageInfo;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.utils.DateUtil;
@@ -31,20 +39,22 @@ import com.cshy.common.model.vo.BargainProductExcelVo;
 import com.cshy.common.model.vo.CombinationProductExcelVo;
 import com.cshy.common.model.vo.order.OrderExcelVo;
 import com.cshy.common.model.vo.ProductExcelVo;
+import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
-*  ExcelServiceImpl 接口实现
-
-*/
+ * ExcelServiceImpl 接口实现
+ */
 @Service
 public class ExcelServiceImpl implements ExcelService {
 
@@ -67,10 +77,20 @@ public class ExcelServiceImpl implements ExcelService {
     private StoreOrderService storeOrderService;
 
     @Autowired
+    private SystemAdminService systemAdminService;
+
+    @Autowired
+    private SystemStoreService systemStoreService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
     private CrmebConfig crmebConfig;
 
     /**
      * 导出砍价商品
+     *
      * @param request 请求参数
      * @return 导出地址
      */
@@ -113,11 +133,12 @@ public class ExcelServiceImpl implements ExcelService {
         aliasMap.put("giveIntegral", "返多少积分");
         aliasMap.put("addTime", "添加时间");
 
-        return ExportUtil.exportExecl(fileName, "砍价商品导出", voList, aliasMap);
+        return ExportUtil.exportExcel(fileName, "砍价商品导出", voList, aliasMap);
     }
 
     /**
      * 导出拼团商品
+     *
      * @param request 请求参数
      * @return 导出地址
      */
@@ -157,11 +178,12 @@ public class ExcelServiceImpl implements ExcelService {
         aliasMap.put("isShow", "商品状态");
         aliasMap.put("stopTime", "拼团结束时间");
 
-        return ExportUtil.exportExecl(fileName, "拼团商品导出", voList, aliasMap);
+        return ExportUtil.exportExcel(fileName, "拼团商品导出", voList, aliasMap);
     }
 
     /**
      * 商品导出
+     *
      * @param request 请求参数
      * @return 导出地址
      */
@@ -172,7 +194,7 @@ public class ExcelServiceImpl implements ExcelService {
         pageParamRequest.setLimit(Constants.EXPORT_MAX_LIMIT);
         PageInfo<StoreProductResponse> storeProductResponsePageInfo = storeProductService.getAdminList(request, pageParamRequest);
         List<StoreProductResponse> list = storeProductResponsePageInfo.getList();
-        if(list.size() < 1){
+        if (list.size() < 1) {
             throw new CrmebException("没有可导出的数据！");
         }
 
@@ -180,13 +202,13 @@ public class ExcelServiceImpl implements ExcelService {
         List<String> cateIdListStr = list.stream().map(StoreProductResponse::getCateId).distinct().collect(Collectors.toList());
 
         HashMap<Integer, String> categoryNameList = new HashMap<Integer, String>();
-        if(cateIdListStr.size() > 0){
+        if (cateIdListStr.size() > 0) {
             String join = StringUtils.join(cateIdListStr, ",");
             List<Integer> cateIdList = CrmebUtil.stringToArray(join);
             categoryNameList = categoryService.getListInId(cateIdList);
         }
         List<ProductExcelVo> voList = CollUtil.newArrayList();
-        for (StoreProductResponse product : list ) {
+        for (StoreProductResponse product : list) {
             ProductExcelVo vo = new ProductExcelVo();
             vo.setStoreName(product.getStoreName());
             vo.setStoreInfo(product.getStoreInfo());
@@ -219,13 +241,13 @@ public class ExcelServiceImpl implements ExcelService {
         aliasMap.put("sales", "销量");
         aliasMap.put("browse", "浏览量");
 
-        return ExportUtil.exportExecl(fileName, "商品导出", voList, aliasMap);
+        return ExportUtil.exportExcel(fileName, "商品导出", voList, aliasMap);
     }
 
     /**
      * 订单导出
      *
-     * @param request  查询条件
+     * @param request 查询条件
      * @return 文件名称
      */
     @Override
@@ -235,21 +257,54 @@ public class ExcelServiceImpl implements ExcelService {
         pageParamRequest.setLimit(Constants.EXPORT_MAX_LIMIT);
         CommonPage<StoreOrderDetailResponse> adminList = storeOrderService.getAdminList(request, pageParamRequest);
         List<StoreOrderDetailResponse> list = adminList.getList();
-        if(list.size() < 1){
+        if (list.size() < 1) {
             throw new CrmebException("没有可导出的数据！");
         }
+        //管理员查询
+        List<Integer> clerkIdList = list.stream().map(StoreOrderDetailResponse::getClerkId).distinct().collect(Collectors.toList());
+        HashMap<Integer, SystemAdmin> systemStoreStaffList = systemAdminService.getMapInId(clerkIdList);
+
+        //用户查询
+        List<User> userList = userService.list();
+
+        //自提点查询
+        List<SystemStore> systemStoreList = systemStoreService.list();
 
         List<OrderExcelVo> voList = CollUtil.newArrayList();
-        for (StoreOrderDetailResponse order: list ) {
+        for (StoreOrderDetailResponse order : list) {
             OrderExcelVo vo = new OrderExcelVo();
+            BeanUtils.copyProperties(order, vo);
             vo.setCreateTime(DateUtil.dateToStr(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
-            vo.setOrderId(order.getOrderId());
-            vo.setOrderType(order.getOrderType());
-            vo.setPayPrice(order.getPayPrice().toString());
+            vo.setPayTime(DateUtil.dateToStr(order.getPayTime(), "yyyy-MM-dd HH:mm:ss"));
+            vo.setRefundReasonTime(DateUtil.dateToStr(order.getRefundReasonTime(), "yyyy-MM-dd HH:mm:ss"));
+            vo.setPaid(order.getPaid() ? "已支付" : "未支付");
             vo.setPayTypeStr(order.getPayTypeStr());
-            vo.setProductName(order.getProductList().stream().map(item-> item.getInfo().getProductName()).collect(Collectors.joining(",")));
+            vo.setProductName(order.getProductList().stream().map(item -> item.getInfo().getProductName()).collect(Collectors.joining(",")));
             vo.setRealName(order.getRealName());
             vo.setStatusStr(order.getStatusStr().get("value"));
+            vo.setRefundStatus(order.getRefundStatus().equals(0) ? "" : order.getRefundStatus().equals(1) ? "退款中" : "已退款");
+            //商家自配处理
+            if ("zp666".equals(order.getTrackingNo())){
+                vo.setShippingType("商家送货");
+                vo.setTrackingNo("");
+            }else {
+                vo.setShippingType(order.getShippingType().equals(1) ? "商家配送" : "门店自提");
+            }
+            //核销人
+            String clerkName = "";
+            if (systemStoreStaffList.containsKey(order.getClerkId())) {
+                clerkName = systemStoreStaffList.get(order.getClerkId()).getRealName();
+            }
+            vo.setClerkName(clerkName);
+
+            //用户真实姓名
+            Optional<User> userOptional = userList.stream().filter(user -> user.getUid().equals(order.getUid())).findFirst();
+            userOptional.ifPresent(user -> vo.setUserName(user.getRealName()));
+
+            //自提点
+            Optional<SystemStore> systemStoreOptional = systemStoreList.stream().filter(systemStore -> systemStore.getId() == order.getStoreId()).findFirst();
+            systemStoreOptional.ifPresent(systemStore -> vo.setPickUpAddress(systemStore.getName()));
+
             voList.add(vo);
         }
 
@@ -267,30 +322,41 @@ public class ExcelServiceImpl implements ExcelService {
         //自定义标题别名
         LinkedHashMap<String, String> aliasMap = new LinkedHashMap<>();
         aliasMap.put("orderId", "订单号");
+        aliasMap.put("createTime", "下单时间");
+        aliasMap.put("paid", "支付状态");
+        aliasMap.put("payTime", "支付时间");
+        aliasMap.put("totalPrice", "订单总金额");
+        aliasMap.put("proTotalPrice", "商品总价");
+        aliasMap.put("deductionPrice", "抵扣金额");
         aliasMap.put("payPrice", "实际支付金额");
-//        aliasMap.put("payType", "支付方式");
-        aliasMap.put("createTime", "创建时间");
-//        aliasMap.put("status", "订单状态");
+        aliasMap.put("totalPostage", "运费");
+        aliasMap.put("payPostage", "实际支付运费");
+        aliasMap.put("deductionPostage", "抵扣运费");
+        aliasMap.put("outTradeNo", "商户订单号");
         aliasMap.put("productName", "商品信息");
         aliasMap.put("statusStr", "订单状态");
         aliasMap.put("payTypeStr", "支付方式");
-//        aliasMap.put("isDel", "是否删除");
-//        aliasMap.put("refundReasonWapImg", "退款图片");
-//        aliasMap.put("refundReasonWapExplain", "退款用户说明");
-//        aliasMap.put("refundReasonTime", "退款时间");
-//        aliasMap.put("refundReasonWap", "前台退款原因");
-//        aliasMap.put("refundReason", "不退款的理由");
-//        aliasMap.put("refundPrice", "退款金额");
-//        aliasMap.put("refundStatus", "退款状态状态，0 未退款 1 申请中 2 已退款");
-//        aliasMap.put("verifyCode", "核销码");
+        aliasMap.put("mark", "买家备注");
+        aliasMap.put("verifyCode", "核销码");
+        aliasMap.put("realName", "收货人姓名");
+        aliasMap.put("userMobile", "收货人电话");
         aliasMap.put("orderType", "订单类型");
-//        aliasMap.put("remark", "订单管理员备注");
-        aliasMap.put("realName", "用户姓名");
-//        aliasMap.put("paid", "支付状态");
-//        aliasMap.put("type", "订单类型:0-普通订单，1-视频号订单");
-//        aliasMap.put("isAlterPrice", "是否改价,0-否，1-是");
+        aliasMap.put("remark", "平台备注");
+        aliasMap.put("shippingType", "配送方式");
+        aliasMap.put("trackingNo", "快递单号");
+        aliasMap.put("clerkName", "核销人");
+        aliasMap.put("address", "地址");
+        aliasMap.put("pickUpAddress", "自提点");
+        aliasMap.put("userName", "用户真实姓名");
+        aliasMap.put("refundStatus", "退款状态");
+        aliasMap.put("refundReasonWapExplain", "用户退款说明");
+        aliasMap.put("refundReasonTime", "申请退款时间");
+        aliasMap.put("refundReasonWap", "管理员退款原因");
+        aliasMap.put("refundReason", "拒绝退款理由");
+        aliasMap.put("refundPrice", "退款金额");
+        aliasMap.put("backIntegral", "退还积分");
 
-        return ExportUtil.exportExecl(fileName, "订单导出", voList, aliasMap);
+        return ExportUtil.exportExcel(fileName, "订单导出", voList, aliasMap);
 
     }
 }

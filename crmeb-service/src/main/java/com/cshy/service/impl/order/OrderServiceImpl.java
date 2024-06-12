@@ -13,10 +13,7 @@ import com.cshy.common.model.entity.giftCard.GiftCard;
 import com.cshy.common.model.entity.giftCard.GiftCardOrder;
 import com.cshy.common.model.entity.order.ShortUrl;
 import com.cshy.common.model.request.*;
-import com.cshy.common.model.request.order.OrderComputedPriceRequest;
-import com.cshy.common.model.request.order.OrderRefundApplyRequest;
-import com.cshy.common.model.request.order.PreOrderDetailRequest;
-import com.cshy.common.model.request.order.PreOrderRequest;
+import com.cshy.common.model.request.order.*;
 import com.cshy.common.model.request.store.SingleOrderRequest;
 import com.cshy.common.model.request.store.StoreOrderShipRequest;
 import com.cshy.common.model.request.store.StoreProductReplyAddRequest;
@@ -50,6 +47,9 @@ import com.cshy.common.model.vo.order.OrderInfoDetailVo;
 import com.cshy.common.model.vo.order.OrderInfoVo;
 import com.cshy.common.model.vo.order.StoreOrderInfoOldVo;
 import com.cshy.common.model.vo.order.StoreOrderInfoVo;
+import com.cshy.common.model.vo.wechat.WechatShippingListDto;
+import com.cshy.common.model.vo.wechat.WechatShippingOrderKeyDto;
+import com.cshy.common.model.vo.wechat.WechatUploadShippingInfoDto;
 import com.cshy.common.utils.*;
 import com.cshy.service.delete.OrderUtils;
 import com.cshy.service.service.*;
@@ -66,6 +66,7 @@ import com.cshy.service.service.store.*;
 import com.cshy.service.service.system.*;
 import com.cshy.service.service.user.UserAddressService;
 import com.cshy.service.service.user.UserService;
+import com.cshy.service.service.wechat.WechatCommonService;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -84,6 +85,7 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -139,6 +141,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private ShortUrlService shortUrlService;
+
+    @Autowired
+    private WechatCommonService wechatCommonService;
 
     private StoreCombinationService storeCombinationService;
 
@@ -327,6 +332,52 @@ public class OrderServiceImpl implements OrderService {
             throw new CrmebException("订单退款中");
         }
 
+        BigDecimal refundIntegral = new BigDecimal(0);
+        //查询所有订单详情
+        List<StoreOrderInfo> storeOrderInfoList = storeOrderInfoService.list(new LambdaQueryWrapper<StoreOrderInfo>().eq(StoreOrderInfo::getOrderId, existStoreOrder.getId()));
+        //判断是否是全部退款
+        boolean isAllRefund = false;
+        Optional<StoreOrderInfo> orderInfoOptional = storeOrderInfoList.stream().filter(storeOrderInfo -> {
+            return request.getRefundOrderInfoRequestList().stream().anyMatch(refundOrderInfoRequest ->
+                    refundOrderInfoRequest.getOrderInfoId().equals(storeOrderInfo.getId()) && !refundOrderInfoRequest.getRefundNum().equals(storeOrderInfo.getPayNum()));
+        }).findFirst();
+        if (!orderInfoOptional.isPresent())
+            isAllRefund = true;
+        if (isAllRefund) {
+            //全额退款
+            refundIntegral = existStoreOrder.getUseIntegral();
+            for (int i = 0; i < request.getRefundOrderInfoRequestList().size(); i++) {
+                RefundOrderInfoRequest refundOrderInfoRequest = request.getRefundOrderInfoRequestList().get(i);
+                Optional<StoreOrderInfo> first = storeOrderInfoList.stream().filter(storeOrderInfo -> storeOrderInfo.getId().equals(refundOrderInfoRequest.getOrderInfoId())).findFirst();
+                if (first.isPresent()) {
+                    StoreOrderInfo storeOrderInfo = first.get();
+                    storeOrderInfo.setRefundNum(refundOrderInfoRequest.getRefundNum());
+                }
+            }
+        } else {
+            //部分退款
+            for (int i = 0; i < request.getRefundOrderInfoRequestList().size(); i++) {
+                RefundOrderInfoRequest refundOrderInfoRequest = request.getRefundOrderInfoRequestList().get(i);
+                Optional<StoreOrderInfo> first = storeOrderInfoList.stream().filter(storeOrderInfo -> storeOrderInfo.getId().equals(refundOrderInfoRequest.getOrderInfoId())).findFirst();
+                if (first.isPresent()) {
+                    StoreOrderInfo storeOrderInfo = first.get();
+                    if (refundOrderInfoRequest.getRefundNum() > storeOrderInfo.getPayNum()) {
+                        throw new CrmebException(storeOrderInfo.getProductName() + "的退款商品数量不能大于购买数量");
+                    }
+
+                    //该种商品单个总价占比
+                    BigDecimal rate = storeOrderInfo.getPrice().divide(existStoreOrder.getProTotalPrice(), 10, RoundingMode.HALF_UP);
+
+                    //积分
+                    refundIntegral = refundIntegral.add(existStoreOrder.getUseIntegral().subtract(existStoreOrder.getPayPostage()).multiply(rate).multiply(BigDecimal.valueOf(refundOrderInfoRequest.getRefundNum())).setScale(2, RoundingMode.HALF_UP));
+                    storeOrderInfo.setRefundNum(refundOrderInfoRequest.getRefundNum());
+                }
+            }
+        }
+
+        if (request.getRefundPrice().compareTo(existStoreOrder.getPayPrice()) > 0)
+            throw new CrmebException("退款金额不能大于实际支付金额");
+
         existStoreOrder.setRefundStatus(1);
         existStoreOrder.setRefundReceivingStatus(request.getRefundReceivingStatus());
         existStoreOrder.setRefundType(request.getRefundType());
@@ -334,10 +385,12 @@ public class OrderServiceImpl implements OrderService {
         existStoreOrder.setRefundReasonWap(request.getText());
         existStoreOrder.setRefundReasonWapExplain(request.getExplain());
         existStoreOrder.setRefundReasonWapImg(systemAttachmentService.clearPrefix(request.getReasonImage()));
-        existStoreOrder.setRefundPrice(request.getRefundPrice());
+        existStoreOrder.setRefundPrice(Objects.nonNull(existStoreOrder.getRefundPrice()) ? existStoreOrder.getRefundPrice().add(request.getRefundPrice()) : request.getRefundPrice());
+        existStoreOrder.setBackIntegral(Objects.nonNull(existStoreOrder.getBackIntegral()) ? existStoreOrder.getBackIntegral().add(refundIntegral) : refundIntegral);
         existStoreOrder.setRefundMobile(request.getMobile());
 
         Boolean execute = transactionTemplate.execute(e -> {
+            storeOrderInfoService.updateBatchById(storeOrderInfoList);
             storeOrderService.updateById(existStoreOrder);
             storeOrderStatusService.createLog(existStoreOrder.getId(), StoreOrderStatusConstants.ORDER_LOG_REFUND_APPLY, request.getText(), 0);
             return Boolean.TRUE;
@@ -442,6 +495,7 @@ public class OrderServiceImpl implements OrderService {
                 orderInfoResponse.setProductId(orderInfo.getProductId());
                 orderInfoResponse.setSku(orderInfo.getSku());
                 orderInfoResponse.setAttrId(Integer.valueOf(orderInfo.getUnique()));
+                orderInfoResponse.setRefundNum(orderInfo.getRefundNum());
                 //查询原价
                 StoreProductAttrValue attrValueServiceById = attrValueService.getById(orderInfo.getAttrValueId());
                 orderInfoResponse.setOtPrice(attrValueServiceById.getOtPrice());
@@ -562,6 +616,7 @@ public class OrderServiceImpl implements OrderService {
         infoList.forEach(e -> {
             OrderInfoResponse orderInfoResponse = new OrderInfoResponse();
             orderInfoResponse.setStoreName(e.getProductName());
+            orderInfoResponse.setId(e.getId());
             orderInfoResponse.setImage(e.getImage());
             orderInfoResponse.setCartNum(e.getPayNum());
             orderInfoResponse.setShipNum(e.getShipNum());
@@ -570,6 +625,7 @@ public class OrderServiceImpl implements OrderService {
             orderInfoResponse.setIsReply(e.getIsReply() ? 1 : 0);
             orderInfoResponse.setAttrId(e.getAttrValueId());
             orderInfoResponse.setSku(e.getSku());
+            orderInfoResponse.setRefundNum(e.getRefundNum());
             //查询原价
             StoreProductAttrValue productAttrValue = attrValueService.getById(e.getAttrValueId());
             orderInfoResponse.setOtPrice(productAttrValue.getOtPrice());
@@ -604,11 +660,11 @@ public class OrderServiceImpl implements OrderService {
         MyRecord record = new MyRecord();
         if (storeOrder.getShippingType() == 1) {
             if (!storeOrder.getPaid()) {
-                if (storeOrder.getStatus().equals(4)){
+                if (storeOrder.getStatus().equals(4)) {
                     record.set("type", 0);
                     record.set("title", "已取消");
                     record.set("msg", "订单已取消");
-                }else {
+                } else {
                     record.set("type", 0);
                     record.set("title", "未支付");
                     record.set("msg", "订单未支付");
@@ -728,12 +784,16 @@ public class OrderServiceImpl implements OrderService {
         }
 
         // 获取商品状态图片 ignore
-        List<SystemGroupDataOrderStatusPicResponse> orderStatusPicList = systemGroupDataService.getListByGid(SysGroupDataConstants.GROUP_DATA_ID_ORDER_STATUS_PIC, SystemGroupDataOrderStatusPicResponse.class);// 53 = group id 在groupData中查询数据
-        for (SystemGroupDataOrderStatusPicResponse picList : orderStatusPicList) {
-            if (picList.getOrderStatus() == record.getInt("type")) {
-                record.set("statusPic", picList.getUrl());
-                break;
+        try {
+            List<SystemGroupDataOrderStatusPicResponse> orderStatusPicList = systemGroupDataService.getListByGid(SysGroupDataConstants.GROUP_DATA_ID_ORDER_STATUS_PIC, SystemGroupDataOrderStatusPicResponse.class);// 53 = group id 在groupData中查询数据
+            for (SystemGroupDataOrderStatusPicResponse picList : orderStatusPicList) {
+                if (picList.getOrderStatus() == record.getInt("type")) {
+                    record.set("statusPic", picList.getUrl());
+                    break;
+                }
             }
+        } catch (NullPointerException e) {
+            throw new CrmebException("订单状态异常，请联系管理员");
         }
         return record;
     }
@@ -831,6 +891,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderInfoResponse> infoResponseList = CollUtil.newArrayList();
         infoVoList.forEach(e -> {
             OrderInfoResponse orderInfoResponse = new OrderInfoResponse();
+            BeanUtils.copyProperties(e, orderInfoResponse);
             orderInfoResponse.setStoreName(e.getInfo().getProductName());
             orderInfoResponse.setImage(e.getInfo().getMainImage());
             orderInfoResponse.setAttrValueImage(e.getInfo().getAttrValueImage());
@@ -1025,66 +1086,132 @@ public class OrderServiceImpl implements OrderService {
                 throw new CrmebException("物流单号为数字或字母格式，多个物流单号请使用,分隔");
         }
 
+        List<SingleOrderRequest> singleOrderRequestList = storeOrderShipRequest.getSingleOrderRequestList();
+        if (CollUtil.isEmpty(singleOrderRequestList))
+            throw new CrmebException("发货数量不能为空");
+
+        boolean anyMatch = singleOrderRequestList.stream().anyMatch(singleOrderRequest -> Objects.isNull(singleOrderRequest.getNum()) || singleOrderRequest.getNum() < 0);
+        if (anyMatch)
+            throw new CrmebException("发货数量不能为0");
+
         String userMobile;
         String param = "";
+
+//        String expressCompany;
+//        if (!storeOrderShipRequest.getTrackingNo().equals("zp666"))
+//            expressCompany = expressService.queryCompany(storeOrderShipRequest.getTrackingNo());
+//        else {
+//            expressCompany = "";
+//        }
 
         if (storeOrderShipRequest.getType() == 0) {
             //查询订单信息
             StoreOrder storeOrder = this.getByOrderIdException(storeOrderShipRequest.getOrderId());
-            AtomicBoolean result = new AtomicBoolean(false);
-            if (storeOrderShipRequest.getTrackingNo().equals("zp666")) {
-                //更新状态和物流单号
-                if (Objects.isNull(storeOrder))
-                    throw new CrmebException("订单不存在，请重试");
+            List<StoreOrderInfo> storeOrderInfoList = storeOrderInfoService.list(new LambdaQueryWrapper<StoreOrderInfo>().eq(StoreOrderInfo::getOrderNo, storeOrderShipRequest.getOrderId()).in(StoreOrderInfo::getProductId, singleOrderRequestList.stream().map(SingleOrderRequest::getProductId).collect(Collectors.toList())));
 
-                storeOrder.setStatus(1);
-                storeOrder.setTrackingNo(storeOrderShipRequest.getTrackingNo());
-                storeOrder.setDeliveryType(StoreOrderStatusConstants.ORDER_LOG_EXPRESS);
-            } else if (CollUtil.isNotEmpty(storeOrderShipRequest.getSingleOrderRequestList())) {
-                storeOrderShipRequest.getSingleOrderRequestList().forEach(singleOrderRequest -> {
-                    //查询订单详情
-                    StoreOrderInfo storeOrderInfo = storeOrderInfoService.getOne(new LambdaQueryWrapper<StoreOrderInfo>().eq(StoreOrderInfo::getOrderId, storeOrder.getId()).eq(StoreOrderInfo::getAttrValueId, singleOrderRequest.getAttrValueId()));
-                    if (Objects.nonNull(storeOrderInfo)) {
-                        if (Objects.isNull(storeOrderInfo.getShipNum())) {
-                            result.set(singleOrderRequest.getNum().equals(storeOrderInfo.getPayNum()));
-                            //未曾发货
-                            storeOrderInfo.setShipNum(singleOrderRequest.getNum());
-                            if (singleOrderRequest.getNum() > storeOrderInfo.getPayNum())
-                                throw new CrmebException("发货数量不能大于购买数量");
-                        } else {
-                            //部分发货过
-                            int shipNum = singleOrderRequest.getNum() + storeOrderInfo.getShipNum();
-
-                            if (shipNum > storeOrderInfo.getPayNum())
-                                throw new CrmebException("发货数量不能大于购买数量");
-
-                            result.set(storeOrderInfo.getPayNum().equals(shipNum));
-                            storeOrderInfo.setShipNum(shipNum);
-                        }
+            AtomicBoolean result = new AtomicBoolean(true);
+            singleOrderRequestList.forEach(singleOrderRequest -> {
+                //查询订单详情
+                Optional<StoreOrderInfo> storeOrderInfoOptional = storeOrderInfoList.stream().filter(storeOrderInfo -> storeOrderInfo.getAttrValueId().equals(singleOrderRequest.getAttrValueId())).findFirst();
+                if (storeOrderInfoOptional.isPresent()) {
+                    StoreOrderInfo storeOrderInfo = storeOrderInfoOptional.get();
+                    if (Objects.isNull(storeOrderInfo.getShipNum()) || storeOrderInfo.getShipNum().equals(0)) {
+                        boolean flag = singleOrderRequest.getNum().equals(storeOrderInfo.getPayNum());
+                        if (!flag)
+                            result.set(false);
+                        //未曾发货
+                        storeOrderInfo.setShipNum(singleOrderRequest.getNum());
+                        if (singleOrderRequest.getNum() > storeOrderInfo.getPayNum())
+                            throw new CrmebException("发货数量不能大于购买数量");
                     } else {
-                        throw new CrmebException("订单详情不存在");
+                        //部分发货过
+                        int shipNum = singleOrderRequest.getNum() + storeOrderInfo.getShipNum();
+
+                        if (shipNum > storeOrderInfo.getPayNum())
+                            throw new CrmebException("发货数量不能大于购买数量");
+
+                        result.set(storeOrderInfo.getPayNum().equals(shipNum));
+                        storeOrderInfo.setShipNum(shipNum);
                     }
                     storeOrderInfoService.updateById(storeOrderInfo);
-                });
-                //更新订单信息
-                storeOrder.setStatus(result.get() ? 1 : 0);
-                if (StringUtils.isNotBlank(storeOrder.getTrackingNo()))
-                    storeOrder.setTrackingNo(storeOrder.getTrackingNo() + "," + storeOrderShipRequest.getTrackingNo());
-                else
-                    storeOrder.setTrackingNo(storeOrderShipRequest.getTrackingNo());
+                } else {
+                    throw new CrmebException("订单详情不存在");
+                }
+            });
+            //更新订单信息
+            storeOrder.setStatus(result.get() ? 1 : 0);
+            storeOrder.setDeliveryType(StoreOrderStatusConstants.ORDER_LOG_EXPRESS);
 
-                storeOrder.setDeliveryType(StoreOrderStatusConstants.ORDER_LOG_EXPRESS);
+            if (StringUtils.isNotBlank(storeOrder.getTrackingNo()))
+                storeOrder.setTrackingNo(storeOrder.getTrackingNo() + "," + storeOrderShipRequest.getTrackingNo());
+            else
+                storeOrder.setTrackingNo(storeOrderShipRequest.getTrackingNo());
+
+            this.storeOrderService.updateById(storeOrder);
+
+            this.storeOrderStatusService.createLog(storeOrder.getId(), StoreOrderStatusConstants.ORDER_LOG_EXPRESS, StoreOrderStatusConstants.ORDER_STATUS_STR_SHIPPING, 1);
+
 
 //            //短连接
 //            ShortUrl shortUrl = shortUrlService.getOne(new LambdaQueryWrapper<ShortUrl>().eq(ShortUrl::getLocation, 0).like(ShortUrl::getParam, storeOrder.getOrderId()));
 //            param = shortUrl.getCode();
 
-                //电话
-                userMobile = storeOrder.getUserMobile();
-            }
-            this.storeOrderService.updateById(storeOrder);
+            //电话
+//            userMobile = storeOrder.getUserMobile();
 
-            this.storeOrderStatusService.createLog(storeOrder.getId(), StoreOrderStatusConstants.ORDER_LOG_EXPRESS, StoreOrderStatusConstants.ORDER_STATUS_STR_SHIPPING, 1);
+//            //更新微信发货信息
+//            // 微信签名key
+//            String mchId = "";
+//            if (storeOrder.getPaymentChannel() == 1) {// 小程序
+//                mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_MCH_ID);
+//
+//                WechatUploadShippingInfoDto wechatUploadShippingInfoDto = new WechatUploadShippingInfoDto();
+//                wechatUploadShippingInfoDto.setDelivery_mode(result.get() ? 1 : 2);
+//                if (!result.get()){
+//                    //判断是否全部发货
+//                    boolean is_all_delivered = storeOrderInfoList.stream().anyMatch(storeOrderInfo -> {
+//                        Integer shipNum = Optional.ofNullable(storeOrderInfo.getShipNum()).orElse(0);
+//                        Integer refundNum = Optional.ofNullable(storeOrderInfo.getRefundNum()).orElse(0);
+//                        return storeOrderInfo.getPayNum() > shipNum + refundNum;
+//                    });
+//                    wechatUploadShippingInfoDto.setIs_all_delivered(is_all_delivered);
+//                }
+//                if (storeOrderShipRequest.getTrackingNo().equals("zp666"))
+//                    wechatUploadShippingInfoDto.setLogistics_type(4);
+//                else
+//                    wechatUploadShippingInfoDto.setLogistics_type(1);
+//
+//                //订单
+//                WechatShippingOrderKeyDto order_key = new WechatShippingOrderKeyDto();
+//                order_key.setMchid(mchId);
+//                order_key.setOrder_number_type(1);
+//                order_key.setOut_trade_no(storeOrder.getOutTradeNo());
+//                wechatUploadShippingInfoDto.setOrder_key(order_key);
+//
+//                //商品
+//                List<WechatShippingListDto> list = new ArrayList<>();
+//
+//                storeOrderInfoList.forEach(storeOrderInfo -> {
+//                    WechatShippingListDto shipping = new WechatShippingListDto();
+//                    if (!storeOrderShipRequest.getTrackingNo().equals("zp666")){
+//                        //自配
+//                        shipping.setExpress_company(expressCompany);
+//                        shipping.setTracking_no(storeOrderShipRequest.getTrackingNo());
+//                    } else {
+//
+//                    }
+//                    shipping.setItem_desc(storeOrderInfo.getProductName() + "*" + storeOrderInfo.getPayNum());
+//                    //联系人
+//                    Map<String, Object> contact = new HashMap<>();
+//                    contact.put("receiver_contact", storeOrder.getUserMobile().replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2"));
+//                    shipping.setContact(contact);
+//                    shipping.setContact(contact);
+//                    list.add(shipping);
+//                });
+//                wechatUploadShippingInfoDto.setShipping_list(list);
+//
+//                wechatCommonService.uploadShippingInfo(wechatUploadShippingInfoDto);
+//            }
 
         } else {
             //更新状态和物流单号
@@ -1103,6 +1230,48 @@ public class OrderServiceImpl implements OrderService {
             userMobile = user.getPhone();
         }
 //        smsService.sendSMS(userMobile, SmsTriggerEnum.ITEMS_SHIPPED.getCode(), request, "/" + param);
+    }
+
+    @Override
+    public BigDecimal refundCompute(OrderRefundComputeRequest request) {
+        //查询订单
+        StoreOrder storeOrder = storeOrderService.getById(request.getId());
+        //查询订单详情
+        List<StoreOrderInfo> storeOrderInfoList = storeOrderInfoService.getListByOrderNo(storeOrder.getOrderId());
+        //计算比例
+        //判断是否是全部退款
+        BigDecimal refundPrice = new BigDecimal(0);
+        boolean isAllRefund = false;
+        Optional<StoreOrderInfo> orderInfoOptional = storeOrderInfoList.stream().filter(storeOrderInfo -> {
+            return request.getRefundOrderInfoRequestList().stream().anyMatch(refundOrderInfoRequest ->
+                    refundOrderInfoRequest.getOrderInfoId().equals(storeOrderInfo.getId()) && !refundOrderInfoRequest.getRefundNum().equals(storeOrderInfo.getPayNum()));
+        }).findFirst();
+        if (!orderInfoOptional.isPresent())
+            isAllRefund = true;
+        if (isAllRefund) {
+            //全额退款
+            refundPrice = storeOrder.getPayPrice();
+        } else {
+            //部分退款
+            for (int i = 0; i < request.getRefundOrderInfoRequestList().size(); i++) {
+                RefundOrderInfoRequest refundOrderInfoRequest = request.getRefundOrderInfoRequestList().get(i);
+                Optional<StoreOrderInfo> first = storeOrderInfoList.stream().filter(storeOrderInfo -> storeOrderInfo.getId().equals(refundOrderInfoRequest.getOrderInfoId())).findFirst();
+                if (first.isPresent()) {
+                    StoreOrderInfo storeOrderInfo = first.get();
+                    if (refundOrderInfoRequest.getRefundNum() > storeOrderInfo.getPayNum()) {
+                        throw new CrmebException(storeOrderInfo.getProductName() + "的退款商品数量不能大于购买数量");
+                    }
+
+                    //该种商品单个总价占比
+                    BigDecimal rate = storeOrderInfo.getPrice().divide(storeOrder.getProTotalPrice(), 10, RoundingMode.HALF_UP);
+                    //单个应退金额
+                    BigDecimal returnPrice = storeOrder.getPayPrice().multiply(rate).setScale(2, RoundingMode.HALF_UP);
+                    storeOrderInfo.setRefundNum(refundOrderInfoRequest.getRefundNum());
+                    refundPrice = refundPrice.add(returnPrice.multiply(new BigDecimal(refundOrderInfoRequest.getRefundNum())).setScale(2, RoundingMode.HALF_UP));
+                }
+            }
+        }
+        return refundPrice;
     }
 
     @Override
@@ -1294,6 +1463,8 @@ public class OrderServiceImpl implements OrderService {
             soInfo.setPayNum(detailVo.getPayNum());
             soInfo.setWeight(detailVo.getWeight());
             soInfo.setVolume(detailVo.getVolume());
+            soInfo.setShipNum(0);
+            soInfo.setRefundNum(0);
             if (ObjectUtil.isNotNull(detailVo.getGiveIntegral()) && detailVo.getGiveIntegral().compareTo(BigDecimal.ZERO) > 0) {
                 soInfo.setGiveIntegral(detailVo.getGiveIntegral());
             } else {
@@ -1398,6 +1569,7 @@ public class OrderServiceImpl implements OrderService {
         storeOrder.setType(0);
         storeOrder.setRefundPrice(new BigDecimal(0));
         storeOrder.setBeforePayPrice(infoVo.getPayFee());
+        storeOrder.setDeductionPostage(infoVo.getDeductionPostage());
         if (infoVo.getIsVideo()) {
             storeOrder.setType(1);// 视频号订单
         }
@@ -2197,12 +2369,12 @@ public class OrderServiceImpl implements OrderService {
         String postageSwitchString = systemConfigService.getValueByKey(SysConfigConstants.STORE_FEE_POSTAGE_SWITCH);
         // 全场满额包邮金额
         String storeFreePostageString = systemConfigService.getValueByKey(SysConfigConstants.STORE_FEE_POSTAGE);
-        BigDecimal storePostage = BigDecimal.ZERO;
+        AtomicReference<BigDecimal> storePostage = new AtomicReference<>(BigDecimal.ZERO);
         if ("true".equals(postageSwitchString) && ("0".equals(storeFreePostageString) || orderInfoVo.getProTotalFee().compareTo(new BigDecimal(storeFreePostageString)) >= 0)) {
-            storePostage = BigDecimal.ZERO;
+            storePostage.set(BigDecimal.ZERO);
         } else if (ObjectUtil.isNull(userAddress) || userAddress.getCityId() <= 0) {
             // 用户地址不存在，默认运费为0元
-            storePostage = BigDecimal.ZERO;
+            storePostage.set(BigDecimal.ZERO);
         } else {
             // 有用户地址的情况下
             // 运费根据商品计算
@@ -2235,9 +2407,27 @@ public class OrderServiceImpl implements OrderService {
             // 指定包邮（单品运费模板）> 指定区域配送（单品运费模板）
             int cityId = userAddress.getCityId();
 
-            for (Map.Entry<Integer, MyRecord> m : proMap.entrySet()) {
-                MyRecord value = m.getValue();
-                Integer tempId = value.getInt("tempId");
+            // 根据 MyRecord 的 tempId 进行分组
+            Map<Integer, List<Map<Integer, MyRecord>>> groupedRecords = proMap.entrySet().stream()
+                    .collect(Collectors.groupingBy(
+                            entry -> entry.getValue().get("tempId"),
+                            Collectors.mapping(
+                                    entry -> Collections.singletonMap(entry.getKey(), entry.getValue()),
+                                    Collectors.toList()
+                            )
+                    ));
+            for (Map.Entry<Integer, List<Map<Integer, MyRecord>>> entry : groupedRecords.entrySet()) {
+                Integer tempId = entry.getKey();
+                List<Map<Integer, MyRecord>> valueList = entry.getValue();
+                List<MyRecord> myRecordList = valueList.stream()
+                        .flatMap(map -> map.values().stream())
+                        .collect(Collectors.toList());
+
+                BigDecimal totalPrice = myRecordList.stream().map(r -> r.getBigDecimal("totalPrice")).reduce(BigDecimal.ZERO, BigDecimal::add);
+                int totalNum = myRecordList.stream().mapToInt(r -> r.getInt("totalNum")).sum();
+                BigDecimal volume = myRecordList.stream().map(r -> r.getBigDecimal("volume")).reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal weight = myRecordList.stream().map(r -> r.getBigDecimal("weight")).reduce(BigDecimal.ZERO, BigDecimal::add);
+
                 ShippingTemplates shippingTemplate = shippingTemplatesService.getById(tempId);
                 if (shippingTemplate.getAppoint()) {// 指定包邮
                     // 判断是否在指定包邮区域内
@@ -2245,10 +2435,9 @@ public class OrderServiceImpl implements OrderService {
                     ShippingTemplatesFree shippingTemplatesFree = shippingTemplatesFreeService.getByTempIdAndCityId(tempId, cityId);
                     if (ObjectUtil.isNotNull(shippingTemplatesFree)) { // 在包邮区域内
                         BigDecimal freeNum = shippingTemplatesFree.getNumber();
-                        BigDecimal multiply = value.getBigDecimal("totalPrice");
-                        if (new BigDecimal(value.getInt("totalNum")).compareTo(freeNum) >= 0 && multiply.compareTo(shippingTemplatesFree.getPrice()) >= 0) {
+                        if (new BigDecimal(totalNum).compareTo(freeNum) >= 0 && totalPrice.compareTo(shippingTemplatesFree.getPrice()) >= 0) {
                             // 满足件数 + 金额 = 包邮
-                            continue;
+                            return;
                         }
                     }
                 }
@@ -2262,45 +2451,65 @@ public class OrderServiceImpl implements OrderService {
                 switch (shippingTemplate.getType()) {
                     case 1: // 件数
                         // 判断件数是否超过首件
-                        Integer num = value.getInt("totalNum");
-                        if (num <= shippingTemplatesRegion.getFirst().intValue()) {
-                            storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice());
+                        if (totalNum <= shippingTemplatesRegion.getFirst().intValue()) {
+                            storePostage.set(storePostage.get().add(shippingTemplatesRegion.getFirstPrice()));
                         } else {// 超过首件的需要计算续件
-                            int renewalNum = num - shippingTemplatesRegion.getFirst().intValue();
+                            int renewalNum = totalNum - shippingTemplatesRegion.getFirst().intValue();
                             // 剩余件数/续件 = 需要计算的续件费用的次数
                             BigDecimal divide = new BigDecimal(renewalNum).divide(shippingTemplatesRegion.getRenewal(), 0, BigDecimal.ROUND_UP);
                             BigDecimal renewalPrice = shippingTemplatesRegion.getRenewalPrice().multiply(divide);
-                            storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice()).add(renewalPrice);
+                            storePostage.set(storePostage.get().add(shippingTemplatesRegion.getFirstPrice()).add(renewalPrice));
                         }
                         break;
                     case 2: // 重量
-                        BigDecimal weight = value.getBigDecimal("weight");
                         if (weight.compareTo(shippingTemplatesRegion.getFirst()) <= 0) {
-                            storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice());
+                            storePostage.set(storePostage.get().add(shippingTemplatesRegion.getFirstPrice()));
                         } else {// 超过首件的需要计算续件
                             BigDecimal renewalNum = weight.subtract(shippingTemplatesRegion.getFirst());
                             // 剩余件数/续件 = 需要计算的续件费用的次数
                             BigDecimal divide = renewalNum.divide(shippingTemplatesRegion.getRenewal(), 0, BigDecimal.ROUND_UP);
                             BigDecimal renewalPrice = shippingTemplatesRegion.getRenewalPrice().multiply(divide);
-                            storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice()).add(renewalPrice);
+                            storePostage.set(storePostage.get().add(shippingTemplatesRegion.getFirstPrice()).add(renewalPrice));
                         }
                         break;
                     case 3: // 体积
-                        BigDecimal volume = value.getBigDecimal("volume");
                         if (volume.compareTo(shippingTemplatesRegion.getFirst()) <= 0) {
-                            storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice());
+                            storePostage.set(storePostage.get().add(shippingTemplatesRegion.getFirstPrice()));
                         } else {// 超过首件的需要计算续件
                             BigDecimal renewalNum = volume.subtract(shippingTemplatesRegion.getFirst());
                             // 剩余件数/续件 = 需要计算的续件费用的次数
                             BigDecimal divide = renewalNum.divide(shippingTemplatesRegion.getRenewal(), 0, BigDecimal.ROUND_UP);
                             BigDecimal renewalPrice = shippingTemplatesRegion.getRenewalPrice().multiply(divide);
-                            storePostage = storePostage.add(shippingTemplatesRegion.getFirstPrice()).add(renewalPrice);
+                            storePostage.set(storePostage.get().add(shippingTemplatesRegion.getFirstPrice()).add(renewalPrice));
                         }
                         break;
                 }
+                //计算减免邮费
+                //满额减邮/包邮
+                if (Objects.nonNull(shippingTemplate.getFullReductionAmount())) {
+                    if (shippingTemplate.getFullReductionAmount().compareTo(orderInfoVo.getProTotalFee()) <= 0) {
+                        if (shippingTemplate.getIsFreePostage()) {
+                            //包邮开关开启 并且支付前商品总额大于满减金额 包邮
+                            orderInfoVo.setDeductionPostage(storePostage.get());
+                            storePostage.set(BigDecimal.ZERO);
+                        } else {
+                            //满减邮费
+                            if (storePostage.get().compareTo(BigDecimal.ZERO) > 0) {
+                                BigDecimal subtract = storePostage.get().subtract(shippingTemplate.getDeductionPostage());
+                                if (subtract.compareTo(BigDecimal.ZERO) <= 0) {
+                                    storePostage.set(BigDecimal.ZERO);
+                                    orderInfoVo.setDeductionPostage(storePostage.get());
+                                } else {
+                                    orderInfoVo.setDeductionPostage(shippingTemplate.getDeductionPostage());
+                                    storePostage.set(subtract);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
-        orderInfoVo.setFreightFee(storePostage);
+        orderInfoVo.setFreightFee(storePostage.get());
     }
 
     private ComputedOrderPriceResponse computedPrice(OrderComputedPriceRequest request, OrderInfoVo orderInfoVo, User user) {

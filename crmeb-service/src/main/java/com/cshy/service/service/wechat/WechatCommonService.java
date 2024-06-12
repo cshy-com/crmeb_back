@@ -5,6 +5,7 @@ import com.cshy.common.model.vo.*;
 import com.cshy.common.model.response.WeChatJsSdkConfigResponse;
 import com.cshy.common.model.vo.order.CreateOrderRequestVo;
 import com.cshy.common.model.vo.order.CreateOrderResponseVo;
+import com.cshy.common.model.vo.wechat.*;
 import com.cshy.common.token.WeChatOauthToken;
 
 import java.util.List;
@@ -181,4 +182,12 @@ public interface WechatCommonService {
      * @return
      */
     JSONObject getOpenIdByCode(String code, Integer type);
+
+    /**
+     * 发货信息录入
+     *
+     * @param wechatUploadShippingInfoDto 发货信息对象
+     * @return
+     */
+    Boolean uploadShippingInfo(WechatUploadShippingInfoDto wechatUploadShippingInfoDto);
 }

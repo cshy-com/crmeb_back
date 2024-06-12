@@ -2,6 +2,7 @@ package com.cshy.admin.controller.store;
 
 import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.*;
+import com.cshy.common.model.request.order.OrderRefundComputeRequest;
 import com.cshy.common.model.request.store.*;
 import com.cshy.common.model.response.*;
 import com.cshy.common.model.vo.ExpressSheetVo;
@@ -21,6 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -134,9 +136,15 @@ public class StoreOrderController {
      */
     @PreAuthorize("hasAuthority('admin:order:refund')")
     @ApiOperation(value = "同意退款")
-    @RequestMapping(value = "/refund", method = RequestMethod.GET)
-    public CommonResult<Boolean> refund(@Validated StoreOrderRefundRequest request) {
+    @RequestMapping(value = "/refund", method = RequestMethod.POST)
+    public CommonResult<Boolean> refund(@RequestBody @Validated StoreOrderRefundRequest request) {
         return CommonResult.success(storeOrderService.refund(request));
+    }
+
+    @ApiOperation(value = "计算应退金额")
+    @RequestMapping(value = "/refund/compute", method = RequestMethod.POST)
+    public CommonResult<BigDecimal> refundCompute(@RequestBody OrderRefundComputeRequest orderRefundComputeRequest) {
+        return CommonResult.success(orderService.refundCompute(orderRefundComputeRequest));
     }
 
     /**

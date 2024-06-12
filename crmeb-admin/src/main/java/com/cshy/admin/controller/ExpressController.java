@@ -132,11 +132,19 @@ public class ExpressController {
         return CommonResult.success(expressService.findExpressDetail(trackingNo, type, userMobile));
     }
 
-//    @PreAuthorize("hasAuthority('admin:express:all')")
+    @PreAuthorize("hasAuthority('admin:express:all')")
     @ApiOperation(value = "手动更新快递信息")
     @RequestMapping(value = "/syncExpressStatus", method = RequestMethod.GET)
     public CommonResult<String> syncExpressStatus() {
         expressService.syncExpressStatus();
+        return CommonResult.success();
+    }
+
+    @PreAuthorize("hasAuthority('admin:express:all')")
+    @ApiOperation(value = "查询快递公司")
+    @RequestMapping(value = "/queryCompany", method = RequestMethod.GET)
+    public CommonResult<String> queryCompany(@RequestParam String trackingNo) {
+        expressService.queryCompany(trackingNo);
         return CommonResult.success();
     }
 }

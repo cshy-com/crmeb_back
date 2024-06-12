@@ -6,7 +6,7 @@ crmeb:
   wechat-js-api-debug: false #微信js api系列是否开启调试模式
   wechat-js-api-beta: true #微信js api是否是beta版本
   asyncWeChatProgramTempList: true #是否同步小程序公共模板库
-  imagePath: /home/file/ # 服务器图片路径配置 斜杠结尾
+  imagePath: C:\Users\admin\Desktop # 服务器图片路径配置 斜杠结尾
 
 server:
   port: 8081

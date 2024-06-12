@@ -1,7 +1,7 @@
 package com.cshy.common.model.response;
 
 import com.cshy.common.model.vo.AliPayJsResultVo;
-import com.cshy.common.model.vo.WxPayJsResultVo;
+import com.cshy.common.model.vo.wechat.WxPayJsResultVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

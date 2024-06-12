@@ -1,5 +1,6 @@
-package com.cshy.common.model.vo;
+package com.cshy.common.model.vo.wechat;
 
+import com.cshy.common.model.vo.BaseResultResponseVo;
 import lombok.Data;
 
 /**

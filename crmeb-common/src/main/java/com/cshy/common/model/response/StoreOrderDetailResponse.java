@@ -1,5 +1,7 @@
 package com.cshy.common.model.response;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.cshy.common.model.vo.order.StoreOrderInfoOldVo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -26,11 +28,23 @@ public class StoreOrderDetailResponse implements Serializable {
 
     private static final long serialVersionUID=1L;
 
+    @ApiModelProperty(value = "订单ID")
+    private Integer id;
+
+    @ApiModelProperty(value = "用户id")
+    private Integer uid;
+
     @ApiModelProperty(value = "订单号")
     private String orderId;
 
     @ApiModelProperty(value = "实际支付金额")
     private BigDecimal payPrice;
+
+    @ApiModelProperty(value = "抵扣金额")
+    private BigDecimal deductionPrice;
+
+    @ApiModelProperty(value = "邮费")
+    private BigDecimal totalPostage;
 
     @ApiModelProperty(value = "支付方式")
     private String payType;
@@ -50,6 +64,9 @@ public class StoreOrderDetailResponse implements Serializable {
     @ApiModelProperty(value = "支付方式")
     private String payTypeStr;
 
+    @ApiModelProperty(value = "店员id")
+    private Integer clerkId;
+
     @ApiModelProperty(value = "是否删除")
     private Boolean isDel;
 
@@ -61,6 +78,9 @@ public class StoreOrderDetailResponse implements Serializable {
 
     @ApiModelProperty(value = "退款时间")
     private Date refundReasonTime;
+
+    @ApiModelProperty(value = "门店id")
+    private Integer storeId;
 
     @ApiModelProperty(value = "前台退款原因")
     private String refundReasonWap;
@@ -80,14 +100,20 @@ public class StoreOrderDetailResponse implements Serializable {
     @ApiModelProperty(value = "订单类型")
     private String orderType;
 
+    @ApiModelProperty(value = "商品总价")
+    private BigDecimal proTotalPrice;
+
     @ApiModelProperty(value = "订单管理员备注")
     private String remark;
 
     @ApiModelProperty(value = "用户姓名")
     private String realName;
 
-//    @ApiModelProperty(value = "备注")
-//    private String mark;
+    @ApiModelProperty(value = "给用户退了多少积分")
+    private BigDecimal backIntegral;
+
+    @ApiModelProperty(value = "备注")
+    private String mark;
 
 //    @ApiModelProperty(value = "订单总价")
 //    private BigDecimal totalPrice;
@@ -116,8 +142,11 @@ public class StoreOrderDetailResponse implements Serializable {
     @ApiModelProperty(value = "配送方式 1=快递 ，2=门店自提")
     private Integer shippingType;
 
-    @ApiModelProperty(value = "邮费")
-    private BigDecimal totalPostage;
+    @ApiModelProperty(value = "快递单号")
+    private String trackingNo;
+
+    @ApiModelProperty(value = "支付邮费")
+    private BigDecimal payPostage;
 
     @ApiModelProperty(value = "支付时间")
     private Date payTime;

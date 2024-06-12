@@ -11,6 +11,7 @@ import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 订单列表请求对象
@@ -38,4 +39,7 @@ public class StoreOrderSearchRequest implements Serializable {
     @NotNull(message = "订单类型不能为空")
     @Range(min = 0, max = 2, message = "未知的订单类型")
     private Integer type;
+
+    @ApiModelProperty(value = "导出用")
+    private List<Integer> idList;
 }

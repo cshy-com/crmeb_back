@@ -60,6 +60,9 @@ public class StoreOrder implements Serializable {
     @ApiModelProperty(value = "邮费")
     private BigDecimal totalPostage;
 
+    @ApiModelProperty(value = "减免邮费")
+    private BigDecimal deductionPostage;
+
     @ApiModelProperty(value = "实际支付金额")
     private BigDecimal payPrice;
 

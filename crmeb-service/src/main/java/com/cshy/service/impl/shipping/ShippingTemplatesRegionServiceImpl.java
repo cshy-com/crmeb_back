@@ -93,6 +93,7 @@ public class ShippingTemplatesRegionServiceImpl extends ServiceImpl<ShippingTemp
 
         ShippingTemplatesRegion shippingTemplatesRegion = new ShippingTemplatesRegion();
         shippingTemplatesRegion.setStatus(false);
+        shippingTemplatesRegion.setTempId(tempId);
         update(shippingTemplatesRegion, lambdaQueryWrapper);
     }
 

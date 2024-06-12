@@ -4,12 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.cshy.common.exception.CrmebException;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.page.CommonPage;
+import com.cshy.common.model.request.store.*;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.request.PageParamRequest;
-import com.cshy.common.model.request.store.StoreCopyProductRequest;
-import com.cshy.common.model.request.store.StoreProductAddRequest;
-import com.cshy.common.model.request.store.StoreProductRequest;
-import com.cshy.common.model.request.store.StoreProductSearchRequest;
 import com.cshy.common.model.response.StoreProductInfoResponse;
 import com.cshy.common.model.response.StoreProductResponse;
 import com.cshy.common.model.response.StoreProductTabsHeader;
@@ -34,6 +31,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -74,6 +72,42 @@ public class StoreProductController {
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public CommonResult<String> save(@RequestBody @Validated StoreProductAddRequest request) {
         if (storeProductService.save(request)) {
+            return CommonResult.success();
+        } else {
+            return CommonResult.failed();
+        }
+    }
+
+    /**
+     * 新增商品
+     * @param request 新增参数
+     */
+    @PreAuthorize("hasAuthority('admin:product:update')")
+    @ApiOperation(value = "修改商品规格属性值")
+    @RequestMapping(value = "/update/attr/value", method = RequestMethod.POST)
+    public CommonResult<String> updateAttrValue(@RequestBody @Validated StoreProductAttrValueUpdateRequest request) {
+        if (storeProductService.updateAttrValue(request)) {
+            return CommonResult.success();
+        } else {
+            return CommonResult.failed();
+        }
+    }
+
+    /**
+     * 新增商品
+     * @param params
+     */
+    @PreAuthorize("hasAuthority('admin:product:update')")
+    @ApiOperation(value = "批量修改运费模板")
+    @RequestMapping(value = "/update/shippingTemplates", method = RequestMethod.POST)
+    public CommonResult<String> updateShippingTemplates(@RequestBody Map<String, Object> params) {
+        Integer tempId = (Integer) params.get("tempId");
+        if (Objects.isNull(tempId))
+            throw new CrmebException("tempId不能为空");
+        List<Integer> productIdList = (List<Integer>) params.get("productIdList");
+        if (Objects.isNull(productIdList))
+            throw new CrmebException("productIdList不能为空");
+        if (storeProductService.updateShippingTemplates(productIdList, tempId)) {
             return CommonResult.success();
         } else {
             return CommonResult.failed();

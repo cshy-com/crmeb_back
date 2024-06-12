@@ -86,8 +86,8 @@ public class ExcelController {
      */
     @PreAuthorize("hasAuthority('admin:export:excel:order')")
     @ApiOperation(value = "订单导出")
-    @RequestMapping(value = "/order", method = RequestMethod.GET)
-    public CommonResult<HashMap<String, String>> exportOrder(@Validated StoreOrderSearchRequest request){
+    @RequestMapping(value = "/order", method = RequestMethod.POST)
+    public CommonResult<HashMap<String, String>> exportOrder(@RequestBody @Validated StoreOrderSearchRequest request){
         String fileName = excelService.exportOrder(request);
         HashMap<String, String> map = new HashMap<>();
         map.put("fileName", fileName);

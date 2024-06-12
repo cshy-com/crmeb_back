@@ -189,6 +189,9 @@ public class SmsServiceImpl implements SmsService {
                 sendSmsRequest.set(sr);
                 SendSmsResponse sendSmsResponse = doSend(client, sendSmsRequest.get());
                 addRecord(phoneNumber, smsTemplate, sendSmsResponse, params);
+                if (!sendSmsResponse.getBody().getCode().equals("OK")){
+                    throw new CrmebException(sendSmsResponse.getBody().getMessage());
+                }
             } else {
                 //其他模板
                 if (CollUtil.isNotEmpty(phoneList)) {
@@ -224,7 +227,10 @@ public class SmsServiceImpl implements SmsService {
                 logger.error("向手机号（{}）发送短信失败， 错误：{}", phoneNumber, e.getMessage());
                 sendSmsResponse.setBody(new SendSmsResponseBody().setMessage(e.getMessage()).setCode("500"));
             }
-            addRecord(phoneNumber, smsTemplate, sendSmsResponse, params);
+            if (e instanceof CrmebException)
+                throw new CrmebException(e.getMessage());
+            else
+                addRecord(phoneNumber, smsTemplate, sendSmsResponse, params);
         }
     }
 
@@ -276,7 +282,7 @@ public class SmsServiceImpl implements SmsService {
 
         if (Objects.nonNull(sendSmsResponse)) {
             smsRecord.setMemo(JSON.toJSONString(sendSmsResponse.getBody()));
-            smsRecord.setResultCode(sendSmsResponse.getBody().getCode());
+            smsRecord.setResultCode(sendSmsResponse.getBody().getMessage());
         } else {
             smsRecord.setResultCode("错误，短信未发送");
         }

@@ -222,8 +222,15 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
                 });
             } else { // 正常商品回滚销量库存
                 for (StoreOrderInfo orderInfoVo : orderInfoList) {
-                    storeProductService.operationStock(orderInfoVo.getProductId(), orderInfoVo.getPayNum(), "add");
-                    attrValueService.operationStock(orderInfoVo.getAttrValueId(), orderInfoVo.getPayNum(), "add", ProductType.PRODUCT_TYPE_NORMAL);
+                    if (orderInfoVo.getRefundNum() != orderInfoVo.getPayNum()) {
+                        //部分退款处理
+                        storeProductService.operationStock(orderInfoVo.getProductId(), orderInfoVo.getRefundNum(), "add");
+                        attrValueService.operationStock(orderInfoVo.getAttrValueId(), orderInfoVo.getRefundNum(), "add", ProductType.PRODUCT_TYPE_NORMAL);
+                    }
+                    else {
+                        storeProductService.operationStock(orderInfoVo.getProductId(), orderInfoVo.getPayNum(), "add");
+                        attrValueService.operationStock(orderInfoVo.getAttrValueId(), orderInfoVo.getPayNum(), "add", ProductType.PRODUCT_TYPE_NORMAL);
+                    }
                 }
             }
         }catch (Exception e){
@@ -281,7 +288,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
         List<UserIntegralRecord> integralRecordList = userIntegralRecordService.findListByOrderIdAndUid(storeOrder.getOrderId(), storeOrder.getUid());
         integralRecordList.forEach(record -> {
             if (record.getType().equals(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_SUB)) {// 订单抵扣部分
-                user.setIntegral(user.getIntegral().add(record.getIntegral()));
+                user.setIntegral(user.getIntegral().add(storeOrder.getBackIntegral()));
                 record.setId(null);
                 if (type.equals("退款"))
                     record.setTitle(IntegralRecordConstants.BROKERAGE_RECORD_TITLE_REFUND);
@@ -289,7 +296,8 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
                     record.setTitle(IntegralRecordConstants.BROKERAGE_RECORD_TITLE_CANCEL);
                 record.setType(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD);
                 record.setBalance(user.getIntegral());
-                record.setMark(StrUtil.format("订单" + type + "，返还支付扣除得{}积分", record.getIntegral()));
+                record.setIntegral(storeOrder.getBackIntegral());
+                record.setMark(StrUtil.format("订单" + type + "，返还支付扣除的{}积分", storeOrder.getBackIntegral()));
                 record.setStatus(IntegralRecordConstants.INTEGRAL_RECORD_STATUS_COMPLETE);
                 record.setUpdateTime(cn.hutool.core.date.DateUtil.date());
             } else if (record.getType().equals(IntegralRecordConstants.INTEGRAL_RECORD_TYPE_ADD)) {// 冻结积分部分

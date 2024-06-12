@@ -77,4 +77,6 @@ public interface ExpressService extends IService<Express> {
     ExpressDetailVo findExpressDetail(String trackingNo, Integer type, String mobile);
 
     void syncExpressStatus();
+
+    String queryCompany(String trackingNo);
 }

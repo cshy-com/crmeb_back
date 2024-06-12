@@ -43,11 +43,11 @@ public class StoreOrderInfoServiceImpl extends ServiceImpl<StoreOrderInfoDao, St
         }
         LambdaQueryWrapper<StoreOrderInfo> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.in(StoreOrderInfo::getOrderId, orderList);
-        List<StoreOrderInfo> systemStoreStaffList = dao.selectList(lambdaQueryWrapper);
-        if(systemStoreStaffList.size() < 1){
+        List<StoreOrderInfo> storeOrderInfoList = dao.selectList(lambdaQueryWrapper);
+        if(storeOrderInfoList.size() < 1){
             return map;
         }
-        for (StoreOrderInfo storeOrderInfo : systemStoreStaffList) {
+        for (StoreOrderInfo storeOrderInfo : storeOrderInfoList) {
             //解析商品详情JSON
             StoreOrderInfoOldVo StoreOrderInfoVo = new StoreOrderInfoOldVo();
             BeanUtils.copyProperties(storeOrderInfo, StoreOrderInfoVo, "info");
@@ -68,18 +68,18 @@ public class StoreOrderInfoServiceImpl extends ServiceImpl<StoreOrderInfoDao, St
     public List<StoreOrderInfoOldVo> getOrderListByOrderId(Integer orderId){
         LambdaQueryWrapper<StoreOrderInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(StoreOrderInfo::getOrderId, orderId);
-        List<StoreOrderInfo> systemStoreStaffList = dao.selectList(lambdaQueryWrapper);
-        if(systemStoreStaffList.size() < 1){
+        List<StoreOrderInfo> storeOrderInfoList = dao.selectList(lambdaQueryWrapper);
+        if(storeOrderInfoList.size() < 1){
             return null;
         }
 
         List<StoreOrderInfoOldVo> storeOrderInfoVoList = new ArrayList<>();
-        for (StoreOrderInfo storeOrderInfo : systemStoreStaffList) {
+        for (StoreOrderInfo storeOrderInfo : storeOrderInfoList) {
             //解析商品详情JSON
             StoreOrderInfoOldVo storeOrderInfoVo = new StoreOrderInfoOldVo();
             BeanUtils.copyProperties(storeOrderInfo, storeOrderInfoVo, "info");
             storeOrderInfoVo.setInfo(JSON.parseObject(storeOrderInfo.getInfo(), OrderInfoDetailVo.class));
-            storeOrderInfoVo.getInfo().setShipNum(storeOrderInfo.getShipNum());
+            storeOrderInfoVo.setShipNum(storeOrderInfo.getShipNum());
             storeOrderInfoVo.getInfo().setIsReply(
                     storeProductReplyService.isReply(storeOrderInfoVo.getUnique(), storeOrderInfoVo.getOrderId()) ? 1 : 0
             );

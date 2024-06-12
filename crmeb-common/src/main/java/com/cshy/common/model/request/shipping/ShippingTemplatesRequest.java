@@ -13,6 +13,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -52,5 +53,14 @@ public class ShippingTemplatesRequest implements Serializable {
     @NotNull(message = "排序数字必须填写")
     @Min(value = 0, message = "排序最小为0")
     private Integer sort;
+
+    @ApiModelProperty(value = "减邮费")
+    private BigDecimal deductionPostage;
+
+    @ApiModelProperty(value = "满减金额")
+    private BigDecimal fullReductionAmount;
+
+    @ApiModelProperty(value = "是否包邮")
+    private Boolean isFreePostage;
 
 }

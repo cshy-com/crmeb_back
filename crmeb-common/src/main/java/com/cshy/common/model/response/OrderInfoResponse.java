@@ -20,6 +20,8 @@ import java.math.BigDecimal;
 public class OrderInfoResponse implements Serializable {
 
     private static final long serialVersionUID=1L;
+    @ApiModelProperty(value = "id")
+    private Integer id;
     @ApiModelProperty(value = "attrId")
     private Integer attrId;
 
@@ -53,4 +55,7 @@ public class OrderInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "原价")
     private BigDecimal otPrice;
+
+    @ApiModelProperty(value = "已申请退款个数")
+    private Integer refundNum;
 }

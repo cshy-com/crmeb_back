@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.product.ProductRequest;
-import com.cshy.common.model.request.store.StoreProductAddRequest;
-import com.cshy.common.model.request.store.StoreProductRequest;
-import com.cshy.common.model.request.store.StoreProductSearchRequest;
-import com.cshy.common.model.request.store.StoreProductStockRequest;
+import com.cshy.common.model.request.store.*;
 import com.cshy.common.model.response.StoreProductInfoResponse;
 import com.cshy.common.model.response.StoreProductResponse;
 import com.cshy.common.model.response.StoreProductTabsHeader;
@@ -52,6 +49,13 @@ public interface StoreProductService extends IService<StoreProduct> {
      * @return 更新结果
      */
     Boolean update(StoreProductAddRequest storeProductRequest);
+
+    /**
+     * 更新商品信息
+     * @param storeProductAttrValueUpdateRequest 商品参数
+     * @return 更新结果
+     */
+    Boolean updateAttrValue(StoreProductAttrValueUpdateRequest storeProductAttrValueUpdateRequest);
 
     /**
      * 商品详情（管理端）
@@ -206,4 +210,6 @@ public interface StoreProductService extends IService<StoreProduct> {
     List<StoreProduct> getLeaderboard();
 
     void updateFeature(List<Integer> idList, String feature, boolean flag);
+
+    boolean updateShippingTemplates(List<Integer> prodcutIdList, Integer tempId);
 }

@@ -4,6 +4,7 @@ import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.order.OrderComputedPriceRequest;
 import com.cshy.common.model.request.order.OrderRefundApplyRequest;
+import com.cshy.common.model.request.order.OrderRefundComputeRequest;
 import com.cshy.common.model.request.order.PreOrderRequest;
 import com.cshy.common.model.request.store.StoreOrderShipRequest;
 import com.cshy.common.model.request.store.StoreProductReplyAddRequest;
@@ -11,6 +12,7 @@ import com.cshy.common.model.response.*;
 import com.cshy.common.model.vo.MyRecord;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -145,4 +147,6 @@ public interface OrderService {
     void refundRevoke(String orderId);
 
     void ship(StoreOrderShipRequest storeOrderShipRequest, HttpServletRequest request);
+
+    BigDecimal refundCompute(OrderRefundComputeRequest orderRefundComputeRequest);
 }

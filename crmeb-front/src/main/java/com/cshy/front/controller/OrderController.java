@@ -5,6 +5,7 @@ import com.cshy.common.model.page.CommonPage;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.order.OrderComputedPriceRequest;
 import com.cshy.common.model.request.order.OrderRefundApplyRequest;
+import com.cshy.common.model.request.order.OrderRefundComputeRequest;
 import com.cshy.common.model.request.order.PreOrderRequest;
 import com.cshy.common.model.request.store.StoreProductReplyAddRequest;
 import com.cshy.common.model.response.*;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -199,6 +201,12 @@ public class OrderController {
         } else {
             return CommonResult.failed();
         }
+    }
+
+    @ApiOperation(value = "计算应退金额")
+    @RequestMapping(value = "/refund/compute", method = RequestMethod.POST)
+    public CommonResult<BigDecimal> refundCompute(@RequestBody OrderRefundComputeRequest orderRefundComputeRequest) {
+            return CommonResult.success(orderService.refundCompute(orderRefundComputeRequest));
     }
 
     @ApiOperation(value = "退货填写物流单号")

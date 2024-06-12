@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cshy.common.constants.*;
 import com.cshy.common.enums.NotifyTypeEnum;
 import com.cshy.common.model.entity.user.*;
@@ -21,6 +22,7 @@ import com.cshy.common.model.entity.system.SystemNotification;
 import com.cshy.common.model.request.order.OrderPayRequest;
 import com.cshy.common.model.response.OrderPayResultResponse;
 import com.cshy.common.model.vo.order.*;
+import com.cshy.common.model.vo.wechat.WxPayJsResultVo;
 import com.cshy.common.utils.CrmebUtil;
 import com.cshy.common.utils.DateUtil;
 import com.cshy.common.utils.RedisUtil;
@@ -259,7 +261,10 @@ public class OrderPayServiceImpl implements OrderPayService {
             userIntegralRecordService.saveBatch(integralList);
 
             // 经验记录
-            userExperienceRecordService.save(experienceRecord);
+            //查询
+            List<UserExperienceRecord> list = userExperienceRecordService.list(new LambdaQueryWrapper<UserExperienceRecord>().eq(UserExperienceRecord::getLinkId, experienceRecord.getLinkId()).eq(UserExperienceRecord::getUid, experienceRecord.getUid()));
+            if (CollUtil.isEmpty(list))
+                userExperienceRecordService.save(experienceRecord);
 
             //经验升级
             userLevelService.upLevel(user);
@@ -744,7 +749,8 @@ public class OrderPayServiceImpl implements OrderPayService {
             responseList.add(response);
 
             // 添加支付成功redis队列
-            redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, orderNo);
+            if (!storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT))
+                redisUtil.lPush(TaskConstants.ORDER_TASK_PAY_SUCCESS_AFTER, orderNo);
         });
 
         OrderPayResultResponse orderPayResultResponse = new OrderPayResultResponse();

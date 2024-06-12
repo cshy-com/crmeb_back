@@ -87,6 +87,8 @@ public class WeChatConstants {
     public static final String PUBLIC_API_DELETE_PROGRAM_TEMPLATE = "wxaapi/newtmpl/deltemplate";
     //发送小程序模板消息
     public static final String PUBLIC_API_PROGRAM_TEMPLATE_MESSAGE_SEND = "cgi-bin/message/subscribe/send";
+    //发货信息录入
+    public static final String PUBLIC_API_UPLOAD_SHIPPING_INFO = "wxa/sec/order/upload_shipping_info";
 
     //授权登录
 

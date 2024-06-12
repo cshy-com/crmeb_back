@@ -34,6 +34,15 @@ public class StoreOrderInfoOldVo implements Serializable {
     @ApiModelProperty(value = "购买东西的详细信息")
     private OrderInfoDetailVo info;
 
+    @ApiModelProperty(value = "规格属性值")
+    private String sku;
+
+    @ApiModelProperty(value = "申请退款数量")
+    private Integer refundNum;
+
+    @ApiModelProperty(value = "已发货数量")
+    private Integer shipNum;
+
     @ApiModelProperty(value = "唯一id")
     @TableField(value = "`unique`")
     private String unique;

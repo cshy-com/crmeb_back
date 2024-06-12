@@ -58,6 +58,12 @@ public class StoreOrderInfoResponse implements Serializable {
     @ApiModelProperty(value = "支付邮费")
     private BigDecimal payPostage;
 
+    @ApiModelProperty(value = "邮费")
+    private BigDecimal totalPostage;
+
+    @ApiModelProperty(value = "减免邮费")
+    private BigDecimal deductionPostage;
+
     @ApiModelProperty(value = "优惠券金额")
     private BigDecimal couponPrice;
 
@@ -101,7 +107,7 @@ public class StoreOrderInfoResponse implements Serializable {
     private BigDecimal useIntegral;
 
     @ApiModelProperty(value = "给用户退了多少积分")
-    private Integer backIntegral;
+    private BigDecimal backIntegral;
 
     @ApiModelProperty(value = "核销码")
     private String verifyCode;

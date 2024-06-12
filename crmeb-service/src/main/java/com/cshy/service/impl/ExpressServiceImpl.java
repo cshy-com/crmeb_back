@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cshy.common.constants.ExpressConstants;
 import com.cshy.common.constants.StoreOrderStatusConstants;
 import com.cshy.common.model.vo.delivery.ExpressDetailVo;
 import com.cshy.common.model.entity.giftCard.GiftCardOrder;
@@ -75,16 +76,6 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
 
     @Autowired
     private UserAddressService userAddressService;
-
-    @Value("${express.host}")
-    private String host;
-
-    @Value("${express.path}")
-    private String path;
-
-    @Value("${express.appcode}")
-    private String appcode;
-
 
     /**
      * 分页显示快递公司表
@@ -228,16 +219,16 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
 
     @Override
     public ExpressDetailVo findExpressDetail(String trackingNo, Integer type, String mobile) {
-        String urlSend = host + path + "?no=" + trackingNo + "&type=";
+        String urlSend = ExpressConstants.HOST + ExpressConstants.QUERY_PATH + "?no=" + trackingNo + "&type=";
         //顺丰需要特殊处理
         if (trackingNo.contains("SF")) {
             mobile = mobile.substring(mobile.length() - 4);
-            urlSend = host + path + "?no=" + trackingNo + ":" + mobile + "&type=";
+            urlSend = ExpressConstants.HOST + ExpressConstants.QUERY_PATH + "?no=" + trackingNo + ":" + mobile + "&type=";
         }
         try {
             URL url = new URL(urlSend);
             HttpURLConnection httpURLCon = (HttpURLConnection) url.openConnection();
-            httpURLCon.setRequestProperty("Authorization", "APPCODE " + appcode);
+            httpURLCon.setRequestProperty("Authorization", "APPCODE " + ExpressConstants.APP_CODE);
             int httpCode = httpURLCon.getResponseCode();
             if (httpCode == 200) {
                 String json = read(httpURLCon.getInputStream());
@@ -248,7 +239,7 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
                     throw new CrmebException((String) jsonObject.get("msg"));
                 ExpressDetailVo expressDetail = JSONObject.parseObject(result.toJSONString(), ExpressDetailVo.class);
                 if (type == 0) {
-                    List<StoreOrder> storeOrderList = this.storeOrderService.list(new LambdaQueryWrapper<StoreOrder>().like(StoreOrder::getTrackingNo, trackingNo));
+                    List<StoreOrder> storeOrderList = this.storeOrderService.list(new LambdaQueryWrapper<StoreOrder>().like(StoreOrder::getTrackingNo, trackingNo).ne(StoreOrder::getTrackingNo, "zp666"));
                     if (CollUtil.isNotEmpty(storeOrderList)) {
                         storeOrderList.forEach(storeOrder -> {
                             //部分发货处理
@@ -325,6 +316,29 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
         });
     }
 
+    public String queryCompany(String trackingNo) {
+        try {
+            String path = ExpressConstants.HOST + ExpressConstants.COMPANY_PATH + "?no=" + trackingNo;
+            URL url = new URL(path);
+            HttpURLConnection httpURLCon = (HttpURLConnection) url.openConnection();
+            httpURLCon.setRequestProperty("Authorization", "APPCODE " + ExpressConstants.APP_CODE);
+            int httpCode = httpURLCon.getResponseCode();
+            if (httpCode == 200) {
+                String json = read(httpURLCon.getInputStream());
+                JSONObject jsonObject = JSON.parseObject(json);
+                if (!"0".equals(jsonObject.get("status"))){
+                    throw new CrmebException("无法识别");
+                } else {
+                    JSONArray list = jsonObject.getJSONArray("list");
+                    return list.getJSONObject(0).getString("type");
+                }
+            }
+        } catch (Exception e) {
+            throw new CrmebException(e.getMessage());
+        }
+        return "";
+    }
+
     private Integer transferOrderStatus(String status) {
         switch (status) {
             case "0":
@@ -334,7 +348,7 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
             case "3":
                 return StoreOrderStatusConstants.ORDER_STATUS_INT_BARGAIN;
         }
-        return StoreOrderStatusConstants.ORDER_STATUS_INT_PAID;
+        return StoreOrderStatusConstants.ORDER_STATUS_INT_SPIKE;
     }
 
     /**
