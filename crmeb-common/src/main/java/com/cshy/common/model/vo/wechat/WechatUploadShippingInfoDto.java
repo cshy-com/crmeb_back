@@ -8,10 +8,10 @@ import java.util.Map;
 
 @Data
 public class WechatUploadShippingInfoDto {
-    @ApiModelProperty(value = "物流模式，发货方式枚举值：1、实体物流配送采用快递公司进行实体物流配送形式 2、同城配送 3、虚拟商品，虚拟商品，例如话费充值，点卡等，无实体配送形式 4、用户自提")
+    @ApiModelProperty(value = "发货模式，发货模式枚举值：1、UNIFIED_DELIVERY（统一发货）2、SPLIT_DELIVERY（分拆发货） 示例值: UNIFIED_DELIVERY")
     public Integer delivery_mode;
 
-    @ApiModelProperty(value = "发货模式，发货模式枚举值：1、UNIFIED_DELIVERY（统一发货）2、SPLIT_DELIVERY（分拆发货） 示例值: UNIFIED_DELIVERY")
+    @ApiModelProperty(value = "物流模式，发货方式枚举值：1、实体物流配送采用快递公司进行实体物流配送形式 2、同城配送 3、虚拟商品，虚拟商品，例如话费充值，点卡等，无实体配送形式 4、用户自提")
     public Integer logistics_type;
 
     @ApiModelProperty(value = "订单")

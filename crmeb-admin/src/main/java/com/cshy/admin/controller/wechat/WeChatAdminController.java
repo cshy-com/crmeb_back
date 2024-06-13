@@ -63,13 +63,13 @@ public class WeChatAdminController {
         WechatShippingOrderKeyDto order_key = new WechatShippingOrderKeyDto();
         order_key.setMchid("1646449278");
         order_key.setOrder_number_type(1);	// 必填
-        order_key.setOut_trade_no("wxNo62359171807764614229901");
+        order_key.setOut_trade_no("wxNo59579171818468503074960");
 
         List<WechatShippingListDto> list = new ArrayList<>();
         WechatShippingListDto shipping = new WechatShippingListDto();
-        shipping.setExpress_company("ZTO");
+        shipping.setExpress_company("null");
         shipping.setItem_desc("微信气泡狗集线器*1");	// 必填
-        shipping.setTracking_no("777220507716408");
+        shipping.setTracking_no("无");
         Map<String, Object> contact = new HashMap<>();
         contact.put("receiver_contact", "15285143252".replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2"));
 
@@ -82,7 +82,7 @@ public class WeChatAdminController {
 
         vo.setOrder_key(order_key);	// 必填
         vo.setLogistics_type(1);	// 必填
-        vo.setDelivery_mode(1);		// 必填
+        vo.setDelivery_mode(2);		// 必填
         vo.setIs_all_delivered(true);	// 分拆发货模式时必填
         vo.setShipping_list(list);	// 必填
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");

@@ -1,6 +1,9 @@
 package com.cshy.service.service.wechat;
 
 import com.alibaba.fastjson.JSONObject;
+import com.cshy.common.model.entity.order.StoreOrder;
+import com.cshy.common.model.entity.order.StoreOrderInfo;
+import com.cshy.common.model.request.store.StoreOrderShipRequest;
 import com.cshy.common.model.vo.*;
 import com.cshy.common.model.response.WeChatJsSdkConfigResponse;
 import com.cshy.common.model.vo.order.CreateOrderRequestVo;
@@ -190,4 +193,15 @@ public interface WechatCommonService {
      * @return
      */
     Boolean uploadShippingInfo(WechatUploadShippingInfoDto wechatUploadShippingInfoDto);
+
+    /**
+     * 构建发货信息录入对象
+     * @param storeOrder
+     * @param isAllDelivered
+     * @param storeOrderInfoList
+     * @param storeOrderShipRequest
+     * @param expressCompany
+     * @return
+     */
+    Boolean buildUploadShippingInfo(StoreOrder storeOrder, boolean isAllDelivered, List<StoreOrderInfo> storeOrderInfoList, StoreOrderShipRequest storeOrderShipRequest, String expressCompany, String openId);
 }

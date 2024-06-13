@@ -297,7 +297,7 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
     public void syncExpressStatus() {
         //查询商城订单并更新物流状态
         List<StoreOrder> storeOrderList = this.storeOrderService.list(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getStatus, StoreOrderStatusConstants.ORDER_STATUS_INT_SPIKE));
-        logger.info("正在同步礼品卡订单数据， 共{}条", storeOrderList.size());
+        logger.info("正在同步订单数据， 共{}条", storeOrderList.size());
         storeOrderList.stream().filter(giftCardOrder -> StringUtils.isNotBlank(giftCardOrder.getTrackingNo())).forEach(storeOrder -> {
             try {
                 this.findExpressDetail(storeOrder.getTrackingNo(), 0, storeOrder.getUserMobile());

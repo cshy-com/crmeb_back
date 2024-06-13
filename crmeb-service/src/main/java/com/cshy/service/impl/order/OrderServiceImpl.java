@@ -12,6 +12,7 @@ import com.cshy.common.constants.*;
 import com.cshy.common.model.entity.giftCard.GiftCard;
 import com.cshy.common.model.entity.giftCard.GiftCardOrder;
 import com.cshy.common.model.entity.order.ShortUrl;
+import com.cshy.common.model.entity.user.UserToken;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.order.*;
 import com.cshy.common.model.request.store.SingleOrderRequest;
@@ -66,6 +67,7 @@ import com.cshy.service.service.store.*;
 import com.cshy.service.service.system.*;
 import com.cshy.service.service.user.UserAddressService;
 import com.cshy.service.service.user.UserService;
+import com.cshy.service.service.user.UserTokenService;
 import com.cshy.service.service.wechat.WechatCommonService;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -117,6 +119,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private UserAddressService userAddressService;
+
+    @Autowired
+    private UserTokenService userTokenService;
 
     @Autowired
     private SystemConfigService systemConfigService;
@@ -211,7 +216,6 @@ public class OrderServiceImpl implements OrderService {
 
     // 定义正则表达式模式
     private static final Pattern ALPHANUMERIC_PATTERN = Pattern.compile("^[a-zA-Z0-9]+$");
-    private static final Pattern ALPHANUMERIC_COMMA_PATTERN = Pattern.compile("^[a-zA-Z0-9,]+$");
 
     /**
      * 删除已完成订单
@@ -1082,8 +1086,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackFor = RuntimeException.class)
     public void ship(StoreOrderShipRequest storeOrderShipRequest, HttpServletRequest request) {
         if (StringUtils.isNotBlank(storeOrderShipRequest.getTrackingNo())) {
-            if (!ALPHANUMERIC_PATTERN.matcher(storeOrderShipRequest.getTrackingNo()).matches() && !ALPHANUMERIC_COMMA_PATTERN.matcher(storeOrderShipRequest.getTrackingNo()).matches())
-                throw new CrmebException("物流单号为数字或字母格式，多个物流单号请使用,分隔");
+            if (!ALPHANUMERIC_PATTERN.matcher(storeOrderShipRequest.getTrackingNo()).matches())
+                throw new CrmebException("物流单号为数字或字母格式");
         }
 
         List<SingleOrderRequest> singleOrderRequestList = storeOrderShipRequest.getSingleOrderRequestList();
@@ -1097,16 +1101,23 @@ public class OrderServiceImpl implements OrderService {
         String userMobile;
         String param = "";
 
-//        String expressCompany;
-//        if (!storeOrderShipRequest.getTrackingNo().equals("zp666"))
-//            expressCompany = expressService.queryCompany(storeOrderShipRequest.getTrackingNo());
-//        else {
-//            expressCompany = "";
-//        }
+        String expressCompany = null;
+        if (!storeOrderShipRequest.getTrackingNo().equals("zp666")) {
+            expressCompany = expressService.queryCompany(storeOrderShipRequest.getTrackingNo());
+            if (StringUtils.isBlank(expressCompany))
+                throw new CrmebException("未查询到对应的快递公司，请确认物流单号后重试");
+        } else {
+            expressCompany = "null";
+        }
 
         if (storeOrderShipRequest.getType() == 0) {
             //查询订单信息
             StoreOrder storeOrder = this.getByOrderIdException(storeOrderShipRequest.getOrderId());
+            //查询用户
+            UserToken userToken = null;
+            if (storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT)) {
+                userToken = userTokenService.getTokenByUserId(storeOrder.getUid(), UserConstants.USER_TOKEN_TYPE_ROUTINE);
+            }
             List<StoreOrderInfo> storeOrderInfoList = storeOrderInfoService.list(new LambdaQueryWrapper<StoreOrderInfo>().eq(StoreOrderInfo::getOrderNo, storeOrderShipRequest.getOrderId()).in(StoreOrderInfo::getProductId, singleOrderRequestList.stream().map(SingleOrderRequest::getProductId).collect(Collectors.toList())));
 
             AtomicBoolean result = new AtomicBoolean(true);
@@ -1116,10 +1127,10 @@ public class OrderServiceImpl implements OrderService {
                 if (storeOrderInfoOptional.isPresent()) {
                     StoreOrderInfo storeOrderInfo = storeOrderInfoOptional.get();
                     if (Objects.isNull(storeOrderInfo.getShipNum()) || storeOrderInfo.getShipNum().equals(0)) {
+                        //未曾发货
                         boolean flag = singleOrderRequest.getNum().equals(storeOrderInfo.getPayNum());
                         if (!flag)
                             result.set(false);
-                        //未曾发货
                         storeOrderInfo.setShipNum(singleOrderRequest.getNum());
                         if (singleOrderRequest.getNum() > storeOrderInfo.getPayNum())
                             throw new CrmebException("发货数量不能大于购买数量");
@@ -1151,6 +1162,8 @@ public class OrderServiceImpl implements OrderService {
 
             this.storeOrderStatusService.createLog(storeOrder.getId(), StoreOrderStatusConstants.ORDER_LOG_EXPRESS, StoreOrderStatusConstants.ORDER_STATUS_STR_SHIPPING, 1);
 
+            if (Objects.nonNull(userToken) && storeOrder.getPayType().equals(PayType.PAY_TYPE_WE_CHAT))
+                wechatCommonService.buildUploadShippingInfo(storeOrder, result.get(), storeOrderInfoList, storeOrderShipRequest, expressCompany, userToken.getToken());
 
 //            //短连接
 //            ShortUrl shortUrl = shortUrlService.getOne(new LambdaQueryWrapper<ShortUrl>().eq(ShortUrl::getLocation, 0).like(ShortUrl::getParam, storeOrder.getOrderId()));
@@ -1158,60 +1171,6 @@ public class OrderServiceImpl implements OrderService {
 
             //电话
 //            userMobile = storeOrder.getUserMobile();
-
-//            //更新微信发货信息
-//            // 微信签名key
-//            String mchId = "";
-//            if (storeOrder.getPaymentChannel() == 1) {// 小程序
-//                mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_MCH_ID);
-//
-//                WechatUploadShippingInfoDto wechatUploadShippingInfoDto = new WechatUploadShippingInfoDto();
-//                wechatUploadShippingInfoDto.setDelivery_mode(result.get() ? 1 : 2);
-//                if (!result.get()){
-//                    //判断是否全部发货
-//                    boolean is_all_delivered = storeOrderInfoList.stream().anyMatch(storeOrderInfo -> {
-//                        Integer shipNum = Optional.ofNullable(storeOrderInfo.getShipNum()).orElse(0);
-//                        Integer refundNum = Optional.ofNullable(storeOrderInfo.getRefundNum()).orElse(0);
-//                        return storeOrderInfo.getPayNum() > shipNum + refundNum;
-//                    });
-//                    wechatUploadShippingInfoDto.setIs_all_delivered(is_all_delivered);
-//                }
-//                if (storeOrderShipRequest.getTrackingNo().equals("zp666"))
-//                    wechatUploadShippingInfoDto.setLogistics_type(4);
-//                else
-//                    wechatUploadShippingInfoDto.setLogistics_type(1);
-//
-//                //订单
-//                WechatShippingOrderKeyDto order_key = new WechatShippingOrderKeyDto();
-//                order_key.setMchid(mchId);
-//                order_key.setOrder_number_type(1);
-//                order_key.setOut_trade_no(storeOrder.getOutTradeNo());
-//                wechatUploadShippingInfoDto.setOrder_key(order_key);
-//
-//                //商品
-//                List<WechatShippingListDto> list = new ArrayList<>();
-//
-//                storeOrderInfoList.forEach(storeOrderInfo -> {
-//                    WechatShippingListDto shipping = new WechatShippingListDto();
-//                    if (!storeOrderShipRequest.getTrackingNo().equals("zp666")){
-//                        //自配
-//                        shipping.setExpress_company(expressCompany);
-//                        shipping.setTracking_no(storeOrderShipRequest.getTrackingNo());
-//                    } else {
-//
-//                    }
-//                    shipping.setItem_desc(storeOrderInfo.getProductName() + "*" + storeOrderInfo.getPayNum());
-//                    //联系人
-//                    Map<String, Object> contact = new HashMap<>();
-//                    contact.put("receiver_contact", storeOrder.getUserMobile().replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2"));
-//                    shipping.setContact(contact);
-//                    shipping.setContact(contact);
-//                    list.add(shipping);
-//                });
-//                wechatUploadShippingInfoDto.setShipping_list(list);
-//
-//                wechatCommonService.uploadShippingInfo(wechatUploadShippingInfoDto);
-//            }
 
         } else {
             //更新状态和物流单号

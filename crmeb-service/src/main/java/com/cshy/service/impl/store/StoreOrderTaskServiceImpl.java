@@ -222,7 +222,7 @@ public class StoreOrderTaskServiceImpl implements StoreOrderTaskService {
                 });
             } else { // 正常商品回滚销量库存
                 for (StoreOrderInfo orderInfoVo : orderInfoList) {
-                    if (orderInfoVo.getRefundNum() != orderInfoVo.getPayNum()) {
+                    if (orderInfoVo.getRefundNum().compareTo(orderInfoVo.getPayNum()) != 0) {
                         //部分退款处理
                         storeProductService.operationStock(orderInfoVo.getProductId(), orderInfoVo.getRefundNum(), "add");
                         attrValueService.operationStock(orderInfoVo.getAttrValueId(), orderInfoVo.getRefundNum(), "add", ProductType.PRODUCT_TYPE_NORMAL);

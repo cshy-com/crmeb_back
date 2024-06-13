@@ -3,6 +3,7 @@ package com.cshy.admin.controller.wm;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.cshy.common.constants.PayType;
 import com.cshy.common.constants.ProductType;
 import com.cshy.common.constants.StoreOrderStatusConstants;
 import com.cshy.common.exception.CrmebException;
@@ -173,7 +174,7 @@ public class WmController {
             storeOrder.setPaid(Boolean.TRUE);
             if (Objects.nonNull(orderJson.getLong("paymentTime")))
                 storeOrder.setPayTime(new Date(orderJson.getLong("paymentTime")));
-            storeOrder.setPayType(storeOrder.getPayPrice().compareTo(BigDecimal.ZERO) != 0 ? "weixin" : "integral");
+            storeOrder.setPayType(storeOrder.getPayPrice().compareTo(BigDecimal.ZERO) != 0 ? PayType.PAY_TYPE_WE_CHAT : PayType.PAY_TYPE_INTEGRAL);
             storeOrder.setCreateTime(new Date(orderJson.getLong("createTime")));
             storeOrder.setStatus(matchStatus(orderJson.getInteger("orderStatus")));
 

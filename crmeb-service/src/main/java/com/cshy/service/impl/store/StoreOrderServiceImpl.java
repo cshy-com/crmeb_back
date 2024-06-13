@@ -611,6 +611,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         if (isAllRefund) {
             //全额退款
             refundIntegral = storeOrder.getUseIntegral();
+            storeOrderInfoList.forEach(storeOrderInfo -> storeOrderInfo.setRefundNum(storeOrderInfo.getPayNum()));
         } else {
             //部分退款
             for (int i = 0; i < request.getRefundOrderInfoRequestList().size(); i++) {

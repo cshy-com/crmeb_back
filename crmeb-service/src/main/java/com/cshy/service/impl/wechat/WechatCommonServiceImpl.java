@@ -1,5 +1,6 @@
 package com.cshy.service.impl.wechat;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -8,10 +9,15 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cshy.common.config.CrmebConfig;
 import com.cshy.common.constants.PayConstants;
+import com.cshy.common.constants.RedisKey;
 import com.cshy.common.constants.WeChatConstants;
 import com.cshy.common.exception.CrmebException;
+import com.cshy.common.model.entity.order.StoreOrder;
+import com.cshy.common.model.entity.order.StoreOrderInfo;
 import com.cshy.common.model.entity.wechat.WechatExceptions;
 import com.cshy.common.model.entity.wechat.WechatPayInfo;
+import com.cshy.common.model.request.store.SingleOrderRequest;
+import com.cshy.common.model.request.store.StoreOrderShipRequest;
 import com.cshy.common.model.vo.*;
 import com.cshy.common.model.response.WeChatJsSdkConfigResponse;
 import com.cshy.common.model.vo.order.CreateOrderRequestVo;
@@ -35,10 +41,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -828,9 +832,137 @@ public class WechatCommonServiceImpl implements WechatCommonService {
                 return true;
             else
                 throw new CrmebException(responseBody.get("errmsg").toString());
-        } catch (Exception e){
-            throw new CrmebException(e.getMessage());
+        } catch (Exception e) {
+            if (e.getMessage().contains("发货信息未更新"))
+                return true;
+            else
+                throw new CrmebException(e.getMessage());
         }
+    }
+
+
+    @Override
+    public Boolean buildUploadShippingInfo(StoreOrder storeOrder, boolean isAllDelivered, List<StoreOrderInfo> storeOrderInfoList, StoreOrderShipRequest storeOrderShipRequest, String expressCompany, String openId) {
+        //更新微信发货信息
+        // 微信签名key
+        String mchId = "";
+        if (storeOrder.getPaymentChannel() == 1) {// 小程序
+            mchId = systemConfigService.getValueByKeyException(RedisKey.CONFIG_KEY_PAY_ROUTINE_MCH_ID);
+
+            WechatUploadShippingInfoDto wechatUploadShippingInfoDto = new WechatUploadShippingInfoDto();
+            wechatUploadShippingInfoDto.setIs_all_delivered(isAllDelivered);
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+            String formatDate = simpleDateFormat.format(new Date());
+            wechatUploadShippingInfoDto.setUpload_time(formatDate);
+
+
+            int deliveryMode = 0;
+            int logisticsType = 0;
+            if (storeOrder.getShippingType() == 1) {
+                String[] trackingNoArr = storeOrder.getTrackingNo().split(",");
+                if (StringUtils.isNotBlank(storeOrder.getTrackingNo())) {
+                    if (!isAllDelivered) {
+                        //如果没有全部发货 默认为物流单
+                        logisticsType = 1;
+                        deliveryMode = 2;
+                    } else {
+                        if (trackingNoArr.length == 1) {
+                            deliveryMode = 1;
+                            //一次全部发货
+                            boolean notZp = Arrays.stream(trackingNoArr).anyMatch(s -> !s.equals("zp666"));
+                            if (!notZp)
+                                //送货 为同城配送
+                                logisticsType = 2;
+                            else
+                                //有不是自配的 为物流单
+                                logisticsType = 1;
+                        } else {
+                            //分批次发货
+                            deliveryMode = 2;
+                            logisticsType = 1;
+                        }
+                    }
+                }
+            } else {
+                //自提
+                deliveryMode = 1;
+                logisticsType = 4;
+            }
+            wechatUploadShippingInfoDto.setLogistics_type(logisticsType);
+            wechatUploadShippingInfoDto.setDelivery_mode(deliveryMode);
+
+            //订单
+            WechatShippingOrderKeyDto order_key = new WechatShippingOrderKeyDto();
+            order_key.setMchid(mchId);
+            order_key.setOrder_number_type(1);
+            order_key.setOut_trade_no(storeOrder.getOutTradeNo());
+            wechatUploadShippingInfoDto.setOrder_key(order_key);
+
+            //商品
+            List<WechatShippingListDto> list = new ArrayList<>();
+
+            WechatShippingListDto shipping = new WechatShippingListDto();
+            if (Objects.nonNull(storeOrderShipRequest)) {
+                //发货
+                if (wechatUploadShippingInfoDto.getLogistics_type().equals(1)) {
+                    //该次发货为物流发货还是自配发货
+                    if (storeOrderShipRequest.getTrackingNo().equals("zp666")) {
+                        int count = storeOrder.getTrackingNo().split("zp666", -1).length - 1;
+                        if (count >= 2) {
+                            //物流
+                            shipping.setExpress_company("null" + count);
+                            shipping.setTracking_no("商家自配" + count);
+                        } else {
+                            shipping.setExpress_company("null");
+                            shipping.setTracking_no("商家自配");
+                        }
+                    } else {
+                        shipping.setExpress_company(expressCompany);
+                        shipping.setTracking_no(storeOrderShipRequest.getTrackingNo());
+                    }
+                }
+                if (CollUtil.isNotEmpty(storeOrderInfoList)) {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    storeOrderShipRequest.getSingleOrderRequestList().forEach(singleOrderRequest -> {
+                        if (singleOrderRequest.getNum() != 0) {
+                            Optional<StoreOrderInfo> orderInfoOptional = storeOrderInfoList.stream().filter(storeOrderInfo -> storeOrderInfo.getAttrValueId().equals(singleOrderRequest.getAttrValueId())).findFirst();
+                            if (orderInfoOptional.isPresent())
+                                stringBuilder.append(orderInfoOptional.get().getProductName()).append("*").append(singleOrderRequest.getNum()).append(";");
+                            else
+                                stringBuilder.append("暂无;");
+                        }
+                    });
+                    shipping.setItem_desc(String.valueOf(stringBuilder));
+                } else {
+                    shipping.setItem_desc("暂无;");
+                }
+                //联系人
+                Map<String, Object> contact = new HashMap<>();
+                contact.put("receiver_contact", storeOrder.getUserMobile().replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2"));
+                shipping.setContact(contact);
+                list.add(shipping);
+            } else {
+                //自提
+                if (CollUtil.isNotEmpty(storeOrderInfoList)) {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    storeOrderInfoList.forEach(sOrderInfo -> {
+                        stringBuilder.append(sOrderInfo.getProductName()).append("*").append(sOrderInfo.getPayNum()).append(";");
+                    });
+                    shipping.setItem_desc(String.valueOf(stringBuilder));
+                    list.add(shipping);
+                }
+            }
+            wechatUploadShippingInfoDto.setShipping_list(list);
+
+            Map<String, Object> payer = new HashMap<>();
+            payer.put("openid", openId);
+            wechatUploadShippingInfoDto.setPayer(payer);    // 必填
+
+
+            uploadShippingInfo(wechatUploadShippingInfoDto);
+        }
+        return true;
     }
 
     /**
