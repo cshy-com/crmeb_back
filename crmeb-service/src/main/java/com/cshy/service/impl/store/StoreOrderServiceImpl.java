@@ -154,7 +154,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
                 , "refund_reason_wap_img", "refund_reason_wap_explain", "refund_reason_wap", "refund_reason", "refund_reason_time"
                 , "is_del", "combination_id", "pink_id", "seckill_id", "bargain_id", "verify_code", "remark", "paid", "is_system_del", "shipping_type", "type", "is_alter_price"
                 , "refund_type", "address", "user_mobile", "use_integral", "total_price", "total_postage", "pay_time", "refund_price", "deduction_price", "pay_postage", "pro_total_price"
-                , "tracking_no", "clerk_id", "mark", "back_integral", "store_id");
+                , "tracking_no", "clerk_id", "mark", "back_integral", "store_id", "deduction_postage", "out_trade_no");
         if (StrUtil.isNotBlank(request.getKeywords())) {
             queryWrapper.and(wrapper -> {
                 wrapper.like("order_id", request.getKeywords())
@@ -1193,6 +1193,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         response.setRefunded(getCount(dateLimit, StoreOrderStatusConstants.ORDER_STATUS_REFUNDED, type));
         // 已删除订单
         response.setDeleted(getCount(dateLimit, StoreOrderStatusConstants.ORDER_STATUS_DELETED, type));
+        response.setCancel(getCount(dateLimit, StoreOrderStatusConstants.ORDER_STATUS_CANCEL, type));
         // 退货退款
         response.setRefundNReturn(getCount(dateLimit, StoreOrderStatusConstants.ORDER_STATUS_APPLY_REFUNDING_RETURN, type));
         return response;
@@ -2065,6 +2066,9 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
                 break;
             case StoreOrderStatusConstants.ORDER_STATUS_DELETED: //已删除
                 queryWrapper.eq("is_del", 1);
+                break;
+            case StoreOrderStatusConstants.ORDER_STATUS_CANCEL: //已取消
+                queryWrapper.eq("status", 4);
                 break;
             case StoreOrderStatusConstants.ORDER_STATUS_APPLY_REFUNDING_RETURN: //申请退货退款
                 queryWrapper.in("refund_status", Lists.newArrayList(1, 4, 5));

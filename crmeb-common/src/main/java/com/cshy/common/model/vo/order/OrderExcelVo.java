@@ -40,6 +40,18 @@ public class OrderExcelVo implements Serializable {
     @ApiModelProperty(value = "商品信息")
     private String productName;
 
+    @ApiModelProperty(value = "购买数量")
+    private Integer payNum;
+
+    @ApiModelProperty(value = "减免邮费")
+    private BigDecimal deductionPostage;
+
+    @ApiModelProperty(value = "抵扣金额")
+    private BigDecimal deductionPrice;
+
+    @ApiModelProperty(value = "商户系统内部的订单号")
+    private String outTradeNo;
+
     @ApiModelProperty(value = "订单状态")
     private String statusStr;
 
@@ -48,6 +60,9 @@ public class OrderExcelVo implements Serializable {
 
     @ApiModelProperty(value = "邮费")
     private BigDecimal totalPostage;
+
+    @ApiModelProperty(value = "商品价格")
+    private BigDecimal productPrice;
 
     @ApiModelProperty(value = "支付邮费")
     private BigDecimal payPostage;

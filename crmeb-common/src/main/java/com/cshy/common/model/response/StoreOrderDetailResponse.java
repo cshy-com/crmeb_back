@@ -46,6 +46,12 @@ public class StoreOrderDetailResponse implements Serializable {
     @ApiModelProperty(value = "邮费")
     private BigDecimal totalPostage;
 
+    @ApiModelProperty(value = "减免邮费")
+    private BigDecimal deductionPostage;
+
+    @ApiModelProperty(value = "商户系统内部的订单号,32个字符内、可包含字母, 其他说明见商户订单号")
+    private String outTradeNo;
+
     @ApiModelProperty(value = "支付方式")
     private String payType;
 

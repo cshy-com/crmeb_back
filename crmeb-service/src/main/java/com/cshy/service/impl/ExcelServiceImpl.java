@@ -18,6 +18,7 @@ import com.cshy.common.model.request.store.StoreOrderSearchRequest;
 import com.cshy.common.model.request.store.StoreProductSearchRequest;
 import com.cshy.common.model.response.StoreOrderDetailResponse;
 import com.cshy.common.model.response.StoreProductResponse;
+import com.cshy.common.model.vo.order.OrderInfoDetailVo;
 import com.cshy.service.service.*;
 import com.cshy.service.service.category.CategoryService;
 import com.cshy.service.service.store.StoreBargainService;
@@ -46,10 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -279,7 +277,7 @@ public class ExcelServiceImpl implements ExcelService {
             vo.setRefundReasonTime(DateUtil.dateToStr(order.getRefundReasonTime(), "yyyy-MM-dd HH:mm:ss"));
             vo.setPaid(order.getPaid() ? "已支付" : "未支付");
             vo.setPayTypeStr(order.getPayTypeStr());
-            vo.setProductName(order.getProductList().stream().map(item -> item.getInfo().getProductName()).collect(Collectors.joining(",")));
+//            vo.setProductName(order.getProductList().stream().map(item -> item.getInfo().getProductName()).collect(Collectors.joining(",")));
             vo.setRealName(order.getRealName());
             vo.setStatusStr(order.getStatusStr().get("value"));
             vo.setRefundStatus(order.getRefundStatus().equals(0) ? "" : order.getRefundStatus().equals(1) ? "退款中" : "已退款");
@@ -289,7 +287,12 @@ public class ExcelServiceImpl implements ExcelService {
                 vo.setTrackingNo("");
             }else {
                 vo.setShippingType(order.getShippingType().equals(1) ? "商家配送" : "门店自提");
+                if (StringUtils.isNotBlank(order.getTrackingNo()) && order.getTrackingNo().contains("zp666"))
+                    vo.setTrackingNo(order.getTrackingNo().replace("zp666,", "").replace(",zp666", ""));
             }
+
+            vo.setDeductionPostage(Objects.isNull(vo.getDeductionPostage()) ? BigDecimal.ZERO : vo.getDeductionPostage());
+
             //核销人
             String clerkName = "";
             if (systemStoreStaffList.containsKey(order.getClerkId())) {
@@ -302,10 +305,26 @@ public class ExcelServiceImpl implements ExcelService {
             userOptional.ifPresent(user -> vo.setUserName(user.getRealName()));
 
             //自提点
-            Optional<SystemStore> systemStoreOptional = systemStoreList.stream().filter(systemStore -> systemStore.getId() == order.getStoreId()).findFirst();
+            Optional<SystemStore> systemStoreOptional = systemStoreList.stream().filter(systemStore -> Objects.equals(systemStore.getId(), order.getStoreId())).findFirst();
             systemStoreOptional.ifPresent(systemStore -> vo.setPickUpAddress(systemStore.getName()));
 
-            voList.add(vo);
+            if (order.getProductList().size() > 1){
+                order.getProductList().forEach(product -> {
+                    OrderExcelVo orderExcelVo = new OrderExcelVo();
+                    BeanUtils.copyProperties(vo, orderExcelVo);
+                    OrderInfoDetailVo info = product.getInfo();
+                    orderExcelVo.setProductName(info.getProductName());
+                    orderExcelVo.setProductPrice(info.getPrice());
+                    orderExcelVo.setPayNum(info.getPayNum());
+                    voList.add(orderExcelVo);
+                });
+            } else {
+                OrderInfoDetailVo info = order.getProductList().get(0).getInfo();
+                vo.setProductPrice(info.getPrice());
+                vo.setProductName(info.getProductName());
+                vo.setPayNum(info.getPayNum());
+                voList.add(vo);
+            }
         }
 
         /*
@@ -323,6 +342,7 @@ public class ExcelServiceImpl implements ExcelService {
         LinkedHashMap<String, String> aliasMap = new LinkedHashMap<>();
         aliasMap.put("orderId", "订单号");
         aliasMap.put("createTime", "下单时间");
+        aliasMap.put("orderType", "订单类型");
         aliasMap.put("paid", "支付状态");
         aliasMap.put("payTime", "支付时间");
         aliasMap.put("totalPrice", "订单总金额");
@@ -334,13 +354,14 @@ public class ExcelServiceImpl implements ExcelService {
         aliasMap.put("deductionPostage", "抵扣运费");
         aliasMap.put("outTradeNo", "商户订单号");
         aliasMap.put("productName", "商品信息");
+        aliasMap.put("productPrice", "商品价格");
+        aliasMap.put("payNum", "购买数量");
         aliasMap.put("statusStr", "订单状态");
         aliasMap.put("payTypeStr", "支付方式");
         aliasMap.put("mark", "买家备注");
         aliasMap.put("verifyCode", "核销码");
         aliasMap.put("realName", "收货人姓名");
         aliasMap.put("userMobile", "收货人电话");
-        aliasMap.put("orderType", "订单类型");
         aliasMap.put("remark", "平台备注");
         aliasMap.put("shippingType", "配送方式");
         aliasMap.put("trackingNo", "快递单号");

@@ -2,6 +2,7 @@ package com.cshy.common.model.vo.order;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 
  */
 @Data
+@Accessors(chain = true)
 public class OrderInfoDetailVo {
 
     /** 商品id */

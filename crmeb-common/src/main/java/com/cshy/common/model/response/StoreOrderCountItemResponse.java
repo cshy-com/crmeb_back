@@ -55,4 +55,7 @@ public class StoreOrderCountItemResponse implements Serializable {
 
     @ApiModelProperty(value = "退货退款")
     private Integer refundNReturn;
+
+    @ApiModelProperty(value = "已取消")
+    private Integer cancel;
 }

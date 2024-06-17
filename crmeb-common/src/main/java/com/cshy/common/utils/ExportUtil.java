@@ -6,6 +6,8 @@ import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.cshy.common.constants.UploadConstants;
 import com.cshy.common.exception.CrmebException;
+import com.cshy.common.model.vo.order.OrderExcelVo;
+import com.cshy.common.model.vo.order.OrderInfoDetailVo;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -69,11 +71,7 @@ public class ExportUtil {
         //设置宽度自适应
         writer.setColumnWidth(-1, 22);
         if (fileName.contains("订单导出")){
-            Sheet sheet = writer.getSheet();
-            writer.autoSizeColumn(9);
-            for (int i = 0; i < sheet.getRow(0).getPhysicalNumberOfCells(); i++) {
-                sheet.autoSizeColumn(i);
-            }
+            mergeOrderCells(writer, aliasMap, voList);
         }
         // 一次性写出内容，使用默认样式，强制输出标题
         writer.write(voList, true);
@@ -81,6 +79,59 @@ public class ExportUtil {
         writer.close();
 
         return newFileName;
+    }
+
+    private static void mergeOrderCells(ExcelWriter writer, LinkedHashMap<String, String> aliasMap, List<?> voList) {
+        Sheet sheet = writer.getSheet();
+        int startRow = 3; // 数据开始的行号（假设第一行是标题行）
+        int endRow = startRow;
+
+        for (int i = 1; i < voList.size(); i++) {
+            Object currentOrder = voList.get(i);
+            Object previousOrder = voList.get(i - 1);
+
+            // 假设 orderId 是订单对象中的一个字段，使用反射获取
+            String currentOrderId = getOrderId(currentOrder);
+            String previousOrderId = getOrderId(previousOrder);
+
+            if (currentOrderId.equals(previousOrderId)) {
+                endRow++;
+            } else {
+                if (startRow != endRow) {
+                    mergeCells(writer, aliasMap, startRow, endRow);
+                }
+                startRow = endRow = i + 3;
+            }
+        }
+
+        if (startRow != endRow) {
+            mergeCells(writer, aliasMap, startRow, endRow);
+        }
+    }
+
+    private static String getOrderId(Object order) {
+        // 使用反射获取 orderId 字段的值（假设 orderId 字段的名称为 "orderId"）
+        try {
+            if (order instanceof OrderExcelVo){
+                OrderExcelVo vo = (OrderExcelVo) order;
+                return vo.getOrderId();
+            }
+            return "";
+        } catch (Exception e) {
+            throw new RuntimeException("获取 orderId 失败", e);
+        }
+    }
+
+    private static void mergeCells(ExcelWriter writer, LinkedHashMap<String, String> aliasMap, int startRow, int endRow) {
+        Sheet sheet = writer.getSheet();
+        int columnIndex = 0;
+
+        for (String key : aliasMap.keySet()) {
+            if (!key.equals("productName") && !key.equals("productPrice") && !key.equals("payNum")) { // 排除商品名称字段
+                sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(startRow, endRow, columnIndex, columnIndex));
+            }
+            columnIndex++;
+        }
     }
 
     /**
