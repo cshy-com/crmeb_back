@@ -298,9 +298,13 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
         //查询商城订单并更新物流状态
         List<StoreOrder> storeOrderList = this.storeOrderService.list(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getStatus, StoreOrderStatusConstants.ORDER_STATUS_INT_SPIKE));
         logger.info("正在同步订单数据， 共{}条", storeOrderList.size());
-        storeOrderList.stream().filter(giftCardOrder -> StringUtils.isNotBlank(giftCardOrder.getTrackingNo())).forEach(storeOrder -> {
+        storeOrderList.stream().filter(storeOrder -> StringUtils.isNotBlank(storeOrder.getTrackingNo())).forEach(storeOrder -> {
             try {
-                this.findExpressDetail(storeOrder.getTrackingNo(), 0, storeOrder.getUserMobile());
+                String[] trackingNoArr = storeOrder.getTrackingNo().split(",");
+                if (trackingNoArr.length == 1 && !trackingNoArr[0].equals("zp666"))
+                    this.findExpressDetail(trackingNoArr[0], 0, storeOrder.getUserMobile());
+                else
+                    Arrays.stream(trackingNoArr).filter(trackingNo -> !trackingNo.equals("zp666")).forEach(trackingNo -> this.findExpressDetail(trackingNo, 0, storeOrder.getUserMobile()));
             } catch (Exception e) {
                 if (!e.getMessage().equals("没有信息"))
                     throw new RuntimeException(e);

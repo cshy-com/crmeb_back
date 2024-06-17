@@ -1,11 +1,20 @@
 package com.cshy.admin.controller.wechat;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.cshy.common.constants.PayType;
+import com.cshy.common.constants.StoreOrderStatusConstants;
+import com.cshy.common.exception.CrmebException;
+import com.cshy.common.model.entity.order.StoreOrder;
+import com.cshy.common.model.entity.user.UserToken;
 import com.cshy.common.model.response.CommonResult;
 import com.cshy.common.model.response.WeChatJsSdkConfigResponse;
 import com.cshy.common.model.vo.wechat.WechatShippingListDto;
 import com.cshy.common.model.vo.wechat.WechatShippingOrderKeyDto;
 import com.cshy.common.model.vo.wechat.WechatUploadShippingInfoDto;
 import com.cshy.common.utils.DateUtil;
+import com.cshy.service.service.store.StoreOrderService;
+import com.cshy.service.service.user.UserService;
+import com.cshy.service.service.user.UserTokenService;
 import com.cshy.service.service.wechat.WechatCommonService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -26,7 +35,6 @@ import java.util.Map;
 
 /**
  * 微信 -- 开放平台 admin
-
  */
 @Slf4j
 @RestController("WeChatAdminController")
@@ -36,6 +44,12 @@ public class WeChatAdminController {
 
     @Autowired
     private WechatCommonService wechatCommonService;
+
+    @Autowired
+    private StoreOrderService storeOrderService;
+
+    @Autowired
+    private UserTokenService userTokenService;
 
     /**
      * 获取微信公众号js配置
@@ -59,36 +73,61 @@ public class WeChatAdminController {
     @ApiOperation(value = "test")
     @RequestMapping(value = "/test", method = RequestMethod.GET)
     public CommonResult<Boolean> uploadShippingInfo() {
-        WechatUploadShippingInfoDto vo = new WechatUploadShippingInfoDto();
-        WechatShippingOrderKeyDto order_key = new WechatShippingOrderKeyDto();
-        order_key.setMchid("1646449278");
-        order_key.setOrder_number_type(1);	// 必填
-        order_key.setOut_trade_no("wxNo59579171818468503074960");
-
-        List<WechatShippingListDto> list = new ArrayList<>();
-        WechatShippingListDto shipping = new WechatShippingListDto();
-        shipping.setExpress_company("null");
-        shipping.setItem_desc("微信气泡狗集线器*1");	// 必填
-        shipping.setTracking_no("无");
-        Map<String, Object> contact = new HashMap<>();
-        contact.put("receiver_contact", "15285143252".replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2"));
-
-        shipping.setContact(contact);
-        list.add(shipping);
-
-        Map<String, Object> payer = new HashMap<>();
-        payer.put("openid", "o70wq5Of-MSUR-ZIn24g2bw67Z8U");
-        vo.setPayer(payer);	// 必填
-
-        vo.setOrder_key(order_key);	// 必填
-        vo.setLogistics_type(1);	// 必填
-        vo.setDelivery_mode(2);		// 必填
-        vo.setIs_all_delivered(true);	// 分拆发货模式时必填
-        vo.setShipping_list(list);	// 必填
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        vo.setUpload_time(simpleDateFormat.format(DateUtil.nowDateTime()));
-        vo.setPayer(payer);	// 必填
-
-        return CommonResult.success(wechatCommonService.uploadShippingInfo(vo));
+        List<StoreOrder> storeOrderList = storeOrderService.list(new LambdaQueryWrapper<StoreOrder>().gt(StoreOrder::getStatus, 1).lt(StoreOrder::getStatus, 4).eq(StoreOrder::getPayType, PayType.PAY_TYPE_WE_CHAT).eq(StoreOrder::getRefundStatus, 0).like(StoreOrder::getOrderId, "order"));
+        System.out.println(storeOrderList);
+        storeOrderList.forEach(storeOrder -> {
+//            WechatUploadShippingInfoDto vo = new WechatUploadShippingInfoDto();
+//            WechatShippingOrderKeyDto order_key = new WechatShippingOrderKeyDto();
+//            order_key.setMchid("1646449278");
+//            order_key.setOrder_number_type(1);    // 必填
+//            order_key.setOut_trade_no(storeOrder.getOutTradeNo());
+//            vo.setOrder_key(order_key);    // 必填
+//
+//            List<WechatShippingListDto> list = new ArrayList<>();
+//            WechatShippingListDto shipping = new WechatShippingListDto();
+//
+//            Map<String, Object> contact = new HashMap<>();
+//            contact.put("receiver_contact", storeOrder.getUserMobile().replaceAll("(\\d{3})\\d{4}(\\d{4})", "$1****$2"));
+//
+//            shipping.setContact(contact);
+//
+//            if (storeOrder.getDeliveryType().equals(StoreOrderStatusConstants.ORDER_LOG_EXPRESS) && storeOrder.getTrackingNo().equals("zp666")){
+//                shipping.setExpress_company("null");
+//                shipping.setItem_desc("系统消息，已收到货请忽略");    // 必填
+//                shipping.setTracking_no("无");
+//                vo.setLogistics_type(2);    // 必填
+//            }
+//            else if (storeOrder.getDeliveryType().equals(StoreOrderStatusConstants.ORDER_LOG_EXPRESS)) {
+//                shipping.setExpress_company("null");
+//                shipping.setItem_desc("系统消息，已收到货请忽略");    // 必填
+//                shipping.setTracking_no("无");
+//                vo.setLogistics_type(1);
+//            } else if (storeOrder.getDeliveryType().equals(StoreOrderStatusConstants.ORDER_LOG_PICKUP)) {
+//                shipping.setExpress_company("null");
+//                shipping.setItem_desc("系统消息，已收到货请忽略");    // 必填
+//                shipping.setTracking_no("无");
+//                vo.setLogistics_type(4);
+//            }
+//            list.add(shipping);
+//
+//            Map<String, Object> payer = new HashMap<>();
+//            UserToken tokenByUserId = userTokenService.getTokenByUserId(storeOrder.getUid(), 2);
+//
+//            payer.put("openid", tokenByUserId.getToken());
+//            vo.setPayer(payer);    // 必填
+//            vo.setDelivery_mode(1);        // 必填
+//            vo.setIs_all_delivered(true);    // 分拆发货模式时必填
+//            vo.setShipping_list(list);    // 必填
+//            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+//            vo.setUpload_time(simpleDateFormat.format(DateUtil.nowDateTime()));
+//            vo.setPayer(payer);    // 必填
+//            try {
+//                wechatCommonService.uploadShippingInfo(vo);
+//            } catch (Exception e) {
+//                if (!e.getMessage().contains("处于不可发货的状态") && !e.getMessage().contains("该笔支付单不属于"))
+//                    throw new CrmebException(vo.getOrder_key().getOut_trade_no() + "=========================" + e.getMessage());
+//            }
+        });
+        return CommonResult.success();
     }
 }
