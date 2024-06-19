@@ -48,6 +48,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
@@ -567,6 +568,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
      * 其余处理放入redis中处理
      */
     @Override
+    @Transactional
     public boolean refund(StoreOrderRefundRequest request) {
         StoreOrder storeOrder = getInfoException(request.getOrderNo());
         if (!storeOrder.getPaid()) {
@@ -606,7 +608,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
             return request.getRefundOrderInfoRequestList().stream().anyMatch(refundOrderInfoRequest ->
                     refundOrderInfoRequest.getOrderInfoId().equals(storeOrderInfo.getId()) && !refundOrderInfoRequest.getRefundNum().equals(storeOrderInfo.getPayNum()));
         }).findFirst();
-        if (!orderInfoOptional.isPresent())
+        if (!orderInfoOptional.isPresent() && storeOrderInfoList.size() == request.getRefundOrderInfoRequestList().size())
             isAllRefund = true;
         if (isAllRefund) {
             //全额退款

@@ -184,7 +184,7 @@ public class StoreOrderVerificationImpl implements StoreOrderVerification {
     public boolean verificationOrderByCode(String vCode) {
         try {
 
-            StoreOrder storeOrder = storeOrderService.getOne(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getVerifyCode, vCode).eq(StoreOrder::getPaid, true).eq(StoreOrder::getRefundStatus, 0));
+            StoreOrder storeOrder = storeOrderService.getOne(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getVerifyCode, vCode).eq(StoreOrder::getPaid, true));
             // 判断当前用户是否有权限核销
             LoginUserVo loginUserVo = SecurityUtil.getLoginUserVo();
             SystemAdmin currentAdmin = loginUserVo.getUser();
