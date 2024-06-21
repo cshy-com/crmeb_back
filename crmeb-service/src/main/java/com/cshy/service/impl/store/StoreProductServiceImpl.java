@@ -210,12 +210,11 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
             StoreProductAttrValue storeProductAttrValuePram = new StoreProductAttrValue();
             storeProductAttrValuePram.setProductId(product.getId()).setType(ProductType.PRODUCT_TYPE_NORMAL);
             List<StoreProductAttrValue> storeProductAttrValues = storeProductAttrValueService.getByEntity(storeProductAttrValuePram);
-            storeProductAttrValues.stream().map(e -> {
+            storeProductAttrValues.forEach(e -> {
                 StoreProductAttrValueResponse response = new StoreProductAttrValueResponse();
                 BeanUtils.copyProperties(e, response);
                 storeProductAttrValueResponse.add(response);
-                return e;
-            }).collect(Collectors.toList());
+            });
             storeProductResponse.setAttrValue(storeProductAttrValueResponse);
             // 处理富文本
             StoreProductDescription sd = storeProductDescriptionService.getOne(

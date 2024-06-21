@@ -17,4 +17,9 @@ public interface StoreProductAttrValueDao extends BaseMapper<StoreProductAttrVal
             "   </if> " +
             " </script>")
     StoreProductAttrValue getById(@Param("id") Integer id, @Param("isDel") Boolean isDel);
+
+    @Select(" <script> " +
+            "   select * from s_product_attr_value where id = #{id} " +
+            " </script>")
+    StoreProductAttrValue get(@Param("id") Integer id);
 }

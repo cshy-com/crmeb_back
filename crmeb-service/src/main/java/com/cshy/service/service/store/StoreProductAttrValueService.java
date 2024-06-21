@@ -86,4 +86,6 @@ public interface StoreProductAttrValueService extends IService<StoreProductAttrV
     List<StoreProductAttrValue> getListByProductIdAndType(Integer productId, Integer type);
 
     StoreProductAttrValue getById(Integer id, Boolean isDel);
+
+    StoreProductAttrValue get(Integer id);
 }

@@ -47,6 +47,7 @@ public class StoreOrderInfoOldVo implements Serializable {
     @TableField(value = "`unique`")
     private String unique;
 
-
+    @ApiModelProperty(value = "商品编号")
+    private String barCode;
 
 }

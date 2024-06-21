@@ -197,5 +197,12 @@ public class StoreProductAttrValueServiceImpl extends ServiceImpl<StoreProductAt
         return one;
 
     }
+
+    @Override
+    public StoreProductAttrValue get(Integer id) {
+        StoreProductAttrValue one = dao.get(id);
+        return one;
+
+    }
 }
 

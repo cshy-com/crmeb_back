@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.*;
 import com.cshy.common.model.entity.order.StoreOrderInfo;
+import com.cshy.common.model.entity.product.StoreProductAttrValue;
 import com.cshy.common.model.entity.system.*;
 import com.cshy.common.model.request.*;
 import com.cshy.common.model.request.order.RefundOrderInfoRequest;
@@ -139,6 +140,9 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
 
     @Autowired
     private SystemRoleMenuService systemRoleMenuService;
+
+    @Autowired
+    private StoreProductAttrValueService storeProductAttrValueService;
 
     /**
      * 列表
@@ -357,7 +361,15 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
             StoreOrderDetailResponse storeOrderItemResponse = new StoreOrderDetailResponse();
             BeanUtils.copyProperties(storeOrder, storeOrderItemResponse);
 
-            storeOrderItemResponse.setProductList(orderInfoList.get(storeOrder.getId()));
+            List<StoreOrderInfoOldVo> storeOrderInfoOldVoList = orderInfoList.get(storeOrder.getId());
+            if (CollUtil.isNotEmpty(storeOrderInfoOldVoList))
+                storeOrderInfoOldVoList.forEach(storeOrderInfoOldVo -> {
+                    StoreProductAttrValue productAttrValue = storeProductAttrValueService.get(storeOrderInfoOldVo.getInfo().getAttrValueId());
+                    if (Objects.nonNull(productAttrValue))
+                        storeOrderInfoOldVo.setBarCode(productAttrValue.getBarCode());
+                });
+
+            storeOrderItemResponse.setProductList(storeOrderInfoOldVoList);
 
             //订单状态
             storeOrderItemResponse.setStatusStr(getStatus(storeOrder));
