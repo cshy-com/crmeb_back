@@ -217,6 +217,7 @@ public class ExpressServiceImpl extends ServiceImpl<ExpressDao, Express> impleme
         return express;
     }
 
+
     @Override
     public ExpressDetailVo findExpressDetail(String trackingNo, Integer type, String mobile) {
         String urlSend = ExpressConstants.HOST + ExpressConstants.QUERY_PATH + "?no=" + trackingNo + "&type=";
