@@ -2396,6 +2396,7 @@ public class OrderServiceImpl implements OrderService {
                         BigDecimal freeNum = shippingTemplatesFree.getNumber();
                         if (new BigDecimal(totalNum).compareTo(freeNum) >= 0 && totalPrice.compareTo(shippingTemplatesFree.getPrice()) >= 0) {
                             // 满足件数 + 金额 = 包邮
+                            orderInfoVo.setFreightFee(BigDecimal.ZERO);
                             return;
                         }
                     }
