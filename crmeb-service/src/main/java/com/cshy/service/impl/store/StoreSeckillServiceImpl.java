@@ -109,6 +109,8 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
      */
     @Override
     public PageInfo<StoreSeckillResponse> getList(StoreSeckillSearchRequest request, PageParamRequest pageParamRequest) {
+        List<StoreSeckillManagerResponse> storeSeckillMangerServiceList = storeSeckillMangerService.getAllList().stream().filter(storeSeckillManger -> storeSeckillManger.getType().equals(request.getType())).collect(Collectors.toList());
+
         //带 StoreSeckill 类的多条件查询
         Page<StoreSeckill> storeSeckillProductPage = PageHelper.startPage(pageParamRequest.getPage(), pageParamRequest.getLimit());
 
@@ -127,7 +129,6 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
         }
 
         //查询所有秒杀配置
-        List<StoreSeckillManagerResponse> storeSeckillMangerServiceList = storeSeckillMangerService.getAllList().stream().filter(storeSeckillManger -> storeSeckillManger.getType().equals(request.getType())).collect(Collectors.toList());
         List<Integer> storeSeckillMangerIdList = storeSeckillMangerServiceList.stream().map(StoreSeckillManagerResponse::getId).collect(Collectors.toList());
         if (CollUtil.isEmpty(storeSeckillMangerIdList))
             throw new CrmebException("未查询到开启的" + (null != request.getType() && request.getType() == 0 ? "活动" : "秒杀") + "配置");

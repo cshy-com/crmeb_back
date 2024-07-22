@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +38,7 @@ public class StoreSeckillMangerController {
      */
     @ApiOperation(value = "分页列表") //配合swagger使用
     @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @PreAuthorize("hasAuthority('admin:seckill:manger:info')")
     public CommonResult<CommonPage<StoreSeckillManagerResponse>>  getList(
             @Validated StoreSeckillMangerSearchRequest request, @Validated PageParamRequest pageParamRequest) {
         return CommonResult.success(CommonPage.restPage(storeSeckillMangerService.page(request, pageParamRequest)));
@@ -48,6 +50,7 @@ public class StoreSeckillMangerController {
      */
     @ApiOperation(value = "新增")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
+    @PreAuthorize("hasAuthority('admin:seckill:manger:save')")
     public CommonResult<String> save(@RequestBody @Validated StoreSeckillMangerRequest storeSeckillMangerRequest) {
         if (storeSeckillMangerService.saveManger(storeSeckillMangerRequest)) {
             return CommonResult.success();
@@ -63,6 +66,7 @@ public class StoreSeckillMangerController {
      */
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
+    @PreAuthorize("hasAuthority('admin:seckill:manger:delete')")
     public CommonResult<String> delete(@RequestParam(value = "id") Integer id) {
         if (storeSeckillMangerService.deleteLogicById(id)) {
             return CommonResult.success();
@@ -78,6 +82,7 @@ public class StoreSeckillMangerController {
      */
     @ApiOperation(value = "修改")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @PreAuthorize("hasAuthority('admin:seckill:manger:update')")
     public CommonResult<String> update(@RequestParam Integer id, @RequestBody @Validated StoreSeckillMangerRequest storeSeckillMangerRequest) {
         storeSeckillMangerService.update(id, storeSeckillMangerRequest);
         return CommonResult.success();
@@ -89,6 +94,7 @@ public class StoreSeckillMangerController {
      */
     @ApiOperation(value = "详情")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
+    @PreAuthorize("hasAuthority('admin:seckill:manger:info')")
     public CommonResult<StoreSeckillManagerResponse> info(@RequestParam(value = "id") Integer id) {
         return CommonResult.success(storeSeckillMangerService.detail(id));
    }
@@ -105,11 +111,10 @@ public class StoreSeckillMangerController {
            @ApiImplicitParam(name = "id", value = "秒杀配置id", dataType = "int", required = true),
            @ApiImplicitParam(name = "status", value = "状态", dataType = "boolean", required = true)
    })
+   @PreAuthorize("hasAuthority('admin:seckill:manger:update:status')")
    public CommonResult<Object> updateStatus(@PathVariable(value = "id") Integer id, Boolean status) {
         return CommonResult.success(storeSeckillMangerService.updateStatus(id,status));
    }
-
-
 }
 
 

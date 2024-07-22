@@ -37,6 +37,7 @@ public class StoreSeckillController {
      */
     @ApiOperation(value = "分页列表") //配合swagger使用
     @RequestMapping(value = "/list", method = RequestMethod.GET)
+    @PreAuthorize("hasAuthority('admin:seckill:info')")
     public CommonResult<CommonPage<StoreSeckillResponse>>  getList(@Validated StoreSeckillSearchRequest request, @Validated PageParamRequest pageParamRequest) {
         CommonPage<StoreSeckillResponse> storeSeckillCommonPage =
                 CommonPage.restPage(storeSeckillService.getList(request, pageParamRequest));
@@ -49,6 +50,7 @@ public class StoreSeckillController {
      */
     @ApiOperation(value = "新增")
     @RequestMapping(value = "/save", method = RequestMethod.POST)
+    @PreAuthorize("hasAuthority('admin:seckill:save')")
     public CommonResult<String> save(@RequestBody @Validated StoreSeckillAddRequest storeSeckillRequest) {
         if (storeSeckillService.saveSeckill(storeSeckillRequest)) {
             return CommonResult.success();
@@ -63,6 +65,7 @@ public class StoreSeckillController {
      */
     @ApiOperation(value = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
+    @PreAuthorize("hasAuthority('admin:seckill:delete')")
     public CommonResult<String> delete(@RequestParam(value = "id") Integer id) {
         if (storeSeckillService.deleteById(id)) {
             return CommonResult.success();
@@ -77,6 +80,7 @@ public class StoreSeckillController {
      */
     @ApiOperation(value = "修改")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @PreAuthorize("hasAuthority('admin:seckill:update')")
     public CommonResult<String> update(@RequestBody @Validated StoreSeckillAddRequest storeSeckillRequest) {
         if (storeSeckillService.updateSeckill(storeSeckillRequest)) {
             return CommonResult.success();
@@ -87,6 +91,7 @@ public class StoreSeckillController {
 
     @ApiOperation(value = "修改秒杀商品状态")
     @RequestMapping(value = "/update/status", method = RequestMethod.POST)
+    @PreAuthorize("hasAuthority('admin:seckill:update:status')")
     public CommonResult<String> updateStatus(@RequestParam @Validated Integer id, @RequestParam @Validated boolean status) {
         if (storeSeckillService.updateSecKillStatus(id,status)) {
             return CommonResult.success();
@@ -101,6 +106,7 @@ public class StoreSeckillController {
      */
     @ApiOperation(value = "详情")
     @RequestMapping(value = "/info", method = RequestMethod.GET)
+    @PreAuthorize("hasAuthority('admin:seckill:info')")
     public CommonResult<StoreProductInfoResponse> info(@RequestParam(value = "id") Integer id) {
         StoreProductInfoResponse storeSeckill = storeSeckillService.getDetailAdmin(id);
         return CommonResult.success(storeSeckill);
