@@ -169,6 +169,9 @@ public class StoreProduct extends Model<StoreProduct> implements Serializable {
     @TableField(exist = false)
     private String content;
 
+    @ApiModelProperty(value = "供应商名称")
+    private String supplier;
+
     @ApiModelProperty(value = "收藏量")
     @TableField(exist = false)
     private Integer collectNum;

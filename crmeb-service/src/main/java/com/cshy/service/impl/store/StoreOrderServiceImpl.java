@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cshy.common.constants.*;
 import com.cshy.common.model.entity.order.StoreOrderInfo;
+import com.cshy.common.model.entity.product.StoreProduct;
 import com.cshy.common.model.entity.product.StoreProductAttrValue;
 import com.cshy.common.model.entity.system.*;
 import com.cshy.common.model.request.*;
@@ -143,6 +144,9 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
 
     @Autowired
     private StoreProductAttrValueService storeProductAttrValueService;
+
+    @Autowired
+    private StoreProductService storeProductService;
 
     /**
      * 列表
@@ -364,6 +368,9 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
             List<StoreOrderInfoOldVo> storeOrderInfoOldVoList = orderInfoList.get(storeOrder.getId());
             if (CollUtil.isNotEmpty(storeOrderInfoOldVoList))
                 storeOrderInfoOldVoList.forEach(storeOrderInfoOldVo -> {
+                    StoreProduct storeProduct = storeProductService.getOne(new LambdaQueryWrapper<StoreProduct>().eq(StoreProduct::getId, storeOrderInfoOldVo.getProductId()));
+                    if (Objects.nonNull(storeProduct))
+                        storeOrderInfoOldVo.setSupplier(storeProduct.getSupplier());
                     StoreProductAttrValue productAttrValue = storeProductAttrValueService.get(storeOrderInfoOldVo.getInfo().getAttrValueId());
                     if (Objects.nonNull(productAttrValue))
                         storeOrderInfoOldVo.setBarCode(productAttrValue.getBarCode());

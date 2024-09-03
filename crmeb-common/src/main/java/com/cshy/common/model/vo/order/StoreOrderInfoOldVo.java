@@ -50,4 +50,7 @@ public class StoreOrderInfoOldVo implements Serializable {
     @ApiModelProperty(value = "商品编号")
     private String barCode;
 
+    @ApiModelProperty(value = "供应商名称")
+    private String supplier;
+
 }

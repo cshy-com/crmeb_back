@@ -127,7 +127,7 @@ public class ExportUtil {
         int columnIndex = 0;
 
         for (String key : aliasMap.keySet()) {
-            if (!key.equals("productName") && !key.equals("productPrice") && !key.equals("payNum")) { // 排除商品名称字段
+            if (!key.equals("productName") && !key.equals("productPrice") && !key.equals("payNum") && !key.equals("supplier")) { // 排除商品名称字段
                 sheet.addMergedRegion(new org.apache.poi.ss.util.CellRangeAddress(startRow, endRow, columnIndex, columnIndex));
             }
             columnIndex++;

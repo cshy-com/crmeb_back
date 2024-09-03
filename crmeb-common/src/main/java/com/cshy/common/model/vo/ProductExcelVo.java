@@ -41,4 +41,7 @@ public class ProductExcelVo implements Serializable {
 
     @ApiModelProperty(value = "浏览量")
     private String browse;
+
+    @ApiModelProperty(value = "供应商名称")
+    private String supplier;
 }

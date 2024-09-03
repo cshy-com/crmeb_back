@@ -260,4 +260,7 @@ public class StoreProductResponse implements Serializable {
 
     @ApiModelProperty(value = "砍价结束时间")
     private Long endTime;
+
+    @ApiModelProperty(value = "供应商名称")
+    private String supplier;
 }

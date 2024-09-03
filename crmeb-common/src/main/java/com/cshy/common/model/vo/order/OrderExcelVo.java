@@ -133,6 +133,9 @@ public class OrderExcelVo implements Serializable {
     @ApiModelProperty(value = "用户真实姓名")
     private String userName;
 
+    @ApiModelProperty(value = "供应商名称")
+    private String supplier;
+
 //    @ApiModelProperty(value = "订单类型:0-普通订单，1-视频号订单")
 //    private String type;
 //

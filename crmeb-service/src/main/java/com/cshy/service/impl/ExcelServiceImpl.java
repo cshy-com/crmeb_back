@@ -215,6 +215,7 @@ public class ExcelServiceImpl implements ExcelService {
             vo.setStock(product.getStock().toString());
             vo.setSales(product.getSales().toString());
             vo.setBrowse(product.getBrowse().toString());
+            vo.setSupplier(product.getSupplier());
             voList.add(vo);
         }
 
@@ -237,6 +238,7 @@ public class ExcelServiceImpl implements ExcelService {
         aliasMap.put("price", "价格");
         aliasMap.put("stock", "库存");
         aliasMap.put("sales", "销量");
+        aliasMap.put("supplier", "供应商名称");
         aliasMap.put("browse", "浏览量");
 
         return ExportUtil.exportExcel(fileName, "商品导出", voList, aliasMap);
@@ -316,6 +318,7 @@ public class ExcelServiceImpl implements ExcelService {
                     orderExcelVo.setProductName(info.getProductName());
                     orderExcelVo.setProductPrice(info.getPrice());
                     orderExcelVo.setPayNum(info.getPayNum());
+                    orderExcelVo.setSupplier(product.getSupplier());
                     voList.add(orderExcelVo);
                 });
             } else {
@@ -323,6 +326,7 @@ public class ExcelServiceImpl implements ExcelService {
                 vo.setProductPrice(info.getPrice());
                 vo.setProductName(info.getProductName());
                 vo.setPayNum(info.getPayNum());
+                vo.setSupplier(order.getProductList().get(0).getSupplier());
                 voList.add(vo);
             }
         }
@@ -355,6 +359,7 @@ public class ExcelServiceImpl implements ExcelService {
         aliasMap.put("outTradeNo", "商户订单号");
         aliasMap.put("productName", "商品信息");
         aliasMap.put("productPrice", "商品价格");
+        aliasMap.put("supplier", "供应商名称");
         aliasMap.put("payNum", "购买数量");
         aliasMap.put("statusStr", "订单状态");
         aliasMap.put("payTypeStr", "支付方式");
