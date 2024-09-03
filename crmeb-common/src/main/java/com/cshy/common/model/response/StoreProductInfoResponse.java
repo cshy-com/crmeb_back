@@ -167,4 +167,7 @@ public class StoreProductInfoResponse implements Serializable {
 
     @ApiModelProperty(value = "是否商家配送")
     private Boolean isDeliver;
+
+    @ApiModelProperty(value = "供应商名称")
+    private String supplier;
 }
