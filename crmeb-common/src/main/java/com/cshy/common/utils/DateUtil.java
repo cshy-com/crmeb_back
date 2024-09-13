@@ -441,12 +441,31 @@ public final class DateUtil {
         return endSdf.format(c.getTime());
     }
 
-    public static dateLimitUtilVo getDateLimit(String data){
+    public static dateLimitUtilVo getDateLimit(String data) {
         //时间计算
         String startTime = null;
         String endTime = DateUtil.nowDateTime(DateConstants.DATE_FORMAT);
         String day = DateUtil.nowDateTime(DateConstants.DATE_FORMAT_START);
         String end = DateUtil.nowDateTime(DateConstants.DATE_FORMAT_END);
+
+        SimpleDateFormat sdf = new SimpleDateFormat(DateConstants.DATE_FORMAT);
+
+        // 解析时间字符串
+        try {
+            Date dayDate = sdf.parse(day);
+            Date endDate = sdf.parse(end);
+            Calendar calendarDay = Calendar.getInstance();
+            calendarDay.setTime(dayDate);
+            calendarDay.add(Calendar.HOUR_OF_DAY, -8);  // 减去 9 小时
+            day = sdf.format(calendarDay.getTime());
+
+            Calendar calendarEnd = Calendar.getInstance();
+            calendarEnd.setTime(endDate);
+            calendarEnd.add(Calendar.HOUR_OF_DAY, -8);  // 减去 9 小时
+            end = sdf.format(calendarEnd.getTime());
+        }catch (Exception e) {
+            throw new CrmebException("时间解析错误");
+        }
 
         if(!StringUtils.isBlank(data)){
             switch (data){
@@ -454,11 +473,11 @@ public final class DateUtil {
                     startTime = day;
                     break;
                 case DateConstants.SEARCH_DATE_YESTERDAY:
-                    startTime = DateUtil.addDay(day, -1, DateConstants.DATE_FORMAT_START);
-                    endTime = DateUtil.addDay(end, -1, DateConstants.DATE_FORMAT_END);
+                    startTime = DateUtil.addDay(day, -1, DateConstants.DATE_FORMAT);
+                    endTime = DateUtil.addDay(end, -1, DateConstants.DATE_FORMAT);
                     break;
                 case DateConstants.SEARCH_DATE_LATELY_7:
-                    startTime = DateUtil.addDay(day, -6, DateConstants.DATE_FORMAT_START);
+                    startTime = DateUtil.addDay(day, -6, DateConstants.DATE_FORMAT);
                     break;
                 case DateConstants.SEARCH_DATE_WEEK:
                     startTime = getWeekStartDay();
@@ -469,7 +488,7 @@ public final class DateUtil {
                     endTime = getLastWeekEndDay();
                     break;
                 case DateConstants.SEARCH_DATE_LATELY_30:
-                    startTime = DateUtil.addDay(day, -30, DateConstants.DATE_FORMAT_START);
+                    startTime = DateUtil.addDay(day, -30, DateConstants.DATE_FORMAT);
                     break;
                 case DateConstants.SEARCH_DATE_MONTH:
                     startTime = DateUtil.nowDateTime(DateConstants.DATE_FORMAT_MONTH_START);

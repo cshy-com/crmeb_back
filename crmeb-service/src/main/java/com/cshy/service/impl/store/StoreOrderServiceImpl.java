@@ -56,6 +56,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -547,7 +548,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
     }
 
     @Override
-    public BigDecimal getSumBigDecimal(Integer userId, String date) {
+    public BigDecimal getSumBigDecimal(Integer userId, String date) throws ParseException {
         QueryWrapper<StoreOrder> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("sum(pay_price) as pay_price").
                 eq("paid", 1).
@@ -566,7 +567,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
         return storeOrder.getPayPrice();
     }
 
-    public List<StoreOrder> getOrderGroupByDate(String date, int lefTime) {
+    public List<StoreOrder> getOrderGroupByDate(String date, int lefTime)  {
         QueryWrapper<StoreOrder> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("sum(pay_price) as pay_price", "left(create_time, " + lefTime + ") as orderId", "count(id) as id");
         if (StringUtils.isNotBlank(date)) {
@@ -1151,7 +1152,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
      * @return BigDecimal
      */
     @Override
-    public BigDecimal getSumPayPriceByUidAndDate(Integer userId, String date) {
+    public BigDecimal getSumPayPriceByUidAndDate(Integer userId, String date){
         LambdaQueryWrapper<StoreOrder> lqw = Wrappers.lambdaQuery();
         lqw.select(StoreOrder::getPayPrice);
         lqw.eq(StoreOrder::getPaid, true);
@@ -1518,7 +1519,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
      * 获取退款中订单数量
      */
     @Override
-    public Integer getRefundingNum() {
+    public Integer getRefundingNum() throws ParseException {
         return getCount("", StoreOrderStatusConstants.ORDER_STATUS_REFUNDING);
     }
 
@@ -1526,7 +1527,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
      * 获取待核销订单数量
      */
     @Override
-    public Integer getNotWriteOffNum() {
+    public Integer getNotWriteOffNum() throws ParseException {
         return getCount("", StoreOrderStatusConstants.ORDER_STATUS_TOBE_WRITTEN_OFF);
     }
 
@@ -1993,7 +1994,7 @@ public class StoreOrderServiceImpl extends ServiceImpl<StoreOrderDao, StoreOrder
      * @param type      支付类型
      * @return Integer
      */
-    private BigDecimal getAmount(String dateLimit, String type) {
+    private BigDecimal getAmount(String dateLimit, String type){
         QueryWrapper<StoreOrder> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("sum(pay_price) as pay_price");
         if (StringUtils.isNotBlank(type)) {

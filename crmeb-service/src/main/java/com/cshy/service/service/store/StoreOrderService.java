@@ -12,6 +12,7 @@ import com.cshy.common.model.response.*;
 import com.cshy.common.model.vo.ExpressSheetVo;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public interface StoreOrderService extends IService<StoreOrder> {
      */
     SystemWriteOffOrderResponse getWriteOffList(SystemWriteOffOrderSearchRequest request, PageParamRequest pageParamRequest);
 
-    BigDecimal getSumBigDecimal(Integer userId, String date);
+    BigDecimal getSumBigDecimal(Integer userId, String date) throws ParseException;
 
     /**
      * H5订单列表
@@ -346,12 +347,12 @@ public interface StoreOrderService extends IService<StoreOrder> {
     /**
      * 获取退款中订单数量
      */
-    Integer getRefundingNum();
+    Integer getRefundingNum() throws ParseException;
 
     /**
      * 获取待核销订单数量
      */
-    Integer getNotWriteOffNum();
+    Integer getNotWriteOffNum() throws ParseException;
 
     /**
      * 获取佣金相关数据

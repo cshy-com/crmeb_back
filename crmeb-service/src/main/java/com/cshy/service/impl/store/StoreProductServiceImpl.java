@@ -275,7 +275,10 @@ public class StoreProductServiceImpl extends ServiceImpl<StoreProductDao, StoreP
         storeProduct.setAddTime(DateUtil.getNowTime());
         storeProduct.setIsShow(false);
 
-        // 设置Acticity活动
+        if (Objects.isNull(request.getGiveIntegral()))
+            storeProduct.setGiveIntegral(BigDecimal.ZERO);
+
+        // 设置Activity活动
         storeProduct.setActivity(getProductActivityStr(request.getActivity()));
 
         //主图
